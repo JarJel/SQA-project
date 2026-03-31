@@ -1,2 +1,1 @@
 # SQA-project
-# SISTEM BRANGKAS
