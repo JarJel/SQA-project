@@ -1,26 +1,42 @@
-# Use Case Diagram
+# Use Case Diagram - Sistem Pemesanan Café
+
+Diagram ini mendefinisikan interaksi antara aktor (Customer & Admin) dengan fungsionalitas sistem.
 
 ```mermaid
-useCaseDiagram
-    actor "Customer" as C
-    actor "Admin" as A
+graph LR
+    %% Definisi Aktor
+    Customer((Customer))
+    Admin((Admin))
 
-    package "Sistem Pemesanan Café" {
-        usecase "Register/Login" as UC1
-        usecase "Lihat Menu" as UC2
-        usecase "Tambah ke Keranjang" as UC3
-        usecase "Checkout & Pilih Tipe" as UC4
-        usecase "Bayar (Cashless)" as UC5
-        usecase "Kelola Menu (CRUD)" as UC6
-        usecase "Update Status Pesanan" as UC7
-    }
+    subgraph "Sistem Pemesanan Café"
+        UC1(Register / Login)
+        UC2(Lihat Menu)
+        UC3(Tambah ke Keranjang)
+        UC4(Checkout & Pilih Tipe)
+        UC5(Bayar Cashless)
+        UC6(Kelola Menu CRUD)
+        UC7(Update Status Pesanan)
+    end
 
-    C --> UC1
-    C --> UC2
-    C --> UC3
-    C --> UC4
-    C --> UC5
+    %% Relasi Customer
+    Customer --- UC1
+    Customer --- UC2
+    Customer --- UC3
+    Customer --- UC4
+    Customer --- UC5
+
+    %% Relasi Admin
+    Admin --- UC1
+    Admin --- UC6
+    Admin --- UC7
     
-    A --> UC1
-    A --> UC6
-    A --> UC7
+    %% Styling agar lebih rapi
+    style Customer fill:#f9f,stroke:#333,stroke-width:2px
+    style Admin fill:#bbf,stroke:#333,stroke-width:2px
+    style UC1 fill:#fff,stroke:#333
+    style UC2 fill:#fff,stroke:#333
+    style UC3 fill:#fff,stroke:#333
+    style UC4 fill:#fff,stroke:#333
+    style UC5 fill:#fff,stroke:#333
+    style UC6 fill:#fff,stroke:#333
+    style UC7 fill:#fff,stroke:#333
