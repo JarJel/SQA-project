@@ -1,1 +1,12 @@
+# 1.2 Latar Belakang
 
+### 1.2.1 Evolusi Digital Sektor F&B
+Industri *Food and Beverage* (F&B), khususnya café dan restoran, saat ini tengah menghadapi tantangan transformasi digital yang sangat masif. Di era yang menuntut kecepatan dan efisiensi, metode pelayanan konvensional yang mengandalkan pencatatan manual di atas kertas mulai dianggap tidak efektif. Kendala umum seperti antrean panjang di kasir, kesalahan manusia (*human error*) dalam mencatat pesanan, serta keterlambatan dalam memperbarui stok menu menjadi hambatan utama dalam perkembangan bisnis.
+
+### 1.2.2 Urgensi Sistem Pemesanan Mandiri
+Pengembangan **Sistem Pemesanan Café Berbasis Web** ini lahir sebagai solusi inovatif untuk mendigitalisasi seluruh ekosistem transaksi di café. Dengan memberikan kemampuan bagi pelanggan untuk melakukan pemesanan dan pembayaran langsung dari meja mereka (via smartphone), café dapat meningkatkan produktivitas staf dan mempercepat *turnover* pelanggan. Sistem ini tidak hanya mempermudah sisi pelanggan, tetapi juga memberikan alat kendali yang kuat bagi pemilik café untuk memantau performa bisnis melalui *dashboard* admin yang terpusat.
+
+### 1.2.3 Mengapa Pengujian Begitu Penting?
+Meskipun solusi digital menawarkan kemudahan, kegagalan teknis pada sistem dapat berakibat fatal. Bayangkan kondisi di mana sistem mengalami *down* pada saat jam sibuk (*peak hours*), atau lebih buruk lagi, terjadi kesalahan dalam kalkulasi pembayaran pelanggan. Hal ini tidak hanya menyebabkan kerugian finansial secara langsung, tetapi juga menghancurkan reputasi merek dan kepercayaan pelanggan.
+
+Oleh karena itu, fase **Software Testing** dalam proyek ini bukan sekadar formalitas, melainkan kebutuhan fundamental. Tanpa pengujian yang ketat, aplikasi berisiko mengandung *bug* yang tersembunyi yang mungkin hanya muncul saat beban transaksi sedang tinggi. Dokumentasi rencana pengujian ini adalah bentuk komitmen tim pengembang untuk memberikan produk yang stabil, aman, dan dapat diandalkan, sehingga transisi café dari sistem manual ke digital dapat berjalan dengan sukses tanpa kendala teknis yang berarti.
