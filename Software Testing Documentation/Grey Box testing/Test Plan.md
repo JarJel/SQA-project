@@ -125,3 +125,43 @@ Berdasarkan pemahaman struktur internal:
 - Tambahkan constraint:
   ```sql
   CHECK (amount >= 0)
+
+
+## 11. Grey Box Testing (Kombinasi / Integrasi)
+
+Pengujian ini berfokus pada integrasi antara **antarmuka pengguna (React.js)** dengan **struktur internal sistem (Laravel API & MySQL Database)**.
+
+Pendekatan dilakukan dengan memahami sebagian alur sistem seperti:
+- Struktur database (tabel transaksi, user, anggaran)
+- Endpoint API dan format request/response
+- Logika bisnis pada backend
+
+---
+
+### 11.1 Data Integrity Testing
+
+Pengujian ini memastikan bahwa data yang diinput melalui UI tersimpan dengan benar dan konsisten di database.
+
+#### ✅ Skenario Pengujian
+
+| No | Skenario | Input | Expected Result | Status |
+|----|---------|------|----------------|--------|
+| 1 | Tambah income | 1.000.000 | Data tersimpan & saldo bertambah | ✅ |
+| 2 | Input negatif | -50000 | Ditolak sistem | ❌ |
+| 3 | Transfer antar dompet | 2 akun | Saldo sinkron | ❌ |
+
+#### 🔎 Analisis
+- Ditemukan bahwa nilai negatif masih masuk ke database  
+- Tidak ada validasi constraint pada kolom nominal  
+- Sinkronisasi saldo tidak berjalan secara atomic  
+
+#### 📌 Contoh Struktur Tabel (Simplified)
+
+```sql
+TABLE transactions (
+  id INT PRIMARY KEY,
+  user_id INT,
+  type ENUM('income','expense'),
+  amount DECIMAL,
+  created_at TIMESTAMP
+);
