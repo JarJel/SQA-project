@@ -1,6 +1,6 @@
-Komponen Analisis,Penjelasan Detail Pengujian,Contoh Implementasi pada Sistem Café
-Fokus Utama,"Memverifikasi alur logika program, struktur percabangan (if-else), dan pengulangan (looping).",Memeriksa fungsi if (payment_status == 'paid') di dalam backend.
-Kualitas Kode,Memastikan tidak ada dead code (kode yang tidak terpakai) dan efisiensi algoritma.,Mengoptimalkan kueri SQL untuk pengambilan data menu yang banyak.
-Statement Coverage,Menjamin bahwa setiap baris kode telah dieksekusi minimal satu kali saat pengujian.,Mengetes jalur kode saat sistem gagal terhubung ke Payment Gateway.
-Security Review,"Memeriksa celah keamanan dari dalam kode, seperti proteksi terhadap SQL Injection.",Memastikan penggunaan Prepared Statements pada form input login.
-Kelebihan,Mampu menemukan error tersembunyi di level logika yang tidak terlihat oleh pengguna.,Mendeteksi variabel yang lupa didefinisikan sebelum digunakan.
+Aspek Pengujian,Deskripsi Teknis Pelaksanaan,Target Output & Validasi
+Logika Percabangan,Memeriksa jalur logika if-else dan switch-case dalam kode backend untuk proses transaksi.,"Menjamin semua kondisi logika (misal: Diskon, Pajak, Ongkir) dieksekusi dengan kalkulasi yang akurat."
+Security Code Review,Melakukan audit pada kode program untuk mencari celah keamanan seperti Hardcoded Credentials.,Memastikan variabel sensitif disimpan dalam environment variable dan tidak terekspos di kode sumber.
+Database Query,Menguji efisiensi kueri SQL yang digunakan untuk mengambil data menu dan menyimpan pesanan.,Kueri berjalan optimal (High Performance) dan tidak menyebabkan beban berlebih pada server database.
+Unit Testing Logic,Menguji fungsi-fungsi mandiri seperti fungsi hitung total harga atau fungsi validasi stok.,Fungsi mengembalikan nilai yang benar saat diberikan input parameter yang bervariasi.
+Code Coverage,Memastikan hampir seluruh baris kode kritikal telah dilewati oleh proses eksekusi pengujian.,Minimal 80% dari jalur logika utama sistem telah terverifikasi kebenarannya melalui pengujian unit.
