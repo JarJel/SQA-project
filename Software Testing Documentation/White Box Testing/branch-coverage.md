@@ -10,4 +10,4 @@ Memastikan semua kondisi diuji.
 if (x > 10) → diuji true dan false
 
 ## Kesimpulan
-Branch Coverage memastikan semua keputusan dalam kode berjalan.
+Branch Coverage memastikan semua keputusan dalam kode berjalan
