@@ -1,1 +1,10 @@
+### **2.7 Asumsi dan Ketergantungan**
 
+Bagian ini menjelaskan faktor-faktor yang diasumsikan benar dan ketergantungan eksternal yang memengaruhi keberhasilan operasional aplikasi SAPOPOE:
+
+* **Ketersediaan Perangkat Lunak Pendukung**: Diasumsikan bahwa server telah terinstalasi perangkat lunak pendukung dengan versi yang sesuai, seperti PHP 8.x, Framework Laravel, dan MySQL, agar fitur-fitur aplikasi dapat berjalan tanpa kendala teknis.
+* **Integritas Data Awal**: Diasumsikan bahwa data awal yang dimasukkan oleh pengguna (seperti saldo awal pada tabel tabungan atau nominal hutang) adalah data yang valid dan akurat, karena sistem tidak melakukan verifikasi ke pihak eksternal seperti institusi perbankan.
+* **Keamanan Perangkat Pengguna**: Diasumsikan bahwa perangkat yang digunakan oleh pengguna (PC atau Smartphone) bebas dari perangkat lunak berbahaya (*malware*) yang dapat mencuri informasi login atau memanipulasi tampilan antarmuka aplikasi.
+* **Kapasitas Server**: Operasional aplikasi sangat bergantung pada penyedia layanan hos (*hosting*) atau infrastruktur server kampus; gangguan pada penyedia layanan tersebut akan menyebabkan aplikasi tidak dapat diakses secara keseluruhan.
+* **Kepatuhan Protokol HTTP/HTTPS**: Aplikasi bergantung pada protokol komunikasi web standar; jika terdapat pemblokiran port atau gangguan pada protokol jaringan di lingkungan pengguna, maka koneksi ke database tidak dapat terjalin.
+* **Pemeliharaan Mandiri**: Ketergantungan aplikasi pada keberlanjutan data bergantung pada kedisiplinan pengguna dalam melakukan pencatatan transaksi secara rutin agar laporan anggaran dan target impian tetap relevan.
