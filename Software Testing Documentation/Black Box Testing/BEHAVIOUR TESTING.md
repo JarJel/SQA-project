@@ -7,7 +7,7 @@ Pengujian yang berfokus pada bagaimana aplikasi merespons tindakan pengguna berd
 * Menyelaraskan antara kode teknis dengan keinginan pengguna/stakeholder.
 * Memastikan alur logika bisnis berjalan secara alami.
 
-** Digunakan Pada**
+**Digunakan Pada**
 * Fitur interaktif (misal: proses registrasi, transaksi belanja).
 * Pengembangan dengan metodologi Agile atau BDD.
 
