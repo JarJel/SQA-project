@@ -1,5 +1,5 @@
-**1. SAMPLE TESTING**
-**### Deskripsi**
+**SAMPLE TESTING**
+**Deskripsi**
 Teknik pengujian yang dilakukan dengan mengambil sebagian kecil data atau fungsionalitas dari total populasi untuk mewakili keseluruhan sistem.
 **### Tujuan**
 * Menghemat waktu dan biaya pengujian pada sistem berskala besar.
