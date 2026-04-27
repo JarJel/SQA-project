@@ -6,11 +6,14 @@ Pengujian yang berfokus pada bagaimana aplikasi merespons tindakan pengguna berd
 **Tujuan**
 * Menyelaraskan antara kode teknis dengan keinginan pengguna/stakeholder.
 * Memastikan alur logika bisnis berjalan secara alami.
-**### Digunakan Pada**
+
+** Digunakan Pada**
 * Fitur interaktif (misal: proses registrasi, transaksi belanja).
 * Pengembangan dengan metodologi Agile atau BDD.
-**### Teknik**
+
+**Teknik**
 * *Behaviour Driven Development* (BDD) menggunakan format **Given-When-Then**.
 * *User Story Testing*.
-**### Kesimpulan**
+
+**Kesimpulan**
 Memastikan bahwa aplikasi tidak hanya "berfungsi secara teknis" tetapi juga "masuk akal secara penggunaan".
