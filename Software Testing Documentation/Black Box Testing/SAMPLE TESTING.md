@@ -1,5 +1,10 @@
 ---
-### **SAMPLE TESTING**
+
+# **DOKUMENTASI TEKNIK PENGUJIAN PERANGKAT LUNAK**
+
+---
+
+### **1. SAMPLE TESTING**
 **### Deskripsi**
 Teknik pengujian yang dilakukan dengan mengambil sebagian kecil data atau fungsionalitas dari total populasi untuk mewakili keseluruhan sistem.
 **### Tujuan**
