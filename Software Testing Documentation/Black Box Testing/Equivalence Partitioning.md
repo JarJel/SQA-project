@@ -1,19 +1,19 @@
-Equivalence Partitioning
-Deskripsi
-Teknik untuk membagi data input menjadi beberapa kelompok (partisi) yang dianggap setara, di mana sistem diharapkan memberikan hasil yang sama untuk setiap data dalam kelompok tersebut.
+## **Equivalence Partitioning**
+### **Deskripsi**
+Equivalence Partitioning adalah teknik membagi atau **mempartisi input data** ke dalam beberapa kelompok yang dianggap setara. Sistem diasumsikan akan memberikan respon yang sama untuk setiap data di dalam satu kelompok tersebut.
+### **Tujuan**
+* **Reduksi jumlah pengujian:** Menghindari pengetesan data yang berulang-ulang untuk kategori yang memiliki perilaku serupa.
+* **Cakupan luas:** Memastikan setiap kategori input (baik yang diterima maupun ditolak) telah diwakili dalam pengujian.
+* **Optimasi waktu:** Mempercepat proses QA dengan hanya mengambil perwakilan data dari setiap partisi.
 
-Tujuan
-Mengurangi jumlah test case dengan cara memilih satu perwakilan data dari setiap kelompok, sehingga pengujian lebih efisien namun tetap mencakup berbagai skenario.
+### **Digunakan pada**
+* **Kategori Nilai:** Mengelompokkan rentang nilai ujian menjadi grade (misal: 80-100 adalah "A").
+* **Pilihan Dropdown:** Menguji perwakilan dari daftar negara, jenis kelamin, atau kategori produk.
+* **Validasi Tipe Data:** Memisahkan kelompok input yang hanya boleh berisi angka, huruf, atau simbol.
 
-Contoh
-Jika form input hanya menerima angka 1 - 100, maka kita bagi menjadi 3 kelompok:
+### **Teknik**
+* **Valid Partition:** Memilih satu perwakilan dari kelompok data yang seharusnya diterima oleh sistem.
+* **Invalid Partition:** Memilih satu perwakilan dari kelompok data yang seharusnya ditolak oleh sistem.
 
-Data Tidak Valid (< 1)
-
-Data Valid (1 - 100)
-
-Data Tidak Valid (> 100)
-Cukup ambil satu angka dari tiap kelompok (misal: 0, 50, dan 101).
-
-Kesimpulan
-Membantu penguji meng-cover seluruh kemungkinan jenis input tanpa harus mencoba setiap angka satu per satu.
+### **Kesimpulan**
+Equivalence Partitioning memungkinkan **pengujian yang komprehensif** dengan jumlah kasus uji yang minimal melalui klasifikasi data yang cerdas.
