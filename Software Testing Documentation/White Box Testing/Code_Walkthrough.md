@@ -1,0 +1,31 @@
+# Code Walkthrough
+
+**Definisi:**
+Proses peninjauan kode secara semi-formal di mana pengembang mempresentasikan kodenya kepada rekan tim untuk mendapatkan masukan.
+
+**Diagram Alur Proses:**
+```mermaid
+graph LR
+  A[Developer Siapkan Kode] --> B[Presentasi ke Tim]
+  B --> C{Diskusi Logika}
+  C --> D[Catat Feedback]
+  D --> E[Revisi Kode]
+
+---
+
+### 3. `Formal_Inspections.md`
+```markdown
+# Formal Inspections
+
+**Definisi:**
+Bentuk review yang paling terstruktur dan memiliki aturan ketat. Menggunakan peran-peran spesifik untuk menjamin kualitas software secara maksimal.
+
+**Peran dalam Inspeksi:**
+| Peran | Tugas Utama |
+|-------|-------------|
+| **Moderator** | Memimpin jalannya pertemuan agar tetap fokus. |
+| **Reader** | Membacakan dan menjelaskan alur kode secara detail. |
+| **Recorder** | Mencatat semua cacat (defect) yang ditemukan. |
+| **Author** | Pemilik kode yang memberikan klarifikasi jika diperlukan. |
+
+**Output:** Laporan daftar temuan (Defect Log) yang harus diperbaiki sebelum rilis.
