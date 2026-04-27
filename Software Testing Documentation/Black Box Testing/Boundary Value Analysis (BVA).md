@@ -1,4 +1,5 @@
-## **Boundary Value Analysis (BVA)**### **Deskripsi**
+## **Boundary Value Analysis (BVA)**
+### **Deskripsi**
 Boundary Value Analysis adalah teknik pengujian yang berfokus pada **nilai-nilai batas** (tepi) dari rentang input yang diizinkan. Teknik ini didasarkan pada asumsi bahwa kesalahan lebih sering terjadi di ambang batas daripada di tengah rentang data.### **Tujuan**
 * **Mendeteksi kesalahan logika:** Menemukan bug pada operator perbandingan (seperti penggunaan < yang seharusnya <=).
 * **Efisiensi kasus uji:** Mengurangi jumlah pengujian dengan hanya mengambil titik-titik kritis yang paling rawan kesalahan.
