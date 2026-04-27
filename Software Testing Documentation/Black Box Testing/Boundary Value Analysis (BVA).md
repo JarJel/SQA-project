@@ -1,28 +1,25 @@
 Boundary Value Analysis (BVA)
 Deskripsi
-Boundary Value Analysis adalah teknik pengujian yang berfokus pada nilai-nilai batas dari rentang input yang diizinkan. Teknik ini didasarkan pada asumsi bahwa kesalahan lebih sering terjadi di tepi rentang (batas) daripada di tengah-tengahnya.
+Boundary Value Analysis adalah teknik pengujian yang berfokus pada nilai-nilai batas (tepi) dari rentang input yang diizinkan. Teknik ini didasarkan pada asumsi bahwa kesalahan lebih sering terjadi di ambang batas daripada di tengah rentang data.
 
 Tujuan
+Mendeteksi kesalahan logika: Menemukan bug pada operator perbandingan (seperti penggunaan < yang seharusnya <=).
 
-Mendeteksi Kesalahan Operator: Menemukan kesalahan logika seperti penggunaan < padahal seharusnya <=.
+Efisiensi kasus uji: Mengurangi jumlah pengujian dengan hanya mengambil titik-titik kritis yang paling rawan kesalahan.
 
-Efisiensi Test Case: Meminimalkan jumlah pengujian dengan hanya mengambil nilai di titik kritis yang paling rawan bug.
-
-Validasi Batas Sistem: Memastikan sistem tetap stabil saat menerima input tepat di batas maksimum atau minimum.
+Validasi ketelitian sistem: Memastikan sistem tetap stabil saat menerima input tepat di angka minimum atau maksimum.
 
 Digunakan pada
-
-Input Numerik: Mengecek batasan angka seperti umur, saldo, atau jumlah stok barang.
+Input Numerik: Mengecek batasan angka seperti umur, saldo minimal, atau jumlah stok barang.
 
 Input Tanggal: Menguji batas awal dan akhir bulan atau tahun dalam sistem reservasi.
 
-Ukuran File: Memastikan sistem menolak atau menerima file tepat pada batas ukuran yang ditentukan (misal: 2MB).
+Batasan Karakter: Memastikan kolom teks (seperti password) memenuhi syarat panjang minimal dan maksimal.
 
 Teknik
+Nilai Batas (Boundary): Mengambil nilai tepat di batas bawah dan batas atas (misal: 1 dan 100).
 
-Minimum & Maximum: Mengambil nilai tepat di batas bawah dan batas atas (misal: 1 dan 100).
-
-Just Below/Above: Menguji satu angka di bawah dan di atas batas (misal: 0, 2, 99, 101) untuk melihat respon sistem terhadap data tidak valid.
+Nilai Luar Batas (Out of Bounds): Menguji satu angka di bawah batas minimum (0) dan satu angka di atas batas maksimum (101).
 
 Kesimpulan
-Boundary Value Analysis membantu penguji menemukan kesalahan logika pada transisi nilai dengan cara yang sangat efektif dan terukur.
+Boundary Value Analysis membantu penguji menemukan kesalahan logika pada transisi nilai dengan cara yang sangat efektif tanpa harus mengetes seluruh rentang angka.
