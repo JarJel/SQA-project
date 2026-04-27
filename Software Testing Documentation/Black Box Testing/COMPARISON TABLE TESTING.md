@@ -1,7 +1,8 @@
 ### **COMPARISON TABLE TESTING**
-**### Deskripsi**
+**Deskripsi**
 Metode pengujian yang membandingkan fitur, kinerja, atau parameter aplikasi dengan standar lain (versi lama atau kompetitor).
-**### Tujuan**
+
+**Tujuan**
 * Mengidentifikasi kelebihan dan kekurangan produk dibanding kompetitor.
 * Memastikan produk baru memiliki nilai tambah (Unique Selling Point).
 **### Digunakan Pada**
