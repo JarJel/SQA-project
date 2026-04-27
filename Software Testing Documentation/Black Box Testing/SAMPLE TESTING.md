@@ -1,10 +1,4 @@
----
-
-# **DOKUMENTASI TEKNIK PENGUJIAN PERANGKAT LUNAK**
-
----
-
-### **1. SAMPLE TESTING**
+**1. SAMPLE TESTING**
 **### Deskripsi**
 Teknik pengujian yang dilakukan dengan mengambil sebagian kecil data atau fungsionalitas dari total populasi untuk mewakili keseluruhan sistem.
 **### Tujuan**
@@ -18,5 +12,3 @@ Teknik pengujian yang dilakukan dengan mengambil sebagian kecil data atau fungsi
 * *Stratified Sampling* (pengambilan berdasarkan kategori).
 **### Kesimpulan**
 Sangat efektif untuk efisiensi sumber daya namun memerlukan pemilihan sampel yang tepat agar tetap akurat.
-
----
