@@ -6,11 +6,14 @@ Teknik pengujian yang dilakukan dengan mengambil sebagian kecil data atau fungsi
 **Tujuan**
 * Menghemat waktu dan biaya pengujian pada sistem berskala besar.
 * Mendapatkan gambaran kualitas tanpa harus menguji setiap baris data.
-**### Digunakan Pada**
+
+**Digunakan Pada**
 * Sistem Database besar (Big Data).
 * Migrasi data antar server atau aplikasi.
-**### Teknik**
+
+**Teknik**
 * *Random Sampling* (pengambilan acak).
 * *Stratified Sampling* (pengambilan berdasarkan kategori).
-**### Kesimpulan**
+
+**Kesimpulan**
 Sangat efektif untuk efisiensi sumber daya namun memerlukan pemilihan sampel yang tepat agar tetap akurat.
