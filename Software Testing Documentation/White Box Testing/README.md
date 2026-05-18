@@ -39,45 +39,37 @@ Dokumentasi ini berisi **7 model White Box Testing** yang diterapkan pada modul-
 
 | \# | Model | File | Modul Target | Tingkat Kompleksitas |
 | :---- | :---- | :---- | :---- | :---- |
-| 1 | **Desk Checking** | [`Desk_Checking.md`](http://./Desk_Checking.md) | Kalkulasi Saldo Transaksi | 🟢 Low |
-| 2 | **Code Walkthrough** | [`Code_Walkthrough.md`](http://./Code_Walkthrough.md) | Autentikasi & Login Flow | 🟢 Low |
-| 3 | **Formal Inspection** | [`Formal_Inspection.md`](http://./Formal_Inspection.md) | Form Input Transaksi | 🟡 Medium |
-| 4 | **Control Flow Testing** | [`Control_Flow_Testing.md`](http://./Control_Flow_Testing.md) | Validasi Limit Anggaran | 🟡 Medium |
-| 5 | **Basis Path Testing** | [`Basis_Path_Testing.md`](http://./Basis_Path_Testing.md) | Login \+ Role Check | 🔴 High |
-| 6 | **Data Flow Testing** | [`Data_Flow_Testing.md`](http://./Data_Flow_Testing.md) | Transfer Antar Wallet | 🔴 High |
-| 7 | **Loop Testing** | [`Loop_Testing.md`](http://./Loop_Testing.md) | Kalkulasi Cicilan Hutang | 🟡 Medium |
+| 1 | **Desk Checking** | `Desk_Checking.md` | Kalkulasi Saldo Transaksi | 🟢 Low |
+| 2 | **Code Walkthrough** | `Code_Walkthrough.md` | Autentikasi & Login Flow | 🟢 Low |
+| 3 | **Formal Inspection** | `Formal_Inspection.md` | Form Input Transaksi | 🟡 Medium |
+| 4 | **Control Flow Testing** | `Control_Flow_Testing.md` | Validasi Limit Anggaran | 🟡 Medium |
+| 5 | **Basis Path Testing** | `Basis_Path_Testing.md` | Login \+ Role Check | 🔴 High |
+| 6 | **Data Flow Testing** | `Data_Flow_Testing.md` | Transfer Antar Wallet | 🔴 High |
+| 7 | **Loop Testing** | `Loop_Testing.md` | Kalkulasi Cicilan Hutang | 🟡 Medium |
 
 ---
 
 ## 🗺️ Klasifikasi Model
 
+```mermaid
 graph TD
+    A[White Box Testing] --> B[Static Testing]
+    A --> C[Dynamic Testing]
+    B --> B1[Desk Checking]
+    B --> B2[Code Walkthrough]
+    B --> B3[Formal Inspection]
+    C --> C1[Control Flow Testing]
+    C --> C2[Basis Path Testing]
+    C --> C3[Data Flow Testing]
+    C --> C4[Loop Testing]
 
-    A\[White Box Testing\] \--\> B\[Static Testing\]
+    style A fill:#1e293b,stroke:#3b82f6,color:#fff
+    style B fill:#0f766e,stroke:#14b8a6,color:#fff
+    style C fill:#7c2d12,stroke:#ea580c,color:#fff
+```
 
-    A \--\> C\[Dynamic Testing\]
-
-    B \--\> B1\[Desk Checking\]
-
-    B \--\> B2\[Code Walkthrough\]
-
-    B \--\> B3\[Formal Inspection\]
-
-    C \--\> C1\[Control Flow Testing\]
-
-    C \--\> C2\[Basis Path Testing\]
-
-    C \--\> C3\[Data Flow Testing\]
-
-    C \--\> C4\[Loop Testing\]
-
-    style A fill:\#1e293b,stroke:\#3b82f6,color:\#fff
-
-    style B fill:\#0f766e,stroke:\#14b8a6,color:\#fff
-
-    style C fill:\#7c2d12,stroke:\#ea580c,color:\#fff
-
-**Static Testing** → dilakukan tanpa menjalankan kode (review manual). **Dynamic Testing** → dilakukan dengan mengeksekusi kode menggunakan test case.
+**Static Testing** → dilakukan tanpa menjalankan kode (review manual).  
+**Dynamic Testing** → dilakukan dengan mengeksekusi kode menggunakan test case.
 
 ---
 
@@ -102,7 +94,7 @@ graph TD
 | **Unit Testing** | PHPUnit | Testing function/method Laravel |
 | **Static Analysis** | PHPStan, Larastan | Deteksi error sebelum runtime |
 | **Code Coverage** | Xdebug \+ PHPUnit Coverage | Mengukur statement/branch coverage |
-| **Code Quality** | PHP\_CodeSniffer, PHP Mess Detector | Code style & complexity |
+| **Code Quality** | PHP_CodeSniffer, PHP Mess Detector | Code style & complexity |
 | **Flowchart** | Mermaid, draw.io | Visualisasi control flow graph |
 | **Manual Review** | GitHub PR Review | Code walkthrough & inspection |
 
@@ -115,13 +107,13 @@ graph TD
 3. **Jalankan test case** menggunakan PHPUnit pada repo backend  
 4. **Verifikasi hasil** dengan tabel ekspektasi yang disediakan
 
-\# Menjalankan unit test (dari root midnight-finance-backend)
-
+```bash
+# Menjalankan unit test (dari root midnight-finance-backend)
 php artisan test
 
-\# Dengan coverage report
-
-php artisan test \--coverage
+# Dengan coverage report
+php artisan test --coverage
+```
 
 ---
 
@@ -137,4 +129,4 @@ php artisan test \--coverage
 
 **Dokumentasi disusun oleh Tim REMACode**
 
-*"Quality is not an act, it is a habit." — Aristotle*  
+*"Quality is not an act, it is a habit." — Aristotle*
