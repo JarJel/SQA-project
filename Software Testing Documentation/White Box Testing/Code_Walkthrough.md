@@ -1,10 +1,10 @@
-# 👥 Code Walkthrough
+#  Code Walkthrough
 
 **Model White Box Testing \#2** — *Static Testing* **Modul Target:** Autentikasi & Login Flow (Laravel Sanctum) **Tim:** REMACode
 
 ---
 
-## 📖 1\. Definisi
+##  1\. Definisi
 
 **Code Walkthrough** adalah teknik review kode secara **formal maupun informal** yang dilakukan bersama-sama antara developer dan tim terkait untuk **memahami logika kode**, mengidentifikasi potensi error, dan meningkatkan kualitas keseluruhan program (Suprihadi, 2025). Berbeda dengan Desk Checking yang dilakukan individual, Code Walkthrough bersifat **kolaboratif** dan menggunakan diskusi tim sebagai mekanisme deteksi error.
 
