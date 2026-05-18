@@ -308,43 +308,8 @@ Checklist standar yang digunakan Tim REMACode dalam sesi walkthrough:
 
 ##  11\. Template Notulen Walkthrough
 
-\# Walkthrough Session — \[Tanggal\]
+<img width="1440" height="1560" alt="image" src="https://github.com/user-attachments/assets/9087d32b-17bd-428f-9e3e-0a6db832c700" />
 
-\*\*File:\*\* \[path/to/file.php\]
-
-\*\*Author:\*\* \[nama\]
-
-\*\*Moderator:\*\* \[nama\]
-
-\*\*Reviewers:\*\* \[nama1, nama2\]
-
-\*\*Durasi:\*\* \[X menit\]
-
-\#\# Ringkasan Kode
-
-\[1-2 paragraf penjelasan singkat\]
-
-\#\# Issue Ditemukan
-
-| ID | Severity | Deskripsi | Owner | Due Date |
-
-|---|---|---|---|---|
-
-\#\# Keputusan Tim
-
-\- \[ \] \[Action item 1\]
-
-\- \[ \] \[Action item 2\]
-
-\#\# Sign-off
-
-\- \[ \] Author
-
-\- \[ \] Reviewer 1
-
-\- \[ \] Reviewer 2
-
----
 
 ##  Referensi
 
