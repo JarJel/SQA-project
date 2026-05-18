@@ -1,14 +1,16 @@
 # 🔍 Formal Inspection
 
-**Model White Box Testing \#3** — *Static Testing* **Modul Target:** Form Input Transaksi (Validasi Kelengkapan & Format Data) **Tim:** REMACode
+**Model White Box Testing \#3** — *Static Testing*  
+**Modul Target:** Form Input Transaksi (Validasi Kelengkapan & Format Data)  
+**Tim:** REMACode
 
 ---
 
-## 📖 1\. Definisi
+## 📖 1. Definisi
 
 **Formal Inspection** adalah teknik pengujian yang berfokus untuk **memeriksa kelengkapan, ketepatan, dan format data** yang ditampilkan dan diterima oleh aplikasi (Suprihadi, 2025). Model ini lebih terstruktur dibanding Code Walkthrough karena mengikuti **prosedur formal** yang diperkenalkan oleh Michael Fagan (IBM, 1976), dengan tahapan, peran, dan dokumen yang baku.
 
-*"Pengujian format inspection adalah teknik pengujian yang berfokus untuk memeriksa kelengkapan, ketepatan, dan format data yang ditampilkan dan diterima oleh aplikasi."* — (Suprihadi, 2025\)
+*"Pengujian format inspection adalah teknik pengujian yang berfokus untuk memeriksa kelengkapan, ketepatan, dan format data yang ditampilkan dan diterima oleh aplikasi."* — (Suprihadi, 2025)
 
 ### Perbedaan dengan Walkthrough
 
@@ -23,7 +25,7 @@
 
 ---
 
-## 🎯 2\. Tujuan Pengujian
+## 🎯 2. Tujuan Pengujian
 
 | No | Tujuan |
 | :---- | :---- |
@@ -35,45 +37,36 @@
 
 ---
 
-## 🔄 3\. Tahapan Fagan Inspection
+## 🔄 3. Tahapan Fagan Inspection
+
 ```mermaid
 flowchart LR
+    A[1. Planning] --> B[2. Overview]
+    B --> C[3. Preparation]
+    C --> D[4. Inspection Meeting]
+    D --> E[5. Rework]
+    E --> F[6. Follow-up]
 
-    A\[1. Planning\] \--\> B\[2. Overview\]
-
-    B \--\> C\[3. Preparation\]
-
-    C \--\> D\[4. Inspection Meeting\]
-
-    D \--\> E\[5. Rework\]
-
-    E \--\> F\[6. Follow-up\]
-
-    style A fill:\#1e40af,stroke:\#3b82f6,color:\#fff
-
-    style B fill:\#1e40af,stroke:\#3b82f6,color:\#fff
-
-    style C fill:\#1e40af,stroke:\#3b82f6,color:\#fff
-
-    style D fill:\#7c2d12,stroke:\#ea580c,color:\#fff
-
-    style E fill:\#14532d,stroke:\#22c55e,color:\#fff
-
-    style F fill:\#14532d,stroke:\#22c55e,color:\#fff
-    ```
+    style A fill:#1e40af,stroke:#3b82f6,color:#fff
+    style B fill:#1e40af,stroke:#3b82f6,color:#fff
+    style C fill:#1e40af,stroke:#3b82f6,color:#fff
+    style D fill:#7c2d12,stroke:#ea580c,color:#fff
+    style E fill:#14532d,stroke:#22c55e,color:#fff
+    style F fill:#14532d,stroke:#22c55e,color:#fff
+```
 
 | Tahap | Aktivitas | Output |
 | :---- | :---- | :---- |
-| **1\. Planning** | Pilih artifact, tentukan tim inspector | Inspection schedule |
-| **2\. Overview** | Author jelaskan kode ke tim | Shared understanding |
-| **3\. Preparation** | Reviewer baca kode independen | Daftar issue per reviewer |
-| **4\. Inspection Meeting** | Diskusi & konfirmasi issue | Defect list |
-| **5\. Rework** | Author perbaiki defect | Updated code |
-| **6\. Follow-up** | Verifikasi perbaikan | Sign-off |
+| **1. Planning** | Pilih artifact, tentukan tim inspector | Inspection schedule |
+| **2. Overview** | Author jelaskan kode ke tim | Shared understanding |
+| **3. Preparation** | Reviewer baca kode independen | Daftar issue per reviewer |
+| **4. Inspection Meeting** | Diskusi & konfirmasi issue | Defect list |
+| **5. Rework** | Author perbaiki defect | Updated code |
+| **6. Follow-up** | Verifikasi perbaikan | Sign-off |
 
 ---
 
-## 👥 4\. Tim Inspeksi (REMACode)
+## 👥 4. Tim Inspeksi (REMACode)
 
 | Peran | Nama | Tanggung Jawab |
 | :---- | :---- | :---- |
@@ -85,82 +78,63 @@ flowchart LR
 
 ---
 
-## 💻 5\. Source Code yang Diinspeksi
+## 💻 5. Source Code yang Diinspeksi
 
-**File:** `app/Http/Requests/StoreTransactionRequest.php` **Konteks:** Form Request validation untuk endpoint `POST /api/transactions`
+**File:** `app/Http/Requests/StoreTransactionRequest.php`  
+**Konteks:** Form Request validation untuk endpoint `POST /api/transactions`
 
-⚠️ **TODO:** Ganti dengan Form Request asli dari `midnight-finance-backend` saat finalisasi.
+> ⚠️ **TODO:** Ganti dengan Form Request asli dari `midnight-finance-backend` saat finalisasi.
 
-\<?php
+```php
+<?php
 
-namespace App\\Http\\Requests;
+namespace App\Http\Requests;
 
-use Illuminate\\Foundation\\Http\\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreTransactionRequest extends FormRequest
-
 {
-
     public function authorize(): bool
-
     {
-
-        return auth()-\>check();
-
+        return auth()->check();
     }
 
     public function rules(): array
-
     {
-
-        return \[
-
-            'account\_id'    \=\> 'required|exists:accounts,id',
-
-            'category\_id'   \=\> 'required|exists:categories,id',
-
-            'type'          \=\> 'required|in:income,expense',
-
-            'amount'        \=\> 'required|numeric|min:0.01',
-
-            'description'   \=\> 'nullable|string|max:255',
-
-            'transaction\_date' \=\> 'required|date',
-
-        \];
-
+        return [
+            'account_id'       => 'required|exists:accounts,id',
+            'category_id'      => 'required|exists:categories,id',
+            'type'             => 'required|in:income,expense',
+            'amount'           => 'required|numeric|min:0.01',
+            'description'      => 'nullable|string|max:255',
+            'transaction_date' => 'required|date',
+        ];
     }
 
     public function messages(): array
-
     {
-
-        return \[
-
-            'amount.min' \=\> 'Nominal transaksi minimal Rp 0,01',
-
-            'type.in'    \=\> 'Tipe transaksi harus income atau expense',
-
-        \];
-
+        return [
+            'amount.min' => 'Nominal transaksi minimal Rp 0,01',
+            'type.in'    => 'Tipe transaksi harus income atau expense',
+        ];
     }
-
 }
+```
 
 ---
 
-## 🔍 6\. Inspection Checklist & Hasil
+## 🔍 6. Inspection Checklist & Hasil
 
 ### 6.1 Kelengkapan Field (Completeness)
 
 | Field | Required? | Validation Rule | Status | Catatan |
 | :---- | :---- | :---- | :---- | :---- |
-| `account_id` | ✅ Yes | `required|exists` | ✅ PASSED | — |
-| `category_id` | ✅ Yes | `required|exists` | ✅ PASSED | — |
-| `type` | ✅ Yes | `required|in:income,expense` | ✅ PASSED | — |
-| `amount` | ✅ Yes | `required|numeric|min:0.01` | ⚠️ ISSUE | Tidak ada batas atas (max) |
-| `description` | ❌ No | `nullable|string|max:255` | ✅ PASSED | — |
-| `transaction_date` | ✅ Yes | `required|date` | ⚠️ ISSUE | Tidak validasi tanggal masa depan |
+| `account_id` | ✅ Yes | `required\|exists` | ✅ PASSED | — |
+| `category_id` | ✅ Yes | `required\|exists` | ✅ PASSED | — |
+| `type` | ✅ Yes | `required\|in:income,expense` | ✅ PASSED | — |
+| `amount` | ✅ Yes | `required\|numeric\|min:0.01` | ⚠️ ISSUE | Tidak ada batas atas (max) |
+| `description` | ❌ No | `nullable\|string\|max:255` | ✅ PASSED | — |
+| `transaction_date` | ✅ Yes | `required\|date` | ⚠️ ISSUE | Tidak validasi tanggal masa depan |
 | `user_id` | — | (tidak ada) | ❌ FAILED | Tidak dipastikan ownership account\_id |
 
 ### 6.2 Ketepatan Tipe Data (Correctness)
@@ -183,7 +157,7 @@ class StoreTransactionRequest extends FormRequest
 
 ---
 
-## 🐛 7\. Defect Log
+## 🐛 7. Defect Log
 
 | ID | Severity | Tipe | Deskripsi | Lokasi | Owner |
 | :---- | :---- | :---- | :---- | :---- | :---- |
@@ -205,17 +179,17 @@ class StoreTransactionRequest extends FormRequest
 
 ---
 
-## 📊 8\. Metrik Inspeksi
+## 📊 8. Metrik Inspeksi
 
 ### Defect Density
 
-Defect Density \= Jumlah Defect / KLOC (Kilo Lines of Code)
+```
+Defect Density = Jumlah Defect / KLOC (Kilo Lines of Code)
+               = 6 defect / 0.025 KLOC (25 baris)
+               = 240 defect/KLOC
+```
 
-                \= 6 defect / 0.025 KLOC (25 baris)
-
-                \= 240 defect/KLOC
-
-⚠️ **Catatan:** Angka ini tinggi karena code base sangat kecil. Untuk artifact kecil seperti Form Request, gunakan **defect per artifact** sebagai metrik alternatif.
+> ⚠️ **Catatan:** Angka ini tinggi karena code base sangat kecil. Untuk artifact kecil seperti Form Request, gunakan **defect per artifact** sebagai metrik alternatif.
 
 ### Distribusi Severity
 
@@ -238,129 +212,83 @@ Defect Density \= Jumlah Defect / KLOC (Kilo Lines of Code)
 
 ---
 
-## ✅ 9\. Rekomendasi Perbaikan Kode
+## ✅ 9. Rekomendasi Perbaikan Kode
 
-\<?php
+```php
+<?php
 
-namespace App\\Http\\Requests;
+namespace App\Http\Requests;
 
-use Illuminate\\Foundation\\Http\\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-use Illuminate\\Validation\\Rule;
-
-/\*\*
-
- \* Validates input for creating a transaction.
-
- \* Enforces ownership check and data format consistency.
-
- \*/
-
+/**
+ * Validates input for creating a transaction.
+ * Enforces ownership check and data format consistency.
+ */
 class StoreTransactionRequest extends FormRequest
-
 {
-
     public function authorize(): bool
-
     {
-
-        return auth()-\>check();
-
+        return auth()->check();
     }
 
     public function rules(): array
-
     {
-
-        return \[
-
+        return [
             // FI-001 fix: enforce ownership via Rule::exists scope
-
-            'account\_id' \=\> \[
-
+            'account_id' => [
                 'required',
-
                 Rule::exists('accounts', 'id')
+                    ->where('user_id', auth()->id()),
+            ],
 
-                    \-\>where('user\_id', auth()-\>id()),
-
-            \],
-
-            'category\_id' \=\> 'required|exists:categories,id',
-
-            'type'        \=\> 'required|in:income,expense',
+            'category_id' => 'required|exists:categories,id',
+            'type'        => 'required|in:income,expense',
 
             // FI-002 fix: batas atas amount (1 miliar)
+            'amount' => 'required|numeric|min:0.01|max:1000000000|decimal:0,2',
 
-            'amount' \=\> 'required|numeric|min:0.01|max:1000000000|decimal:0,2',
-
-            // FI-004 fix: strip HTML tags \+ max length
-
-            'description' \=\> 'nullable|string|max:255',
+            // FI-004 fix: strip HTML tags + max length
+            'description' => 'nullable|string|max:255',
 
             // FI-003 fix: tidak boleh tanggal masa depan
-
-            'transaction\_date' \=\> 'required|date|before\_or\_equal:today',
-
-        \];
-
+            'transaction_date' => 'required|date|before_or_equal:today',
+        ];
     }
 
     public function messages(): array
-
     {
-
-        return \[
-
-            'account\_id.required'        \=\> 'Akun wajib dipilih',
-
-            'account\_id.exists'          \=\> 'Akun tidak valid atau bukan milik Anda',
-
-            'category\_id.required'       \=\> 'Kategori wajib dipilih',
-
-            'type.required'              \=\> 'Tipe transaksi wajib diisi',
-
-            'type.in'                    \=\> 'Tipe transaksi harus income atau expense',
-
-            'amount.required'            \=\> 'Nominal transaksi wajib diisi',
-
-            'amount.min'                 \=\> 'Nominal transaksi minimal Rp 0,01',
-
-            'amount.max'                 \=\> 'Nominal transaksi maksimal Rp 1 miliar',
-
-            'amount.decimal'             \=\> 'Nominal hanya boleh 2 angka desimal',
-
-            'transaction\_date.required'  \=\> 'Tanggal transaksi wajib diisi',
-
-            'transaction\_date.before\_or\_equal' \=\> 'Tanggal tidak boleh di masa depan',
-
-        \];
-
+        return [
+            'account_id.required'               => 'Akun wajib dipilih',
+            'account_id.exists'                 => 'Akun tidak valid atau bukan milik Anda',
+            'category_id.required'              => 'Kategori wajib dipilih',
+            'type.required'                     => 'Tipe transaksi wajib diisi',
+            'type.in'                           => 'Tipe transaksi harus income atau expense',
+            'amount.required'                   => 'Nominal transaksi wajib diisi',
+            'amount.min'                        => 'Nominal transaksi minimal Rp 0,01',
+            'amount.max'                        => 'Nominal transaksi maksimal Rp 1 miliar',
+            'amount.decimal'                    => 'Nominal hanya boleh 2 angka desimal',
+            'transaction_date.required'         => 'Tanggal transaksi wajib diisi',
+            'transaction_date.before_or_equal'  => 'Tanggal tidak boleh di masa depan',
+        ];
     }
 
     // FI-004 fix: sanitize description sebelum validasi
-
     protected function prepareForValidation(): void
-
     {
-
-        if ($this-\>has('description')) {
-
-            $this-\>merge(\[
-
-                'description' \=\> strip\_tags($this-\>description),
-
-            \]);
-
+        if ($this->has('description')) {
+            $this->merge([
+                'description' => strip_tags($this->description),
+            ]);
         }
-
     }
-
 }
+```
 
 ---
 
-## 🖼️ 10\. Verifikasi Tampilan Form (UI Inspection)
+## 🖼️ 10. Verifikasi Tampilan Form (UI Inspection)
 
 Sesuai konsep slide, Formal Inspection juga memeriksa **tampilan data** di UI. Berikut hasil inspeksi tampilan form input transaksi:
 
@@ -377,104 +305,91 @@ Sesuai konsep slide, Formal Inspection juga memeriksa **tampilan data** di UI. B
 
 ---
 
-## ⚖️ 11\. Kelebihan & Kekurangan
+## ⚖️ 11. Kelebihan & Kekurangan
 
 ### ✅ Kelebihan
 
-- **Sangat sistematis** — defect tertangkap dengan disiplin  
-- Menghasilkan **metrik kuantitatif** (defect density, severity distribution)  
-- Cocok untuk **sistem kritis** (finance, healthcare, aerospace)  
-- Track record terbukti: Fagan Inspection menurunkan defect rate hingga 50-90% (IBM Studies)  
+- **Sangat sistematis** — defect tertangkap dengan disiplin
+- Menghasilkan **metrik kuantitatif** (defect density, severity distribution)
+- Cocok untuk **sistem kritis** (finance, healthcare, aerospace)
+- Track record terbukti: Fagan Inspection menurunkan defect rate hingga 50-90% (IBM Studies)
 - Audit trail untuk **compliance** (ISO 9000, CMMI)
 
 ### ❌ Kekurangan
 
-- **Mahal & lambat** — butuh waktu meeting \+ dokumen formal  
-- Memerlukan **moderator terlatih**  
-- Bisa terasa birokratis untuk tim kecil/startup  
-- Diminishing return setelah beberapa iterasi  
+- **Mahal & lambat** — butuh waktu meeting \+ dokumen formal
+- Memerlukan **moderator terlatih**
+- Bisa terasa birokratis untuk tim kecil/startup
+- Diminishing return setelah beberapa iterasi
 - Tidak menggantikan testing dinamis
 
 ---
 
-## 🛠️ 12\. Tools Pendukung
+## 🛠️ 12. Tools Pendukung
 
 | Tool | Kegunaan |
 | :---- | :---- |
 | **PHPStan / Larastan** | Static analysis untuk type checking |
 | **Laravel Pint** | Auto-format code sesuai PSR-12 |
-| **PHP\_CodeSniffer** | Detect coding standard violation |
+| **PHP_CodeSniffer** | Detect coding standard violation |
 | **SonarQube** | Defect density tracking jangka panjang |
 | **GitHub Issues** | Tracking defect log dengan label severity |
 
 ---
 
-## 📋 13\. Template Inspection Report
+## 📋 13. Template Inspection Report
 
-\# Inspection Report — \[Tanggal\]
+```markdown
+# Inspection Report — [Tanggal]
 
-\*\*Artifact:\*\* \[path/to/file\]
+**Artifact:** [path/to/file]
+**Inspection Type:** Code / Design / Requirement
+**Duration:** [X menit]
+**LOC Inspected:** [N baris]
 
-\*\*Inspection Type:\*\* Code / Design / Requirement
+## Tim Inspeksi
 
-\*\*Duration:\*\* \[X menit\]
+| Peran     | Nama |
+|-----------|------|
+| Moderator |      |
+| Author    |      |
+| Reader    |      |
+| Inspector |      |
 
-\*\*LOC Inspected:\*\* \[N baris\]
-
-\#\# Tim Inspeksi
-
-| Peran | Nama |
-
-|---|---|
-
-| Moderator | |
-
-| Author | |
-
-| Reader | |
-
-| Inspector | |
-
-\#\# Defect Log
+## Defect Log
 
 | ID | Severity | Tipe | Deskripsi | Lokasi |
+|----|----------|------|-----------|--------|
 
-|---|---|---|---|---|
+## Metrik
 
-\#\# Metrik
+- Defect Density: [X / KLOC]
+- Total Critical: [N]
+- Total High: [N]
 
-\- Defect Density: \[X / KLOC\]
+## Keputusan
 
-\- Total Critical: \[N\]
+- [ ] Accept (no rework)
+- [x] Conditional accept (rework minor)
+- [ ] Reject (major rework + re-inspect)
 
-\- Total High: \[N\]
+## Sign-off
 
-\#\# Keputusan
-
-\- \[ \] Accept (no rework)
-
-\- \[x\] Conditional accept (rework minor)
-
-\- \[ \] Reject (major rework \+ re-inspect)
-
-\#\# Sign-off
-
-\- \[ \] Moderator
-
-\- \[ \] Author
+- [ ] Moderator
+- [ ] Author
+```
 
 ---
 
 ## 📚 Referensi
 
-1. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10*. Universitas Kristen Indonesia.  
-2. Fagan, M. E. (1976). *Design and code inspections to reduce errors in program development*. IBM Systems Journal, 15(3), 182-211.  
-3. Gilb, T., & Graham, D. (1993). *Software Inspection*. Addison-Wesley.  
-4. OWASP Foundation. (2021). *OWASP Top 10:2021 — A03: Injection*. [https://owasp.org/Top10/](https://owasp.org/Top10/)
+1. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10*. Universitas Kristen Indonesia.
+2. Fagan, M. E. (1976). *Design and code inspections to reduce errors in program development*. IBM Systems Journal, 15(3), 182-211.
+3. Gilb, T., & Graham, D. (1993). *Software Inspection*. Addison-Wesley.
+4. OWASP Foundation. (2021). *OWASP Top 10:2021 — A03: Injection*. https://owasp.org/Top10/
 
 ---
 
-[⬅ Code Walkthrough](http://./Code_Walkthrough.md) · [Kembali ke README](http://./README.md) · [Lanjut ke Control Flow Testing ➡](http://./Control_Flow_Testing.md)
+[⬅ Code Walkthrough](./Code_Walkthrough.md) · [Kembali ke README](./README.md) · [Lanjut ke Control Flow Testing ➡](./Control_Flow_Testing.md)
 
-**Tim REMACode** — Midnight Finance SQA Documentation  
-
+**Tim REMACode** — Midnight Finance SQA Documentation
