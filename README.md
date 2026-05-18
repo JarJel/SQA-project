@@ -76,7 +76,7 @@ Repositori ini didedikasikan sepenuhnya untuk keperluan **Software Quality Assur
 
 ---
 
-## 👥 Tim REMAKO
+## 👥 Tim REMACode
 
 <table>
   <thead>
