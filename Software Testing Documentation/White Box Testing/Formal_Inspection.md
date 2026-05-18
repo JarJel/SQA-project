@@ -36,7 +36,7 @@
 ---
 
 ## 🔄 3\. Tahapan Fagan Inspection
-
+```mermaid
 flowchart LR
 
     A\[1. Planning\] \--\> B\[2. Overview\]
@@ -60,6 +60,7 @@ flowchart LR
     style E fill:\#14532d,stroke:\#22c55e,color:\#fff
 
     style F fill:\#14532d,stroke:\#22c55e,color:\#fff
+    ```
 
 | Tahap | Aktivitas | Output |
 | :---- | :---- | :---- |
