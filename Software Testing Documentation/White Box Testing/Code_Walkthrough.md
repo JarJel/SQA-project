@@ -98,25 +98,8 @@ public function login(Request $request)
 
 flowchart TD
 
-    A(\[Mulai: POST /api/login\]) \--\> B\[Validasi email & password\]
+<img width="1440" height="1240" alt="image" src="https://github.com/user-attachments/assets/aae0e38f-e0d8-40bb-9faf-c9fd2a4b0d21" />
 
-    B \--\> C{User ditemukan?}
-
-    C \--\>|Tidak| D\[Return 404: User not found\]
-
-    C \--\>|Ya| E{Password match?}
-
-    E \--\>|Tidak| F\[Return 401: Invalid password\]
-
-    E \--\>|Ya| G\[Generate Sanctum token\]
-
-    G \--\> H\[Return 200: token \+ user data\]
-
-    style D fill:\#7f1d1d,stroke:\#ef4444,color:\#fff
-
-    style F fill:\#7f1d1d,stroke:\#ef4444,color:\#fff
-
-    style H fill:\#14532d,stroke:\#22c55e,color:\#fff
 
 **Narasi author:**
 
