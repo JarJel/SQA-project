@@ -1,4 +1,4 @@
-# 🎲 Sample Testing
+# 🎲 Sample Testing masih salah
 
 > **Model Black Box Testing #4** — *Input-Based Testing*
 > **Modul Target:** Riwayat Transaksi — Sampling dari Dataset Besar
