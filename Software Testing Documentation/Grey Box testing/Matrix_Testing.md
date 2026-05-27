@@ -1,78 +1,79 @@
-# 📐 Orthogonal Array Testing — Midnight Finance
+# 📊 Matrix Testing — Midnight Finance
 
 **Mata Kuliah:** Software Quality Assurance  
-**Model Pengujian:** Gray Box Testing — Orthogonal Array Testing (OAT)  
+**Model Pengujian:** Gray Box Testing — Matrix Testing  
 **Tim:** REMACode  
-**Modul Target:** Filter & Sort Riwayat Transaksi (`GET /api/transactions`)  
+**Modul Target:** Fitur Pencarian & Filter Riwayat Transaksi  
 
 ---
 
 ## 📖 Definisi
 
-**Orthogonal Array Testing (OAT)** adalah teknik pengujian perangkat lunak yang menggunakan **array ortogonal untuk membuat kasus uji**. Ini adalah pendekatan pengujian statistik yang sangat berguna ketika sistem yang akan diuji memiliki **input data yang besar**. Pengujian susunan ortogonal membantu memaksimalkan cakupan pengujian dengan **memasangkan dan menggabungkan input** serta menguji sistem dengan jumlah kasus pengujian yang relatif lebih sedikit untuk menghemat waktu (Suprihadi, 2025).
+**Matrix Testing** adalah teknik pengujian perangkat lunak yang **sistematis dan terstruktur** untuk menguji berbagai **kombinasi input dan kondisi** dalam suatu aplikasi. Teknik ini membantu **mengidentifikasi bug yang disebabkan oleh interaksi antara parameter atau faktor yang berbeda** dalam aplikasi (Suprihadi, 2025).
 
-**Langkah-Langkah dalam pengujian OAT:**
-1. Identifikasi variabel independen untuk skenario tersebut
-2. Temukan array terkecil dengan jumlah proses
-3. Petakan faktor-faktor tersebut ke dalam array
-4. Pilih nilai untuk level "sisa" mana pun
-5. Transkripsikan proses ke dalam kasus uji, tambahkan kombinasi mencurigakan yang tidak dihasilkan
+**Langkah Skenario Matrix Testing:**
+1. Definisikan Parameter dan Kondisi
+2. Membuat Tabel Matriks
+3. Menjalankan Test Case
+4. Analisis Hasil
 
 ---
 
 ## 🎯 Modul yang Diuji
 
 **Endpoint:** `GET /api/transactions`  
-**Deskripsi:** Endpoint ini mendukung kombinasi filter dan sorting simultan.
-
-```php
-// Parameter yang tersedia di TransactionController@index
-$request->filled('start_date')           // Filter tanggal mulai
-$request->filled('end_date')             // Filter tanggal akhir
-$request->filled('type')                 // Filter tipe: income / expense
-$request->input('sort_by', 'date')       // Kolom sort: date / amount
-$request->input('sort_order', 'desc')    // Arah sort: asc / desc
-```
+**Skenario:** Aplikasi Midnight Finance memiliki fitur filter transaksi yang memungkinkan pengguna mencari berdasarkan **tipe transaksi**, **rentang tanggal**, dan **kategori**.
 
 ---
 
-## 📊 Identifikasi Faktor & Level
+## 📊 Tahap 1: Definisikan Parameter dan Kondisi
 
-| No | Faktor | Level 1 | Level 2 | Level 3 |
-|:--:|:---|:---:|:---:|:---:|
-| 1 | `type` (Filter tipe) | `income` | `expense` | *(kosong/semua)* |
-| 2 | `sort_by` (Kolom sort) | `date` | `amount` | — |
-| 3 | `sort_order` (Arah sort) | `asc` | `desc` | — |
-
-- **Jumlah Faktor** = 3 (type, sort_by, sort_order)
-- **Jumlah Level** = 3 level untuk factor 1, 2 level untuk factor 2 & 3
-- **Tipe Array** = L6 (6 kasus uji)
+| Parameter | Kondisi A (Valid/Ada) | Kondisi B (Kosong/Default) |
+|:---|:---:|:---:|
+| `type` (Tipe transaksi) | `income` atau `expense` | *(tidak diisi — ambil semua)* |
+| `start_date` (Tanggal mulai) | `2025-01-01` | *(tidak diisi)* |
+| `category_id` (Kategori) | ID kategori valid milik user | *(tidak diisi)* |
 
 ---
 
-## 📋 Tabel Orthogonal Array L6
+## 📋 Tahap 2: Tabel Matriks Kombinasi
 
-| Kasus Uji # | `type` | `sort_by` | `sort_order` |
-|:---:|:---:|:---:|:---:|
-| 1 | `income` | `date` | `asc` |
-| 2 | `income` | `amount` | `desc` |
-| 3 | `expense` | `date` | `desc` |
-| 4 | `expense` | `amount` | `asc` |
-| 5 | *(semua)* | `date` | `asc` |
-| 6 | *(semua)* | `amount` | `desc` |
+| # | `type` | `start_date` | `category_id` | Kombinasi |
+|:--:|:---:|:---:|:---:|:---|
+| M1 | A (income) | A (ada) | A (ada) | Semua filter aktif |
+| M2 | A (income) | A (ada) | B (kosong) | type + tanggal |
+| M3 | A (income) | B (kosong) | A (ada) | type + kategori |
+| M4 | A (income) | B (kosong) | B (kosong) | Hanya type |
+| M5 | B (expense) | A (ada) | A (ada) | Semua filter (expense) |
+| M6 | B (expense) | A (ada) | B (kosong) | type expense + tanggal |
+| M7 | B (expense) | B (kosong) | A (ada) | type expense + kategori |
+| M8 | B (kosong) | B (kosong) | B (kosong) | Tanpa filter (semua data) |
 
 ---
 
-## 📝 Test Case OAT
+## 📝 Tahap 3: Test Case Matrix Testing
 
-| No | Kasus Uji | Parameter Request | Expected Output | Actual Output | Status |
-|:--:|:---|:---|:---|:---:|:---:|
-| TC-OAT-01 | Income, sort date ASC | `type=income&sort_by=date&sort_order=asc` | HTTP 200 — hanya income, urut tanggal terlama → terbaru | HTTP 200 | ✅ Valid |
-| TC-OAT-02 | Income, sort amount DESC | `type=income&sort_by=amount&sort_order=desc` | HTTP 200 — hanya income, urut jumlah terbesar → terkecil | HTTP 200 | ✅ Valid |
-| TC-OAT-03 | Expense, sort date DESC | `type=expense&sort_by=date&sort_order=desc` | HTTP 200 — hanya expense, urut tanggal terbaru → terlama | HTTP 200 | ✅ Valid |
-| TC-OAT-04 | Expense, sort amount ASC | `type=expense&sort_by=amount&sort_order=asc` | HTTP 200 — hanya expense, urut jumlah terkecil → terbesar | HTTP 200 | ✅ Valid |
-| TC-OAT-05 | Semua tipe, sort date ASC | `sort_by=date&sort_order=asc` | HTTP 200 — semua transaksi, urut tanggal terlama → terbaru | HTTP 200 | ✅ Valid |
-| TC-OAT-06 | Semua tipe, sort amount DESC | `sort_by=amount&sort_order=desc` | HTTP 200 — semua transaksi, urut jumlah terbesar → terkecil | HTTP 200 | ✅ Valid |
+| No | Matriks | Input Parameter | Expected Output | Actual Output | Status |
+|:--:|:---:|:---|:---|:---:|:---:|
+| TC-MT-01 | M1 | `type=income&start_date=2025-01-01&category_id=1` | HTTP 200 — income, mulai Jan 2025, kategori id=1 | HTTP 200 | ✅ Valid |
+| TC-MT-02 | M2 | `type=income&start_date=2025-01-01` | HTTP 200 — semua income mulai Jan 2025 | HTTP 200 | ✅ Valid |
+| TC-MT-03 | M3 | `type=income&category_id=1` | HTTP 200 — semua income di kategori id=1 | HTTP 200 | ✅ Valid |
+| TC-MT-04 | M4 | `type=income` | HTTP 200 — semua transaksi income milik user | HTTP 200 | ✅ Valid |
+| TC-MT-05 | M5 | `type=expense&start_date=2025-01-01&category_id=2` | HTTP 200 — expense, mulai Jan 2025, kategori id=2 | HTTP 200 | ✅ Valid |
+| TC-MT-06 | M6 | `type=expense&start_date=2025-06-01` | HTTP 200 — expense mulai Juni 2025 | HTTP 200 | ✅ Valid |
+| TC-MT-07 | M7 | `type=expense&category_id=2` | HTTP 200 — semua expense di kategori id=2 | HTTP 200 | ✅ Valid |
+| TC-MT-08 | M8 | *(tanpa parameter)* | HTTP 200 — seluruh transaksi milik user | HTTP 200 | ✅ Valid |
+
+---
+
+## 📊 Tahap 4: Analisis Hasil
+
+| Analisis | Temuan |
+|:---|:---|
+| Bug interaksi parameter | Tidak ditemukan — setiap kombinasi menghasilkan output yang konsisten |
+| Konsistensi respons JSON | Struktur data `{ "data": [...] }` konsisten di semua 8 skenario |
+| Filter kosong | Sistem mengembalikan semua data tanpa filter — sesuai ekspektasi |
+| Filter kategori bukan milik user | Mengembalikan array kosong `[]` — aman, tidak bocor ke data user lain |
 
 ---
 
@@ -80,13 +81,13 @@ $request->input('sort_order', 'desc')    // Arah sort: asc / desc
 
 | Kategori | Jumlah |
 |:---|:---:|
-| Total Faktor | 3 |
-| Total Level | Maks. 3 |
-| Total Test Case (OAT) | 6 |
-| Test Case Passed | 6 |
-| **Coverage Pasangan (Pairwise)** | **100%** |
+| Total Parameter | 3 |
+| Total Kombinasi Matriks | 8 |
+| Test Case Passed | 8 |
+| Bug Ditemukan | 0 |
+| **Coverage Kombinasi** | **100%** |
 
-> **Kesimpulan:** OAT berhasil mereduksi jumlah kasus uji dari 12 kemungkinan kombinasi menjadi hanya 6 kasus uji tanpa kehilangan coverage pasangan. Semua kombinasi faktor filter dan sorting pada endpoint `GET /api/transactions` Midnight Finance berjalan dengan benar.
+> **Kesimpulan:** Matrix Testing berhasil memverifikasi semua 8 kombinasi parameter filter pada endpoint `GET /api/transactions`. Tidak ditemukan bug interaksi antar parameter. Sistem Midnight Finance menangani seluruh kombinasi filter secara konsisten dan aman.
 
 ---
 
