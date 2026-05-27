@@ -1,444 +1,299 @@
 # 🔬 Basis Path Testing — Midnight Finance
 
-**Mata Kuliah:** Software Quality Assurance
-**Pertemuan:** 10 — White Box Testing
-**Tim:** REMACode
-**Model Pengujian:** Basis Path Testing
-**Modul Target:** Login + Role Check
-**Tingkat Kompleksitas:** 🔴 High
+**Mata Kuliah:** Software Quality Assurance  
+**Model Pengujian:** White Box Testing — Basis Path Testing  
+**Tim:** REMACode  
+**Aplikasi:** Midnight Finance (Private Wealth Management)  
+**Stack:** Laravel 11 (PHP 8.2) + React.js  
 
 ---
 
-## 📖 Definisi & Konsep Dasar
+## 📖 Definisi
 
-**Basis Path Testing** adalah teknik *White Box Testing* yang diusulkan oleh **Tom McCabe (1976)**. Teknik ini memungkinkan tester untuk mengukur **kompleksitas logis** dari suatu kode program dan menggunakan pengukuran tersebut sebagai panduan untuk menentukan kumpulan **jalur eksekusi dasar (*basis set*)** yang harus diuji (Ndaumanu, 2023).
+**White Box Testing** adalah teknik pengujian perangkat lunak yang menggunakan runtutan logika program yang terkait pada *source code*. White box testing mengikuti analisis internal kerja dan struktur software, yaitu proses pemberian input ke dalam sistem kemudian memeriksanya bagaimana sistem tersebut memproses input kemudian menghasilkan output yang diinginkan (Suprihadi, 2025).
 
-Berbeda dengan teknik lain, Basis Path Testing memberikan **jaminan matematis** bahwa setiap pernyataan (*statement*) dan setiap kondisi logika akan dieksekusi setidaknya satu kali.
+**Basis Path Testing** adalah model *White Box Testing* yang berfokus pada identifikasi semua jalur eksekusi yang mungkin dijalankan dalam suatu program, sehingga perlu memahami alur logika aplikasi. **Cyclomatic Complexity** adalah metrik yang digunakan untuk mengukur kompleksitas suatu program.
 
-### Karakteristik Utama
-
-| Aspek | Penjelasan |
-| :---- | :---- |
-| **Tipe Pengujian** | Dynamic Testing (kode dieksekusi) |
-| **Metode Utama** | Cyclomatic Complexity + Independent Paths |
-| **Output Utama** | Basis set jalur + Test case per jalur |
-| **Penemu** | Thomas J. McCabe, 1976 |
-| **Standar** | IEEE Transactions on Software Engineering |
+> **Rumus:** `V(G) = E − N + 2P`  
+> dimana **E** = Jumlah edge (penghubung), **N** = Jumlah node (kotak keputusan), **P** = Jumlah komponen terhubung (default = 1)
 
 ---
 
-## 🎯 Tujuan Pengujian
+## 🔐 MODUL 1: Fitur Login (`AuthController@login`)
 
-> Memastikan cakupan pengujian (*test coverage*) mencapai **maksimal** dan meminimalkan risiko adanya jalur logika yang tidak pernah dieksekusi (*untested paths*) pada modul **Login + Role Check** Midnight Finance.
-
-**Tujuan spesifik pada modul ini:**
-
-- ✅ Memvalidasi seluruh jalur autentikasi pengguna (login berhasil/gagal)
-- ✅ Memverifikasi pengecekan peran (*role check*) berjalan sesuai logika
-- ✅ Memastikan tidak ada jalur akses tidak sah (*unauthorized path*) yang terlewat
-- ✅ Mengukur Cyclomatic Complexity untuk menilai risiko pemeliharaan kode
-
----
-
-## 🧮 Metode: Cyclomatic Complexity
-
-**Cyclomatic Complexity** $V(G)$ adalah metrik yang menentukan **jumlah jalur independen minimum** yang menjamin setiap baris perintah dieksekusi setidaknya satu kali.
-
-### Rumus Perhitungan $V(G)$
-
-| No. | Pendekatan | Rumus | Keterangan |
-| :--: | :---- | :----: | :---- |
-| 1 | **Berdasarkan Region** | $V(G) = R$ | $R$ = jumlah region (wilayah tertutup) pada CFG |
-| 2 | **Berdasarkan Edges & Nodes** | $V(G) = E - N + 2$ | $E$ = jumlah edge, $N$ = jumlah node |
-| 3 | **Berdasarkan Predicate Nodes** | $V(G) = P + 1$ | $P$ = jumlah titik keputusan (`if`, `while`, `for`) |
-
-> **Catatan:** Ketiga rumus di atas akan selalu menghasilkan nilai yang **sama** jika diterapkan pada CFG yang sama.
-
-### Interpretasi Nilai $V(G)$
-
-| Nilai $V(G)$ | Tingkat Risiko | Keterangan |
-| :---: | :--- | :--- |
-| 1 – 10 | 🟢 Rendah | Sederhana, mudah dipelihara |
-| 11 – 20 | 🟡 Sedang | Moderat, perlu perhatian |
-| 21 – 50 | 🟠 Tinggi | Kompleks, risiko tinggi |
-| > 50 | 🔴 Sangat Tinggi | Tidak stabil, wajib refactor |
-
----
-
-## 💻 Kode Sumber — Modul Login + Role Check
-
-Berikut adalah implementasi modul autentikasi dan pengecekan peran pada **Midnight Finance** menggunakan Laravel 11:
+### 1.1 Source Code yang Diuji
 
 ```php
-<?php
-// app/Http/Controllers/Auth/LoginController.php
-
-namespace App\Http\Controllers\Auth;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
-class LoginController extends Controller
+public function login(Request $request)
 {
-    public function login(Request $request): \Illuminate\Http\JsonResponse  // Node 1
-    {
-        // Validasi input
-        $credentials = $request->validate([                                   // Node 2
-            'email'    => 'required|email',
-            'password' => 'required|string|min:8',
-        ]);
+    // Node 1: Validasi input
+    $request->validate(['email' => 'required|email', 'password' => 'required']);
 
-        // Cek apakah kredensial valid
-        if (!Auth::attempt($credentials)) {                                   // Node 3 (P1)
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Email atau password salah.',
-            ], 401);                                                           // Node 4
-        }
+    // Node 2: Cari user berdasarkan email
+    $user = User::where('email', $request->email)->first();
 
-        $user = Auth::user();                                                 // Node 5
+    // Node 3: Decision — user ditemukan?
+    if (!$user)
+        return response()->json(['message' => 'Alamat email tidak ditemukan.'], 404);
 
-        // Cek apakah akun aktif
-        if (!$user->is_active) {                                              // Node 6 (P2)
-            Auth::logout();
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'Akun Anda telah dinonaktifkan.',
-            ], 403);                                                           // Node 7
-        }
+    // Node 4: Decision — password cocok?
+    if (!Hash::check($request->password, $user->password))
+        return response()->json(['message' => 'Kata sandi salah.'], 401);
 
-        // Cek role pengguna
-        if ($user->role === 'admin') {                                        // Node 8 (P3)
-            $redirectTo = '/admin/dashboard';                                 // Node 9
-        } elseif ($user->role === 'member') {                                 // Node 10 (P4)
-            $redirectTo = '/member/dashboard';                                // Node 11
-        } else {
-            $redirectTo = '/guest/dashboard';                                 // Node 12
-        }
+    // Node 5: Decision — akun sudah verifikasi OTP?
+    if ($user->otp_code)
+        return response()->json(['message' => 'Akun belum diverifikasi.', 'need_otp' => true], 403);
 
-        $token = $user->createToken('auth_token')->plainTextToken;           // Node 13
-
-        return response()->json([                                             // Node 14
-            'status'      => 'success',
-            'message'     => 'Login berhasil.',
-            'token'       => $token,
-            'redirect_to' => $redirectTo,
-            'user'        => [
-                'id'    => $user->id,
-                'name'  => $user->name,
-                'email' => $user->email,
-                'role'  => $user->role,
-            ],
-        ], 200);
-    }
+    // Node 6: Buat token & return sukses
+    return response()->json([
+        'access_token' => $user->createToken('auth_token')->plainTextToken,
+        'user' => $user
+    ]);
 }
 ```
 
----
+### 1.2 Flowchart Fitur Login
 
-## 🗺️ Control Flow Graph (CFG)
+```mermaid
+flowchart TD
+    A([▶ START]) --> B[/Input: email, password/]
+    B --> C{Validasi input\nformat valid?}
+    C -- Tidak --> Z1[/⚠ Return 422\nValidation Error/]
+    C -- Ya --> D[Cari user\nberdasarkan email]
+    D --> E{User\nditemukan?}
+    E -- Tidak --> Z2[/⚠ Return 404\nEmail tidak ditemukan/]
+    E -- Ya --> F{Password\ncocok?}
+    F -- Tidak --> Z3[/⚠ Return 401\nPassword salah/]
+    F -- Ya --> G{OTP Code\nmasih ada?}
+    G -- Ya --> Z4[/⚠ Return 403\nAkun belum diverifikasi/]
+    G -- Tidak --> H[Buat Sanctum Token]
+    H --> I[/✅ Return 200\naccess_token + user data/]
+    Z1 --> J([⏹ END])
+    Z2 --> J
+    Z3 --> J
+    Z4 --> J
+    I --> J
+```
 
-### Diagram CFG
+### 1.3 Flow Graph Fitur Login
 
 ```mermaid
 graph TD
-    N1([Node 1\nFungsi login dipanggil]) --> N2
-    N2([Node 2\nValidasi input email & password]) --> N3
-    N3{Node 3\nAuth::attempt\nberhasil?}
-    N3 -- Tidak / P1=False --> N4([Node 4\nReturn 401\nKredensial salah])
-    N3 -- Ya / P1=True --> N5([Node 5\nAmbil data user])
-    N5 --> N6
-    N6{Node 6\nuser->is_active\n= true?}
-    N6 -- Tidak / P2=False --> N7([Node 7\nLogout + Return 403\nAkun nonaktif])
-    N6 -- Ya / P2=True --> N8
-    N8{Node 8\nrole = admin?}
-    N8 -- Ya / P3=True --> N9([Node 9\nredirectTo\n/admin/dashboard])
-    N8 -- Tidak / P3=False --> N10
-    N10{Node 10\nrole = member?}
-    N10 -- Ya / P4=True --> N11([Node 11\nredirectTo\n/member/dashboard])
-    N10 -- Tidak / P4=False --> N12([Node 12\nredirectTo\n/guest/dashboard])
-    N9 --> N13
-    N11 --> N13
-    N12 --> N13
-    N13([Node 13\nBuat token autentikasi]) --> N14
-    N14([Node 14\nReturn 200\nLogin berhasil])
-
-    style N3 fill:#7c2d12,stroke:#ea580c,color:#fff
-    style N6 fill:#7c2d12,stroke:#ea580c,color:#fff
-    style N8 fill:#7c2d12,stroke:#ea580c,color:#fff
-    style N10 fill:#7c2d12,stroke:#ea580c,color:#fff
-    style N4 fill:#1e3a5f,stroke:#3b82f6,color:#fff
-    style N7 fill:#1e3a5f,stroke:#3b82f6,color:#fff
-    style N14 fill:#14532d,stroke:#22c55e,color:#fff
+    N1((1)) --> N2((2))
+    N2 --> N3((3))
+    N3 -- "User=null [FALSE]" --> N4((4))
+    N3 -- "User found [TRUE]" --> N5((5))
+    N4 --> N10((10))
+    N5 -- "Hash≠pass [FALSE]" --> N6((6))
+    N5 -- "Hash=pass [TRUE]" --> N7((7))
+    N6 --> N10
+    N7 -- "otp≠null [TRUE]" --> N8((8))
+    N7 -- "otp=null [FALSE]" --> N9((9))
+    N8 --> N10
+    N9 --> N10
 ```
 
-### Identifikasi Komponen CFG
+| Node | Keterangan |
+|:----:|:-----------|
+| 1 | START — Terima request + validasi format input |
+| 2 | Cari user berdasarkan email di database |
+| 3 | Decision: `!$user` — apakah user ditemukan? |
+| 4 | Return 404 (email tidak ditemukan) |
+| 5 | Decision: `!Hash::check(password)` — password cocok? |
+| 6 | Return 401 (password salah) |
+| 7 | Decision: `$user->otp_code` — sudah verifikasi? |
+| 8 | Return 403 (perlu verifikasi OTP) |
+| 9 | Buat Sanctum Token → Return 200 (login sukses) |
+| 10 | END |
 
-| Komponen | Simbol | Jumlah | Daftar Node |
-| :---- | :---: | :---: | :---- |
-| **Nodes (N)** | ○ | 14 | N1 – N14 |
-| **Edges (E)** | → | 17 | N1→N2, N2→N3, N3→N4, N3→N5, N5→N6, N6→N7, N6→N8, N8→N9, N8→N10, N10→N11, N10→N12, N9→N13, N11→N13, N12→N13, N13→N14, N4 (end), N7 (end) |
-| **Predicate Nodes (P)** | ◇ | 4 | N3, N6, N8, N10 |
-| **Region (R)** | — | 5 | R1 (luar), R2–R5 (dalam) |
+### 1.4 Perhitungan Cyclomatic Complexity
+
+| Parameter | Nilai | Keterangan |
+|:---:|:---:|:---|
+| **E** (Edges) | 12 | N1→N2, N2→N3, N3→N4, N3→N5, N4→N10, N5→N6, N5→N7, N6→N10, N7→N8, N7→N9, N8→N10, N9→N10 |
+| **N** (Nodes) | 10 | Node 1 s/d Node 10 |
+| **P** | 1 | Graf terhubung tunggal |
+
+```
+V(G) = E − N + 2P
+V(G) = 12 − 10 + 2(1)
+V(G) = 4
+```
+
+> **Interpretasi:** Nilai CC = 4 → Risiko **Rendah** (< 10). Terdapat **4 jalur independen** yang harus diuji.
+
+### 1.5 Jalur Independen (Independent Path)
+
+| No | Independent Path | Skenario |
+|:--:|:---|:---|
+| **Path 1** | N1 → N2 → N3 → **N4** → N10 | Email tidak terdaftar di database |
+| **Path 2** | N1 → N2 → N3 → N5 → **N6** → N10 | Email benar, password salah |
+| **Path 3** | N1 → N2 → N3 → N5 → N7 → **N8** → N10 | Email & password benar, tapi akun belum verifikasi OTP |
+| **Path 4** | N1 → N2 → N3 → N5 → N7 → **N9** → N10 | Login berhasil — semua kondisi terpenuhi |
+
+### 1.6 Test Case Basis Path Login
+
+| No | Test Case | Path | Input | Expected Output | Actual Output | Status |
+|:--:|:---|:---:|:---|:---|:---|:---:|
+| TC-L-01 | Email tidak terdaftar | Path 1 | email: `notexist@mail.com`, password: `Test@1234` | HTTP 404 — "Alamat email tidak ditemukan" | HTTP 404 | ✅ Valid |
+| TC-L-02 | Password salah | Path 2 | email: `user@midnight.com`, password: `WrongPass!` | HTTP 401 — "Kata sandi yang Anda masukkan salah" | HTTP 401 | ✅ Valid |
+| TC-L-03 | Akun belum verifikasi OTP | Path 3 | email: `unverified@midnight.com`, password: `Test@1234` | HTTP 403 — "Akun belum diverifikasi", `need_otp: true` | HTTP 403 | ✅ Valid |
+| TC-L-04 | Login berhasil | Path 4 | email: `user@midnight.com`, password: `Test@1234` | HTTP 200 — `access_token` + data user | HTTP 200 | ✅ Valid |
 
 ---
 
-## 🧮 Perhitungan Cyclomatic Complexity
+## 💸 MODUL 2: Fitur Catat Transaksi (`TransactionController@store`)
 
-Menggunakan ketiga rumus untuk verifikasi silang:
-
-**Rumus 1 — Berdasarkan Region:**
-$$V(G) = R = 5$$
-
-**Rumus 2 — Berdasarkan Edges & Nodes:**
-$$V(G) = E - N + 2 = 17 - 14 + 2 = \mathbf{5}$$
-
-**Rumus 3 — Berdasarkan Predicate Nodes:**
-$$V(G) = P + 1 = 4 + 1 = \mathbf{5}$$
-
-> ✅ **Hasil konsisten:** $V(G) = 5$ → Terdapat **5 jalur independen** yang harus diuji.
->
-> 📊 **Interpretasi:** Nilai 5 berada pada rentang 1–10 (🟢 Rendah), namun dikategorikan **🔴 High** dalam konteks proyek karena modul ini menangani autentikasi dan kontrol akses yang kritis terhadap keamanan sistem.
-
----
-
-## 🛣️ Identifikasi Independent Paths (Basis Set)
-
-| Jalur | Urutan Node | Deskripsi Skenario |
-| :---- | :---- | :---- |
-| **Path 1** | N1 → N2 → N3 → **N4** (end) | Login gagal: kredensial salah |
-| **Path 2** | N1 → N2 → N3 → N5 → N6 → **N7** (end) | Login gagal: akun nonaktif |
-| **Path 3** | N1 → N2 → N3 → N5 → N6 → N8 → **N9** → N13 → N14 | Login berhasil: role **admin** |
-| **Path 4** | N1 → N2 → N3 → N5 → N6 → N8 → N10 → **N11** → N13 → N14 | Login berhasil: role **member** |
-| **Path 5** | N1 → N2 → N3 → N5 → N6 → N8 → N10 → **N12** → N13 → N14 | Login berhasil: role **guest/lainnya** |
-
----
-
-## 🧪 Tabel Test Case & Hasil Eksekusi
-
-### Test Case Detail
-
-| TC | Jalur | Input | Kondisi yang Diuji | Output Diharapkan | Status HTTP |
-| :-- | :---- | :---- | :---- | :---- | :---: |
-| **TC-01** | Path 1 | `email: user@test.com` `password: wrongpass` | `Auth::attempt()` → `false` | `{ status: "error", message: "Email atau password salah." }` | `401` |
-| **TC-02** | Path 2 | `email: inactive@test.com` `password: ValidPass123` | `Auth::attempt()` → `true` `is_active` → `false` | `{ status: "error", message: "Akun Anda telah dinonaktifkan." }` | `403` |
-| **TC-03** | Path 3 | `email: admin@midnight.com` `password: AdminPass123` | Kredensial valid, `is_active` → `true`, `role` → `admin` | `{ status: "success", redirect_to: "/admin/dashboard" }` | `200` |
-| **TC-04** | Path 4 | `email: member@midnight.com` `password: MemberPass123` | Kredensial valid, `is_active` → `true`, `role` → `member` | `{ status: "success", redirect_to: "/member/dashboard" }` | `200` |
-| **TC-05** | Path 5 | `email: guest@midnight.com` `password: GuestPass123` | Kredensial valid, `is_active` → `true`, `role` → `viewer` | `{ status: "success", redirect_to: "/guest/dashboard" }` | `200` |
-
-### Hasil Eksekusi PHPUnit
+### 2.1 Source Code yang Diuji
 
 ```php
-<?php
-// tests/Feature/Auth/LoginBasisPathTest.php
-
-namespace Tests\Feature\Auth;
-
-use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class LoginBasisPathTest extends TestCase
+public function store(Request $request)
 {
-    use RefreshDatabase;
+    // Node 1: Validasi input wajib
+    $validated = $request->validate([
+        'financial_account_id' => 'required|exists:financial_accounts,id',
+        'category_id'          => 'required|exists:categories,id',
+        'amount'               => 'required|numeric|min:1',
+        'type'                 => 'required|in:income,expense',
+        'date'                 => 'required|date',
+    ]);
 
-    /** @test — TC-01: Path 1 — Kredensial salah */
-    public function test_path1_login_fails_with_wrong_credentials(): void
-    {
-        $response = $this->postJson('/api/auth/login', [
-            'email'    => 'user@test.com',
-            'password' => 'wrongpass',
-        ]);
+    // Node 2: Mulai DB Transaction
+    DB::beginTransaction();
+    try {
+        // Node 3: Ambil akun & verifikasi kepemilikan
+        $account = FinancialAccount::where('id', $validated['financial_account_id'])
+            ->where('user_id', $user->id)->firstOrFail();
 
-        $response->assertStatus(401)
-                 ->assertJson(['status' => 'error']);
-    }
+        // Node 4: Decision — tipe transaksi?
+        if ($validated['type'] === 'income') {
+            $account->balance += $validated['amount']; // Node 5: Tambah saldo
+        } else {
+            $account->balance -= $validated['amount']; // Node 6: Kurangi saldo
+        }
+        // Node 7: Simpan saldo
+        $account->save();
 
-    /** @test — TC-02: Path 2 — Akun nonaktif */
-    public function test_path2_login_fails_when_account_inactive(): void
-    {
-        $user = User::factory()->create([
-            'email'     => 'inactive@test.com',
-            'password'  => bcrypt('ValidPass123'),
-            'is_active' => false,
-            'role'      => 'member',
-        ]);
+        // Node 8: Catat histori transaksi
+        $transaction = $user->transactions()->create($validated);
 
-        $response = $this->postJson('/api/auth/login', [
-            'email'    => 'inactive@test.com',
-            'password' => 'ValidPass123',
-        ]);
+        // Node 9: Commit & return sukses
+        DB::commit();
+        return response()->json($transaction->load(['category', 'financialAccount']), 201);
 
-        $response->assertStatus(403)
-                 ->assertJson(['status' => 'error']);
-    }
-
-    /** @test — TC-03: Path 3 — Login admin berhasil */
-    public function test_path3_admin_login_redirects_to_admin_dashboard(): void
-    {
-        $user = User::factory()->create([
-            'email'     => 'admin@midnight.com',
-            'password'  => bcrypt('AdminPass123'),
-            'is_active' => true,
-            'role'      => 'admin',
-        ]);
-
-        $response = $this->postJson('/api/auth/login', [
-            'email'    => 'admin@midnight.com',
-            'password' => 'AdminPass123',
-        ]);
-
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'status'      => 'success',
-                     'redirect_to' => '/admin/dashboard',
-                 ]);
-    }
-
-    /** @test — TC-04: Path 4 — Login member berhasil */
-    public function test_path4_member_login_redirects_to_member_dashboard(): void
-    {
-        $user = User::factory()->create([
-            'email'     => 'member@midnight.com',
-            'password'  => bcrypt('MemberPass123'),
-            'is_active' => true,
-            'role'      => 'member',
-        ]);
-
-        $response = $this->postJson('/api/auth/login', [
-            'email'    => 'member@midnight.com',
-            'password' => 'MemberPass123',
-        ]);
-
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'status'      => 'success',
-                     'redirect_to' => '/member/dashboard',
-                 ]);
-    }
-
-    /** @test — TC-05: Path 5 — Login guest/lainnya berhasil */
-    public function test_path5_guest_role_login_redirects_to_guest_dashboard(): void
-    {
-        $user = User::factory()->create([
-            'email'     => 'guest@midnight.com',
-            'password'  => bcrypt('GuestPass123'),
-            'is_active' => true,
-            'role'      => 'viewer',
-        ]);
-
-        $response = $this->postJson('/api/auth/login', [
-            'email'    => 'guest@midnight.com',
-            'password' => 'GuestPass123',
-        ]);
-
-        $response->assertStatus(200)
-                 ->assertJson([
-                     'status'      => 'success',
-                     'redirect_to' => '/guest/dashboard',
-                 ]);
+    } catch (Exception $e) {
+        // Node 10: Rollback & return error
+        DB::rollBack();
+        return response()->json(['message' => 'Gagal mencatat transaksi.'], 500);
     }
 }
 ```
 
-### Rekap Hasil
+### 2.2 Flowchart Fitur Catat Transaksi
 
-| TC | Jalur | Status Eksekusi | Hasil | Catatan |
-| :--: | :---- | :---: | :---: | :---- |
-| TC-01 | Path 1 | ✅ Pass | PASS | Respon 401 sesuai ekspektasi |
-| TC-02 | Path 2 | ✅ Pass | PASS | Logout + respon 403 berjalan benar |
-| TC-03 | Path 3 | ✅ Pass | PASS | Token dibuat, redirect admin benar |
-| TC-04 | Path 4 | ✅ Pass | PASS | Token dibuat, redirect member benar |
-| TC-05 | Path 5 | ✅ Pass | PASS | Fallback guest/lainnya berjalan benar |
+```mermaid
+flowchart TD
+    A([▶ START]) --> B[/Input: account_id, category_id,\namount, type, date/]
+    B --> C{Validasi input\nvalid?}
+    C -- Tidak --> Z1[/⚠ Return 422\nValidation Error/]
+    C -- Ya --> D[DB::beginTransaction]
+    D --> E[Cari FinancialAccount\nmilik user]
+    E --> F{Account\nditemukan?}
+    F -- Tidak --> G[Throw Exception]
+    F -- Ya --> H{type === \n'income'?}
+    H -- Ya --> I[balance += amount\nTambah Saldo]
+    H -- Tidak --> J[balance -= amount\nKurangi Saldo]
+    I --> K[account->save]
+    J --> K
+    K --> L[Catat Histori\ntransaction->create]
+    L --> M[DB::commit]
+    M --> N[/✅ Return 201\nData Transaksi/]
+    G --> O[DB::rollBack]
+    O --> P[/⚠ Return 500\nGagal mencatat/]
+    Z1 --> Q([⏹ END])
+    N --> Q
+    P --> Q
+```
 
-> ✅ **Semua 5 jalur independen berhasil diuji dan lolos.** Coverage modul Login + Role Check mencapai **100% statement coverage** dan **100% branch coverage**.
+### 2.3 Flow Graph Fitur Catat Transaksi
+
+```mermaid
+graph TD
+    N1((1)) --> N2((2))
+    N2 --> N3((3))
+    N3 -- "Not found [EXCEPTION]" --> N9((9))
+    N3 -- "Found [OK]" --> N4((4))
+    N4 -- "income [TRUE]" --> N5((5))
+    N4 -- "expense [FALSE]" --> N6((6))
+    N5 --> N7((7))
+    N6 --> N7
+    N7 --> N8((8))
+    N8 --> N10((10))
+    N9 --> N10
+```
+
+| Node | Keterangan |
+|:----:|:-----------|
+| 1 | START — Validasi input request |
+| 2 | DB::beginTransaction() |
+| 3 | Decision: FinancialAccount ditemukan & milik user? |
+| 4 | Decision: `type === 'income'`? |
+| 5 | `balance += amount` (Tambah saldo — income) |
+| 6 | `balance -= amount` (Kurangi saldo — expense) |
+| 7 | `account->save()` + `transaction->create()` |
+| 8 | DB::commit() → Return 201 Sukses |
+| 9 | DB::rollBack() → Return 500 Error |
+| 10 | END |
+
+### 2.4 Perhitungan Cyclomatic Complexity
+
+| Parameter | Nilai | Keterangan |
+|:---:|:---:|:---|
+| **E** (Edges) | 11 | N1→N2, N2→N3, N3→N9, N3→N4, N4→N5, N4→N6, N5→N7, N6→N7, N7→N8, N8→N10, N9→N10 |
+| **N** (Nodes) | 10 | Node 1 s/d Node 10 |
+| **P** | 1 | Graf terhubung tunggal |
+
+```
+V(G) = E − N + 2P
+V(G) = 11 − 10 + 2(1)
+V(G) = 3
+```
+
+> **Interpretasi:** Nilai CC = 3 → Risiko **Sangat Rendah**. Terdapat **3 jalur independen** yang harus diuji.
+
+### 2.5 Jalur Independen (Independent Path)
+
+| No | Independent Path | Skenario |
+|:--:|:---|:---|
+| **Path 1** | N1 → N2 → N3 → N4 → **N5** → N7 → N8 → N10 | Transaksi income berhasil dicatat, saldo bertambah |
+| **Path 2** | N1 → N2 → N3 → N4 → **N6** → N7 → N8 → N10 | Transaksi expense berhasil dicatat, saldo berkurang |
+| **Path 3** | N1 → N2 → N3 → **N9** → N10 | Akun tidak ditemukan / bukan milik user → gagal |
+
+### 2.6 Test Case Basis Path Transaksi
+
+| No | Test Case | Path | Input | Expected Output | Actual Output | Status |
+|:--:|:---|:---:|:---|:---|:---|:---:|
+| TC-T-01 | Catat transaksi income | Path 1 | type: `income`, amount: `500000`, account valid | HTTP 201 — data transaksi, saldo +500.000 | HTTP 201 | ✅ Valid |
+| TC-T-02 | Catat transaksi expense | Path 2 | type: `expense`, amount: `150000`, account valid | HTTP 201 — data transaksi, saldo -150.000 | HTTP 201 | ✅ Valid |
+| TC-T-03 | Akun tidak valid / bukan milik user | Path 3 | `financial_account_id`: ID milik user lain | HTTP 500 — "Gagal mencatat transaksi" | HTTP 500 | ✅ Valid |
 
 ---
 
-## 📊 Analisis Hasil Pengujian
+## 📊 Ringkasan Hasil Pengujian
 
-### Coverage Report
+| Modul | E | N | V(G) | Jalur Independen | Risk Level |
+|:---|:---:|:---:|:---:|:---:|:---:|
+| Login (`AuthController@login`) | 12 | 10 | **4** | 4 jalur | 🟢 Rendah |
+| Catat Transaksi (`TransactionController@store`) | 11 | 10 | **3** | 3 jalur | 🟢 Sangat Rendah |
+| **Total** | 23 | 20 | **7** | **7 jalur** | 🟢 **Rendah** |
 
-```
-LoginController@login
-  Statements  : 100% (18/18)
-  Branches    : 100% (8/8)
-  Paths       : 100% (5/5)
-  Lines       : 100% (18/18)
-```
-
-### Temuan & Observasi
-
-| No. | Temuan | Kategori | Rekomendasi |
-| :-- | :---- | :---: | :---- |
-| 1 | Semua 5 jalur tereksekusi dengan benar | ✅ Baik | Pertahankan struktur logika saat ini |
-| 2 | $V(G) = 5$ — dalam batas aman | ✅ Baik | Hindari penambahan kondisi berlebih pada fungsi ini |
-| 3 | Tidak ada jalur yang menghasilkan output tak terdefinisi | ✅ Baik | Fallback `else` pada role check sudah tepat |
-| 4 | Validasi input hanya dilakukan di level Request | ⚠️ Perhatian | Pertimbangkan menambahkan validasi tambahan di service layer |
-| 5 | Token tidak memiliki waktu kedaluwarsa eksplisit pada test | ⚠️ Perhatian | Tambahkan pengujian expiry token secara terpisah |
-
----
-
-## ⚖️ Kelebihan & Kekurangan
-
-### Kelebihan
-
-| No. | Kelebihan |
-| :--: | :---- |
-| 1 | Memberikan **jaminan matematis** bahwa semua jalur logika telah diuji |
-| 2 | Menghasilkan **jumlah test case minimum yang terukur** berdasarkan kompleksitas kode |
-| 3 | Efektif mendeteksi **dead code** (jalur yang tidak pernah bisa dicapai) |
-| 4 | Membantu menilai **maintainability** modul berdasarkan nilai $V(G)$ |
-| 5 | Dapat diotomasi menggunakan tools seperti **PHPUnit + Xdebug** |
-
-### Kekurangan
-
-| No. | Kekurangan |
-| :--: | :---- |
-| 1 | Tidak menjamin pengujian **semua kombinasi kondisi** (perlu *Decision/Condition Coverage*) |
-| 2 | Tidak mendeteksi kesalahan yang berkaitan dengan **data flow** secara langsung |
-| 3 | Untuk modul besar dengan $V(G)$ tinggi, jumlah test case bisa sangat banyak |
-| 4 | Membutuhkan pemahaman mendalam tentang **struktur internal kode** |
-
----
-
-## 🛠️ Tools yang Digunakan
-
-| Kategori | Tool | Kegunaan pada Modul Ini |
-| :---- | :---- | :---- |
-| **Unit Testing** | PHPUnit | Mengeksekusi 5 test case basis path |
-| **Code Coverage** | Xdebug + PHPUnit Coverage | Memverifikasi 100% path coverage |
-| **Static Analysis** | Larastan | Mendeteksi potensi error sebelum runtime |
-| **Flowchart** | Mermaid | Visualisasi Control Flow Graph |
-| **API Testing** | Laravel HTTP Test | Simulasi request login via `postJson()` |
-| **Code Quality** | PHP Mess Detector | Verifikasi nilai Cyclomatic Complexity |
-
-### Menjalankan Test
-
-```bash
-# Jalankan test basis path saja
-php artisan test --filter=LoginBasisPathTest
-
-# Dengan laporan coverage
-php artisan test --filter=LoginBasisPathTest --coverage
-
-# Output coverage ke HTML
-php artisan test --coverage-html=coverage-report/
-```
+> **Kesimpulan:** Seluruh test case dinyatakan **valid**. Nilai Cyclomatic Complexity yang rendah menunjukkan bahwa risiko error dari aplikasi Midnight Finance terbilang **cukup rendah** dan kode dapat dipelihara dengan baik.
 
 ---
 
 ## 📚 Referensi
 
-1. Ndaumanu, R. I. (2023). *Pengujian Sistem Informasi Perpustakaan Berbasis Website dengan Basis Path Testing*. Justek: Jurnal Sains dan Teknologi.
-2. Andriyadi, A., Zulkarnaini, Fikri, R. R. N., & Saputri, E. F. (2022). *Evaluasi Sistem Informasi Perpustakaan Institut Informatika Darmajaya Dengan WhiteBox Testing*. Journal of Innovation Research and Knowledge.
-3. Pressman, R. S., & Maxim, B. R. (2020). *Software Engineering: A Practitioner's Approach* (9th ed.). McGraw-Hill.
-4. McCabe, T. J. (1976). *A Complexity Measure*. IEEE Transactions on Software Engineering.
-5. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10 — White Box Testing*. Universitas Kristen Indonesia.
-
----
-
-**Dokumentasi disusun oleh Tim REMACode**
-
-*"Quality is not an act, it is a habit." — Aristotle*
+- Suprihadi, D. (2025). *Software Quality — White Box Testing*. T Informatika UKRI.
+- Ndaumanu, R. I. (2023). Pengujian Sistem Informasi Perpustakaan Berbasis Website dengan Basis Path Testing. *Justek*, 6(1), 123.
+- Zen, H. R. R., & Nuryasin, I. (2024). Penerapan Whitebox Testing pada Pengujian Sistem Menggunakan Teknik Basis Path. *JOISIE*, 8(1), 101–111.
+- McCabe, T. J. (1976). A Complexity Measure. *IEEE Transactions on Software Engineering*, SE-2(4), 308–320.
