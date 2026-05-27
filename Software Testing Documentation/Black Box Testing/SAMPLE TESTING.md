@@ -40,6 +40,10 @@
 
 > ⚠️ **TODO:** Konfirmasi parameter filter & pagination yang tersedia di `midnight-finance-backend`.
 
+### Class Diagram
+
+<img width="1440" height="1040" alt="image" src="https://github.com/user-attachments/assets/5feea517-64d4-4606-bfb7-a508b9f5a36d" />
+
 ### Parameter Endpoint
 
 | Parameter | Tipe | Deskripsi |
