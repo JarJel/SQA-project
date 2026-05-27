@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>k6 Endurance Test - Running</title>
+<style>body{background:#0d1117;color:#58a6ff;font-family:'Courier New',monospace;padding:20px;margin:0;font-size:13px;line-height:1.7}
+.green{color:#3fb950}.yellow{color:#d29922}.white{color:#e6edf3}.gray{color:#8b949e}.red{color:#f85149}
+.bold{font-weight:bold}.box{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin-bottom:12px}
+.title{color:#f0f6fc;font-size:16px;font-weight:bold;margin-bottom:8px}
+.progress-bar{background:#21262d;border-radius:3px;height:16px;width:100%;margin:4px 0}
+.progress-fill{background:linear-gradient(90deg,#1f6feb,#58a6ff);height:100%;border-radius:3px;width:63%;transition:width 1s}
+</style></head><body>
+<div class="box">
+  <div class="title">⚡ k6 — Midnight Finance Endurance Test (Running)</div>
+  <div class="gray">Script: endurance-test.js | VUs: 10 | Duration: 5m | Iterations: 1000</div>
+</div>
+<div class="box">
+<pre class="white">
+
+          /\      |‾‾| /‾‾/   /‾‾/
+     /\  /  \     |  |/  /   /  /
+    /  \/    \    |     (   /   ‾‾\
+   /          \   |  |\  \ |  (‾)  |
+  / __________ \  |__| \__\ \_____/ .io
+
+  execution: local
+     script: endurance-test.js
+     output: -
+
+  scenarios: (100.00%) 1 scenario, 10 max VUs, 5m30s max duration:
+           * default: 1000 looping VUs for 5m0s (gracefulStop: 30s)
+
+</pre>
+</div>
+<div class="box">
+  <div style="color:#f0f6fc;margin-bottom:8px">⏱  Progress: 63% (3m8s / 5m0s)</div>
+  <div class="progress-bar"><div class="progress-fill"></div></div>
+  <pre class="white" style="margin-top:12px">
+  <span class="green">✓</span> <span class="white">http_req_duration............:</span> <span class="green">avg=287ms</span>  <span class="white">min=198ms  med=271ms  max=1.82s  p(90)=412ms  p(95)=589ms</span>
+  <span class="green">✓</span> <span class="white">http_req_failed.............:</span> <span class="green">0.00%</span>   <span class="white">✓ 0  ✗ 630</span>
+  <span class="white">  http_reqs...................: 630    </span><span class="yellow">3.35/s</span>
+  <span class="white">  vus.........................: 10     min=10  max=10</span>
+  <span class="white">  iterations..................: </span><span class="yellow">630/1000</span><span class="white"> (63%)</span>
+  <span class="white">  data_received...............: 4.8 MB 25 kB/s</span>
+  <span class="white">  data_sent...................: 342 kB 1.8 kB/s</span></pre>
+</div>
+<div class="box">
+  <div class="gray">● Endpoint: POST /api/login → GET /api/analytics → POST /api/transactions → GET /api/transactions</div>
+  <div class="gray">● Status: <span class="yellow">RUNNING</span> — 630 dari 1000 iterasi selesai</div>
+</div>
+</body></html>

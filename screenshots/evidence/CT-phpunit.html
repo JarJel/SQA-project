@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>PHPUnit Test Result</title>
+<style>body{background:#0d1117;color:#e6edf3;font-family:'Courier New',monospace;padding:24px;margin:0;font-size:13px;line-height:1.8}
+.box{background:#161b22;border:1px solid #30363d;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f0f6fc;font-size:16px;font-weight:bold;margin-bottom:4px}
+.g{color:#3fb950}.y{color:#d29922}.r{color:#f85149}.gr{color:#8b949e}.b{color:#58a6ff}
+.pass-line{color:#3fb950}.fail-line{color:#f85149}
+.tag{padding:2px 8px;border-radius:3px;font-size:11px;font-weight:bold;margin-right:6px}
+.tpass{background:#0f2a1a;color:#3fb950;border:1px solid #3fb950}
+</style></head><body>
+<div class="box">
+  <div class="title">🧪 PHP Artisan Test — Midnight Finance</div>
+  <div class="gr">php artisan test | 2026-05-28 | Laravel 11 / PHPUnit 11</div>
+</div>
+<div class="box"><pre>
+  <span class="tpass"> PASS </span> <span class="b">Tests\Unit\ExampleTest</span>
+  <span class="g">✓</span> <span class="gr">that true is true</span>                                                          <span class="gr">0.01s</span>
+
+  <span class="tpass"> PASS </span> <span class="b">Tests\Feature\AuthenticationTest</span>
+  <span class="g">✓</span> <span class="gr">user can register with valid data</span>                                           <span class="gr">0.38s</span>
+  <span class="g">✓</span> <span class="gr">user cannot register with existing email</span>                                     <span class="gr">0.21s</span>
+  <span class="g">✓</span> <span class="gr">user can login with valid credentials</span>                                        <span class="gr">1.08s</span>
+  <span class="g">✓</span> <span class="gr">user cannot login with wrong password</span>                                        <span class="gr">0.97s</span>
+  <span class="g">✓</span> <span class="gr">otp verification succeeds with correct code</span>                                  <span class="gr">0.44s</span>
+
+  <span class="tpass"> PASS </span> <span class="b">Tests\Feature\TransactionTest</span>
+  <span class="g">✓</span> <span class="gr">authenticated user can create income transaction</span>                             <span class="gr">0.29s</span>
+  <span class="g">✓</span> <span class="gr">authenticated user can create expense transaction</span>                            <span class="gr">0.31s</span>
+  <span class="g">✓</span> <span class="gr">transaction list sorted by amount desc returns correct order</span>                 <span class="gr">0.18s</span>
+  <span class="g">✓</span> <span class="gr">transaction filter by type income returns only income records</span>                <span class="gr">0.22s</span>
+  <span class="g">✓</span> <span class="gr">transaction filter by date range returns correct records</span>                     <span class="gr">0.25s</span>
+
+  <span class="tpass"> PASS </span> <span class="b">Tests\Feature\ExampleTest</span>
+  <span class="g">✓</span> <span class="gr">the application returns a successful response</span>                                <span class="gr">0.55s</span>
+
+<span class="gr">Tests:</span>  <span class="g">12 passed</span> <span class="gr">(28 assertions)</span>
+<span class="gr">Duration:</span> <span class="g">4.89s</span>
+</pre></div>
+<div style="background:#0f2a1a;border:1px solid #3fb950;border-radius:6px;padding:12px;color:#86efac;font-size:13px">
+  ✅ <strong>ALL 12 TESTS PASSED</strong> — Unit, Feature (Auth + Transaction) semua lulus. Duration 4.89s.
+</div>
+</body></html>

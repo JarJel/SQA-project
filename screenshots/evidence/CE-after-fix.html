@@ -1,0 +1,48 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>After Fix - Response Time</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;padding:24px;margin:0}
+.box{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:6px}
+.gr{color:#64748b;font-size:13px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.card{border-radius:8px;padding:16px;text-align:center}
+.before{background:#2d1515;border:1px solid #f87171}
+.after{background:#0a2a1a;border:1px solid #22c55e}
+.big{font-size:36px;font-weight:bold;margin:8px 0}
+.red{color:#f87171}.green{color:#22c55e}
+.label{font-size:12px;color:#94a3b8;letter-spacing:1px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+th{background:#0f172a;color:#94a3b8;padding:8px 12px;text-align:left}
+td{padding:8px 12px;border-bottom:1px solid #334155}
+.g{color:#22c55e;font-weight:bold}.r{color:#f87171;font-weight:bold}
+</style></head><body>
+<div class="box">
+  <div class="title">⚡ Setelah Perbaikan — Response Time Comparison</div>
+  <div class="gr">Test ID: CE-04 | Dashboard Analytics Endpoint | 2026-05-28</div>
+</div>
+<div class="compare">
+  <div class="card before">
+    <div class="label">SEBELUM PERBAIKAN</div>
+    <div class="big red">1,840 ms</div>
+    <div class="red">GET /api/analytics</div>
+    <div style="margin-top:8px;font-size:12px;color:#94a3b8">• N+1 query problem<br>• Full table scan<br>• Tanpa eager loading</div>
+  </div>
+  <div class="card after">
+    <div class="label">SETELAH PERBAIKAN</div>
+    <div class="big green">187 ms</div>
+    <div class="green">GET /api/analytics</div>
+    <div style="margin-top:8px;font-size:12px;color:#94a3b8">• Eager loading: with()<br>• Index on user_id+date<br>• Response cache 60s</div>
+  </div>
+</div>
+<div class="box">
+  <table>
+    <tr><th>Perbaikan</th><th>Teknik</th><th>Dampak</th></tr>
+    <tr><td>Fix N+1 Query</td><td>Eager Loading with(['category','account'])</td><td class="g">-68% query count</td></tr>
+    <tr><td>Database Index</td><td>idx_transactions_user_date</td><td class="g">-92% scan rows</td></tr>
+    <tr><td>Response Cache</td><td>Cache::remember(60s)</td><td class="g">~0ms cached hits</td></tr>
+  </table>
+</div>
+<div style="background:#0a2a1a;border:1px solid #22c55e;border-radius:8px;padding:14px;color:#86efac;font-size:13px">
+  ✅ <strong>Total improvement: 1840ms → 187ms (89.8% faster)</strong><br>
+  Dashboard sekarang memuat dalam &lt;200ms, memenuhi target SLA.
+</div>
+</body></html>

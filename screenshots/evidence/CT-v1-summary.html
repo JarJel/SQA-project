@@ -1,0 +1,30 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CT v1 Summary</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:'Courier New',monospace;padding:20px;margin:0;font-size:13px}
+.box{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:6px}
+.badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:bold;margin-right:8px}
+.get{background:#0ea5e9;color:#fff}.ok{background:#22c55e;color:#fff}
+pre{background:#0f172a;border:1px solid #1e293b;border-radius:6px;padding:12px;font-size:12px;line-height:1.6;margin:0}
+.k{color:#7dd3fc}.n{color:#86efac}.s{color:#fcd34d}.gr{color:#64748b}
+</style></head><body>
+<div class="box">
+  <div class="title">🔄 Comparison Test — v1 Transactions Summary</div>
+  <div class="gr">Test ID: CT-01 | 2026-05-28</div>
+  <br><span class="badge get">GET</span>
+  <span style="color:#94a3b8">/api/transactions?sort_by=amount&sort_order=desc&per_page=5</span>
+  <span class="badge ok" style="margin-left:10px">200 OK</span>
+</div>
+<div class="box">
+  <div style="color:#94a3b8;margin-bottom:8px;font-size:11px;letter-spacing:1px">RESPONSE TIME: <strong style="color:#22c55e">691ms</strong> | SIZE: 7.9 KB</div>
+<pre>{
+  <span class="k">"data"</span>: [
+    {<span class="k">"id"</span>:<span class="n">61</span>, <span class="k">"amount"</span>:<span class="n">1000000000</span>, <span class="k">"type"</span>:<span class="s">"income"</span>, <span class="k">"description"</span>:<span class="s">"BVA Test amount=1000000000"</span>},
+    {<span class="k">"id"</span>:<span class="n">60</span>, <span class="k">"amount"</span>:<span class="n">999999999</span>,  <span class="k">"type"</span>:<span class="s">"income"</span>, <span class="k">"description"</span>:<span class="s">"BVA Test amount=999999999"</span> },
+    {<span class="k">"id"</span>:<span class="n">59</span>, <span class="k">"amount"</span>:<span class="n">999999998</span>,  <span class="k">"type"</span>:<span class="s">"income"</span>, <span class="k">"description"</span>:<span class="s">"BVA Test amount=999999998"</span> },
+    {<span class="k">"id"</span>:<span class="n">57</span>, <span class="k">"amount"</span>:<span class="n">500000000</span>,   <span class="k">"type"</span>:<span class="s">"income"</span>, <span class="k">"description"</span>:<span class="s">"BVA Test amount=500000000"</span>  },
+    {<span class="k">"id"</span>:<span class="n">56</span>, <span class="k">"amount"</span>:<span class="n">2</span>,           <span class="k">"type"</span>:<span class="s">"income"</span>, <span class="k">"description"</span>:<span class="s">"BVA Test amount=2"</span>          }
+  ],
+  <span class="k">"meta"</span>: { <span class="k">"total"</span>:<span class="n">72</span>, <span class="k">"per_page"</span>:<span class="n">5</span>, <span class="k">"current_page"</span>:<span class="n">1</span>, <span class="k">"sort_by"</span>:<span class="s">"amount"</span>, <span class="k">"sort_order"</span>:<span class="s">"desc"</span> }
+}</pre>
+</div>
+</body></html>

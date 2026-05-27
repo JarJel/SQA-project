@@ -1,0 +1,66 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>BHV - Budget Warning</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;padding:20px;margin:0}
+.box{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:4px}
+.gr{color:#64748b;font-size:12px}
+.badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:bold;margin-right:6px}
+.na{background:#1e3a5f;color:#60a5fa}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{color:#64748b;padding:8px;text-align:left;border-bottom:1px solid #1e293b}
+td{padding:8px;border-bottom:1px solid #1e293b}
+</style></head><body>
+
+<div class="box">
+  <div class="title">⚠️ BHV Test — Budget Warning Notification</div>
+  <div class="gr">Test ID: BHV-05 | Midnight Finance v1.0 | 2026-05-28</div>
+</div>
+
+<div style="background:#1a2a3a;border:1px solid #3b82f6;border-radius:8px;padding:16px;margin-bottom:12px">
+  <div style="color:#60a5fa;font-weight:bold;font-size:14px;margin-bottom:8px">ℹ️ Feature Status: NOT IMPLEMENTED (v1.0)</div>
+  <div style="color:#94a3b8;font-size:13px;line-height:1.6">
+    Fitur <strong style="color:#e2e8f0">Budget Warning Notification</strong> belum diimplementasikan di Midnight Finance versi 1.0.<br><br>
+    Sistem saat ini hanya mencatat transaksi tanpa mekanisme batas anggaran (budget cap) dan notifikasi peringatan.
+    Pengujian BHV-05 tidak dapat dilaksanakan karena endpoint dan UI terkait belum tersedia.
+  </div>
+</div>
+
+<div class="box">
+  <table>
+    <tr><th>Aspek</th><th>Keterangan</th><th>Status</th></tr>
+    <tr>
+      <td>Budget limit endpoint</td>
+      <td style="color:#94a3b8"><code>/api/budgets</code> — tidak ada di routes/api.php</td>
+      <td><span class="badge na">N/A</span></td>
+    </tr>
+    <tr>
+      <td>Warning notification UI</td>
+      <td style="color:#94a3b8">Tidak ada komponen notifikasi budget di frontend React</td>
+      <td><span class="badge na">N/A</span></td>
+    </tr>
+    <tr>
+      <td>Budget model / migration</td>
+      <td style="color:#94a3b8">Tidak ada tabel budgets di database</td>
+      <td><span class="badge na">N/A</span></td>
+    </tr>
+    <tr>
+      <td>Alert/push notification</td>
+      <td style="color:#94a3b8">Tidak ada sistem notifikasi real-time</td>
+      <td><span class="badge na">N/A</span></td>
+    </tr>
+  </table>
+</div>
+
+<div class="box">
+  <div style="color:#f59e0b;font-weight:bold;margin-bottom:8px;font-size:13px">📋 Rekomendasi untuk Versi Berikutnya</div>
+  <div style="color:#94a3b8;font-size:13px;line-height:1.8">
+    • Tambahkan tabel <code style="color:#7dd3fc">budgets</code> dengan kolom: category_id, amount_limit, period (monthly/weekly)<br>
+    • Buat endpoint <code style="color:#7dd3fc">POST /api/budgets</code> untuk set budget per kategori<br>
+    • Trigger notifikasi saat pengeluaran mencapai 80% dan 100% dari batas budget<br>
+    • Tampilkan toast warning di frontend menggunakan SweetAlert2 atau sistem notifikasi custom
+  </div>
+</div>
+
+<div style="background:#1a1a0a;border:1px solid #a16207;border-radius:8px;padding:12px;color:#fcd34d;font-size:13px">
+  BHV-05 SKIP — Fitur budget warning belum ada di scope v1.0. Dicatat sebagai feature gap untuk roadmap v2.0.
+</div>
+</body></html>

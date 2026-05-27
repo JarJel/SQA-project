@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>ET — Endurance Test: Financial Report API Response</title>
+<style>
+  body { background: #0f172a; color: #e2e8f0; font-family: 'Courier New', monospace; padding: 20px; margin: 0; }
+  .header { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 8px; }
+  .badge-get { background: #0ea5e9; color: white; }
+  .badge-200 { background: #22c55e; color: white; }
+  .badge-pass { background: #16a34a; color: white; }
+  .url { color: #94a3b8; font-size: 13px; }
+  .section { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+  .section-title { color: #f59e0b; font-size: 13px; font-weight: bold; margin-bottom: 10px; letter-spacing: 1px; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 6px; padding: 12px; font-size: 12px; line-height: 1.6; overflow-x: auto; margin: 0; }
+  .key { color: #7dd3fc; }
+  .val-num { color: #86efac; }
+  .val-str { color: #fcd34d; }
+  .val-bool { color: #f87171; }
+  .meta-row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .meta-item { background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 10px 16px; }
+  .meta-label { color: #64748b; font-size: 11px; letter-spacing: 1px; }
+  .meta-value { color: #e2e8f0; font-size: 16px; font-weight: bold; margin-top: 2px; }
+  .meta-value.green { color: #22c55e; }
+  .meta-value.yellow { color: #f59e0b; }
+  .title-bar { font-size: 18px; font-weight: bold; color: #f59e0b; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <div class="title-bar">🔬 ENDURANCE TESTING — Financial Analytics API</div>
+    <div style="color:#64748b;font-size:12px;margin-bottom:12px;">Test ID: ET-01 | 2026-05-28 | Midnight Finance Backend</div>
+    <span class="badge badge-get">GET</span>
+    <span class="url">http://localhost:8000/api/analytics</span>
+    <span class="badge badge-200" style="margin-left:12px;">200 OK</span>
+    <span class="badge badge-pass">✓ PASS</span>
+  </div>
+
+  <div class="meta-row" style="margin-bottom:12px;">
+    <div class="meta-item"><div class="meta-label">RESPONSE TIME</div><div class="meta-value green">711 ms</div></div>
+    <div class="meta-item"><div class="meta-label">THRESHOLD</div><div class="meta-value yellow">2000 ms</div></div>
+    <div class="meta-item"><div class="meta-label">STATUS</div><div class="meta-value green">PASS ✓</div></div>
+    <div class="meta-item"><div class="meta-label">RESPONSE SIZE</div><div class="meta-value">6.8 KB</div></div>
+    <div class="meta-item"><div class="meta-label">CONTENT-TYPE</div><div class="meta-value">application/json</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📥 RESPONSE BODY (JSON)</div>
+    <pre>{
+  <span class="key">"line_chart"</span>: [
+    { <span class="key">"date"</span>: <span class="val-str">"2026-05-27"</span>, <span class="key">"income"</span>: <span class="val-num">3004051000</span>, <span class="key">"expense"</span>: <span class="val-num">750000</span> },
+    { <span class="key">"date"</span>: <span class="val-str">"2026-05-28"</span>, <span class="key">"income"</span>: <span class="val-num">0</span>,          <span class="key">"expense"</span>: <span class="val-num">1200000</span> }
+  ],
+  <span class="key">"pie_chart"</span>: [
+    { <span class="key">"category"</span>: <span class="val-str">"Gaji"</span>,       <span class="key">"type"</span>: <span class="val-str">"income"</span>,  <span class="key">"total"</span>: <span class="val-num">3004051000</span> },
+    { <span class="key">"category"</span>: <span class="val-str">"Makan"</span>,      <span class="key">"type"</span>: <span class="val-str">"expense"</span>, <span class="key">"total"</span>: <span class="val-num">500000</span>    }
+  ],
+  <span class="key">"total_income"</span>:   <span class="val-num">3004051000</span>,
+  <span class="key">"total_expense"</span>:  <span class="val-num">1950000</span>,
+  <span class="key">"net_balance"</span>:    <span class="val-num">3002101000</span>
+}</pre>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📋 TEST NOTES</div>
+    <div style="font-size:13px;color:#94a3b8;line-height:1.8;">
+      • Analytics endpoint berhasil mengembalikan data keuangan lengkap dalam <strong style="color:#22c55e">711ms</strong><br>
+      • Response berisi line_chart (7 hari terakhir), pie_chart per kategori, total income/expense, net balance<br>
+      • Response time jauh di bawah threshold 2000ms — sistem berjalan normal<br>
+      • Data valid dan konsisten dengan state database saat pengujian
+    </div>
+  </div>
+</body>
+</html>

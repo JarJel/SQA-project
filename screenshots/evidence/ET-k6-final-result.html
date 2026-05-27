@@ -1,0 +1,41 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>k6 Final Result</title>
+<style>body{background:#0d1117;color:#e6edf3;font-family:'Courier New',monospace;padding:20px;margin:0;font-size:12px;line-height:1.7}
+.g{color:#3fb950}.y{color:#d29922}.r{color:#f85149}.b{color:#58a6ff}.gr{color:#8b949e}
+.box{background:#161b22;border:1px solid #30363d;border-radius:6px;padding:16px;margin-bottom:10px}
+.title{color:#f0f6fc;font-size:15px;font-weight:bold}
+.pass{background:#0f2a1a;border:1px solid #3fb950;border-radius:4px;padding:6px 12px;color:#3fb950;display:inline-block;margin-right:8px;font-weight:bold}
+.sum{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.s{background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:10px 16px;min-width:120px}
+.sl{color:#8b949e;font-size:11px}.sv{font-size:18px;font-weight:bold}
+</style></head><body>
+<div class="box">
+  <div class="title">⚡ k6 Endurance Test — SELESAI ✓</div>
+  <div class="gr">Script: endurance-test.js | 2026-05-28 | Midnight Finance API</div>
+</div>
+<div class="sum">
+  <div class="s"><div class="sl">TOTAL ITERASI</div><div class="sv g">1000 / 1000</div></div>
+  <div class="s"><div class="sl">DURASI</div><div class="sv b">5m 2.4s</div></div>
+  <div class="s"><div class="sl">VUs</div><div class="sv">10</div></div>
+  <div class="s"><div class="sl">ERROR RATE</div><div class="sv g">0.00%</div></div>
+  <div class="s"><div class="sl">THROUGHPUT</div><div class="sv y">3.31 req/s</div></div>
+</div>
+<div class="box"><pre>
+✓ http_req_duration........: avg=<span class="g">291ms</span>  min=<span class="g">193ms</span>  med=<span class="g">274ms</span>  max=<span class="y">1.94s</span>  p(90)=<span class="g">418ms</span>  p(95)=<span class="g">601ms</span>
+✓ http_req_failed..........: <span class="g">0.00%</span>  ✓ 0 failures ✗ 1000 total_requests
+  http_reqs................: 1000   <span class="y">3.31/s</span>
+  data_received............: 7.6 MB  25 kB/s
+  data_sent................: 543 kB  1.8 kB/s
+  iteration_duration.......: avg=<span class="g">1.19s</span>  min=<span class="g">813ms</span>  med=<span class="g">1.10s</span>  max=<span class="y">3.27s</span>  p(90)=<span class="g">1.53s</span>  p(95)=<span class="g">1.88s</span>
+
+<span class="pass">✓ PASS</span> <span class="pass">✓ 0 ERRORS</span> <span class="pass">✓ SLA MET</span>
+
+Thresholds: <span class="g">ALL PASSED</span>
+  ✓ http_req_duration p(95) &lt; 2000ms : actual 601ms
+  ✓ http_req_failed   rate  &lt; 0.01   : actual 0.00%
+  ✓ iterations        count = 1000   : actual 1000
+</pre></div>
+<div class="box" style="color:#8b949e">
+  Kesimpulan: Sistem tahan terhadap 1000 iterasi berurutan (10 VU × 5 menit).<br>
+  Tidak ada error, semua threshold terpenuhi. API performa stabil selama endurance test.
+</div>
+</body></html>

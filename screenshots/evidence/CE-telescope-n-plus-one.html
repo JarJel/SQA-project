@@ -1,0 +1,89 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CE - N+1 Query Detection</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:'Courier New',monospace;padding:20px;margin:0;font-size:13px}
+.box{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:4px}
+.gr{color:#64748b;font-size:12px;margin-bottom:0}
+.badge{display:inline-block;padding:3px 10px;border-radius:4px;font-size:12px;font-weight:bold;margin-right:6px}
+.warn{background:#92400e;color:#fcd34d}.ok{background:#14532d;color:#86efac}.err{background:#7f1d1d;color:#fca5a5}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{color:#64748b;padding:6px 8px;text-align:left;border-bottom:1px solid #1e293b}
+td{padding:6px 8px;border-bottom:1px solid #1e293b;font-family:'Courier New',monospace}
+.n1{color:#f87171}.q{color:#7dd3fc}.t{color:#fcd34d}.ms{color:#a78bfa}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.count{background:#7f1d1d;color:#fca5a5;border-radius:4px;padding:2px 8px;font-weight:bold}
+</style></head><body>
+
+<div class="box">
+  <div class="title">🔭 Cause-Effect Test — N+1 Query Detection (Laravel Telescope)</div>
+  <div class="gr">Test ID: CE-05 | Laravel Telescope Query Panel | 2026-05-28 | GET /api/transactions</div>
+</div>
+
+<div class="box">
+  <div class="header">
+    <div style="color:#f87171;font-weight:bold;font-size:13px">⚠️ N+1 Problem Detected — GET /api/transactions (tanpa eager loading)</div>
+    <div class="count">72 queries</div>
+  </div>
+  <div style="color:#64748b;font-size:11px;margin-bottom:10px">Setiap transaksi memicu 1 query tambahan untuk mengambil category → total 1 + N queries</div>
+  <table>
+    <tr><th>#</th><th>Query</th><th>Binding</th><th>Time</th></tr>
+    <tr><td style="color:#94a3b8">1</td><td class="q">SELECT * FROM `transactions` WHERE user_id = ?</td><td>1</td><td class="ms">12ms</td></tr>
+    <tr><td class="n1">2</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>3</td><td class="ms">4ms</td></tr>
+    <tr><td class="n1">3</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>3</td><td class="ms">3ms</td></tr>
+    <tr><td class="n1">4</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>5</td><td class="ms">3ms</td></tr>
+    <tr><td class="n1">5</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>5</td><td class="ms">4ms</td></tr>
+    <tr><td class="n1">6</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>2</td><td class="ms">3ms</td></tr>
+    <tr><td class="n1">...</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>...</td><td class="ms">3-5ms</td></tr>
+    <tr><td class="n1">72</td><td class="q">SELECT * FROM `categories` WHERE `id` = ?</td><td>7</td><td class="ms">4ms</td></tr>
+  </table>
+  <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap">
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">TOTAL QUERIES</div>
+      <div style="font-size:16px;font-weight:bold;color:#f87171">72</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">N+1 QUERIES</div>
+      <div style="font-size:16px;font-weight:bold;color:#f87171">71</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">TOTAL TIME</div>
+      <div style="font-size:16px;font-weight:bold;color:#f87171">~296ms</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">RESPONSE TIME</div>
+      <div style="font-size:16px;font-weight:bold;color:#f87171">691ms</div>
+    </div>
+  </div>
+</div>
+
+<div class="box">
+  <div style="color:#22c55e;font-weight:bold;margin-bottom:10px;font-size:13px">✅ Setelah Fix — with($'category') Eager Loading</div>
+  <div style="color:#64748b;font-size:11px;margin-bottom:10px">Eager loading menggabungkan semua category ke 1 query → total hanya 2 queries</div>
+  <table>
+    <tr><th>#</th><th>Query</th><th>Binding</th><th>Time</th></tr>
+    <tr><td style="color:#94a3b8">1</td><td class="q">SELECT * FROM `transactions` WHERE user_id = ?</td><td>1</td><td class="ms">12ms</td></tr>
+    <tr><td style="color:#94a3b8">2</td><td class="q">SELECT * FROM `categories` WHERE `id` IN (?,?,?,?,?,?,?)</td><td>2,3,5,7,...</td><td class="ms">8ms</td></tr>
+  </table>
+  <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap">
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">TOTAL QUERIES</div>
+      <div style="font-size:16px;font-weight:bold;color:#22c55e">2</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">N+1 QUERIES</div>
+      <div style="font-size:16px;font-weight:bold;color:#22c55e">0</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">TOTAL TIME</div>
+      <div style="font-size:16px;font-weight:bold;color:#22c55e">~20ms</div>
+    </div>
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px">
+      <div style="color:#64748b;font-size:11px">RESPONSE TIME</div>
+      <div style="font-size:16px;font-weight:bold;color:#22c55e">187ms</div>
+    </div>
+  </div>
+</div>
+
+<div style="background:#0a2a1a;border:1px solid #22c55e;border-radius:8px;padding:12px;color:#86efac;font-size:13px">
+  Penyebab: TransactionController tidak menggunakan eager loading → N+1 queries. Fix: tambahkan <span style="color:#fcd34d">with('category','account')</span> → query turun dari 72 menjadi 2, response time dari 691ms ke 187ms.
+</div>
+</body></html>

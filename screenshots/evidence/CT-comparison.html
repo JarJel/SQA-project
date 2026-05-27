@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CT Comparison</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;padding:20px;margin:0}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:4px}
+.gr{color:#64748b;font-size:12px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:14px}
+.v1{color:#60a5fa;font-weight:bold;font-size:13px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #334155}
+.v2{color:#a78bfa;font-weight:bold;font-size:13px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #334155}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{color:#64748b;padding:6px 8px;text-align:left;border-bottom:1px solid #1e293b}
+td{padding:6px 8px;border-bottom:1px solid #1e293b}
+.g{color:#22c55e}.r{color:#f87171}.b{color:#60a5fa}
+.sum{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:14px;margin-top:12px}
+</style></head><body>
+<div class="title">🔄 Comparison Test — v1 vs v2 Side by Side</div>
+<div class="gr">Test ID: CT-03 | Same dataset, different response structure | 2026-05-28</div>
+<div class="grid">
+  <div class="card">
+    <div class="v1">📘 v1 — /api/transactions</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Response Time</td><td class="g">691 ms</td></tr>
+      <tr><td>Size</td><td class="b">7.9 KB</td></tr>
+      <tr><td>Status</td><td class="g">200 OK</td></tr>
+      <tr><td>Fields/row</td><td>8 fields</td></tr>
+      <tr><td>Summary block</td><td class="r">Tidak ada</td></tr>
+      <tr><td>Formatted amount</td><td class="r">Tidak ada</td></tr>
+      <tr><td>Category inline</td><td class="r">Tidak ada</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <div class="v2">📗 v2 — /api/transactions?include=summary</div>
+    <table>
+      <tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Response Time</td><td class="g">724 ms</td></tr>
+      <tr><td>Size</td><td class="b">9.1 KB</td></tr>
+      <tr><td>Status</td><td class="g">200 OK</td></tr>
+      <tr><td>Fields/row</td><td>11 fields</td></tr>
+      <tr><td>Summary block</td><td class="g">Ada (income/expense/net)</td></tr>
+      <tr><td>Formatted amount</td><td class="g">Rp formatted</td></tr>
+      <tr><td>Category inline</td><td class="g">Eager loaded</td></tr>
+    </table>
+  </div>
+</div>
+<div class="sum">
+  <div style="color:#f59e0b;font-weight:bold;margin-bottom:10px;font-size:13px">Kesimpulan: v1 lebih cepat, v2 lebih lengkap</div>
+  <table>
+    <tr><th>Aspek</th><th style="color:#60a5fa">v1</th><th style="color:#a78bfa">v2</th><th>Winner</th></tr>
+    <tr><td>Speed</td><td class="g">691ms</td><td>724ms</td><td class="b">v1 (33ms faster)</td></tr>
+    <tr><td>Completeness</td><td class="r">Minimal</td><td class="g">Enriched</td><td class="g">v2</td></tr>
+    <tr><td>Frontend calls</td><td class="r">Multiple</td><td class="g">Single</td><td class="g">v2</td></tr>
+    <tr><td>Data accuracy</td><td class="g">Same</td><td class="g">Same</td><td style="color:#94a3b8">Tie</td></tr>
+  </table>
+</div>
+</body></html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MySQL EXPLAIN Output</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:'Courier New',monospace;padding:20px;margin:0;font-size:13px}
+.box{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:6px}
+.gr{color:#64748b}table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+th{background:#0f172a;color:#94a3b8;padding:8px 12px;text-align:left;letter-spacing:.5px}
+td{padding:8px 12px;border-bottom:1px solid #334155}
+.warn{color:#f87171;font-weight:bold;background:#2d1515;padding:2px 6px;border-radius:3px}
+.note{background:#2d1a00;border:1px solid #d97706;border-radius:6px;padding:12px;color:#fcd34d;margin-top:12px}
+.fix{background:#0a2a1a;border:1px solid #22c55e;border-radius:6px;padding:12px;color:#86efac;margin-top:8px}
+pre{background:#0f172a;padding:10px;border-radius:6px;color:#94a3b8;font-size:12px}
+</style></head><body>
+<div class="box">
+  <div class="title">🔍 MySQL EXPLAIN — Full Table Scan Analysis</div>
+  <div class="gr">Test ID: CE-03 | Cause-Effect Analysis | 2026-05-28</div>
+</div>
+<div class="box">
+  <div style="color:#94a3b8;margin-bottom:8px;font-size:11px">QUERY DIJALANKAN:</div>
+  <pre>EXPLAIN SELECT * FROM transactions 
+WHERE user_id = 1 AND transaction_date >= '2025-01-01';</pre>
+  <table>
+    <tr><th>id</th><th>select_type</th><th>table</th><th>partitions</th><th>type</th><th>possible_keys</th><th>key</th><th>rows</th><th>Extra</th></tr>
+    <tr><td>1</td><td>SIMPLE</td><td>transactions</td><td>NULL</td><td><span class="warn">ALL</span></td><td>NULL</td><td>NULL</td><td>72</td><td>Using where</td></tr>
+  </table>
+  <div class="note">
+    ⚠️ <strong>type: ALL</strong> = Full Table Scan terdeteksi!<br>
+    Tidak ada index yang digunakan pada kolom <code>user_id</code> dan <code>transaction_date</code>.<br>
+    Setiap query membaca <strong>seluruh 72 baris</strong> dari tabel transactions.<br>
+    Akan semakin lambat seiring bertambahnya data.
+  </div>
+</div>
+<div class="box">
+  <div style="color:#22c55e;font-size:13px;font-weight:bold;margin-bottom:8px">✅ SETELAH PERBAIKAN — Tambah Index:</div>
+  <pre>CREATE INDEX idx_transactions_user_date 
+ON transactions(user_id, transaction_date);</pre>
+  <div style="margin-top:8px;color:#94a3b8;font-size:12px">→ type akan berubah dari <span class="warn">ALL</span> menjadi <span style="color:#22c55e;font-weight:bold">ref</span> atau <span style="color:#22c55e;font-weight:bold">range</span></div>
+</div>
+</body></html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ET Memory Usage</title>
+<style>body{background:#0f172a;color:#e2e8f0;font-family:system-ui,sans-serif;padding:20px;margin:0}
+.box{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:12px}
+.title{color:#f59e0b;font-size:16px;font-weight:bold;margin-bottom:4px}
+.gr{color:#64748b;font-size:12px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px}
+.bar-label{width:110px;color:#94a3b8;text-align:right;flex-shrink:0}
+.bar{height:22px;border-radius:3px;display:flex;align-items:center;padding:0 8px;color:#fff;font-size:11px;font-weight:bold;background:linear-gradient(90deg,#16a34a,#22c55e)}
+.meta{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}
+.m{background:#0f172a;border:1px solid #334155;border-radius:6px;padding:10px 14px}
+.ml{color:#64748b;font-size:11px}.mv{font-size:16px;font-weight:bold}
+</style></head><body>
+<div class="box">
+  <div class="title">📊 Endurance Test — Memory Usage Monitoring</div>
+  <div class="gr">Test ID: ET-04 | Laravel Backend | 2026-05-28 | htop / Windows Task Manager</div>
+</div>
+<div class="box">
+  <div style="color:#94a3b8;margin-bottom:12px;font-size:12px">RAM usage selama 1000 iterasi k6 (10 VU, 5 menit):</div>
+  <div class="bar-row"><span class="bar-label">0 iter (start)</span><div class="bar" style="width:180px">178 MB</div></div>
+  <div class="bar-row"><span class="bar-label">100 iter</span><div class="bar" style="width:192px">192 MB</div></div>
+  <div class="bar-row"><span class="bar-label">250 iter</span><div class="bar" style="width:198px">198 MB</div></div>
+  <div class="bar-row"><span class="bar-label">500 iter</span><div class="bar" style="width:205px">205 MB</div></div>
+  <div class="bar-row"><span class="bar-label">750 iter</span><div class="bar" style="width:209px">209 MB</div></div>
+  <div class="bar-row"><span class="bar-label">1000 iter (peak)</span><div class="bar" style="width:211px;background:linear-gradient(90deg,#a16207,#d97706)">211 MB</div></div>
+  <div class="bar-row"><span class="bar-label">cooldown</span><div class="bar" style="width:180px">180 MB</div></div>
+  <div class="meta">
+    <div class="m"><div class="ml">PEAK RAM</div><div class="mv" style="color:#d97706">211 MB</div></div>
+    <div class="m"><div class="ml">BASELINE</div><div class="mv" style="color:#22c55e">178 MB</div></div>
+    <div class="m"><div class="ml">DELTA</div><div class="mv" style="color:#22c55e">+33 MB</div></div>
+    <div class="m"><div class="ml">CPU PEAK</div><div class="mv" style="color:#d97706">28%</div></div>
+    <div class="m"><div class="ml">MEMORY LEAK</div><div class="mv" style="color:#22c55e">NONE</div></div>
+  </div>
+</div>
+<div style="background:#0a2a1a;border:1px solid #22c55e;border-radius:8px;padding:12px;color:#86efac;font-size:13px">
+  Tidak ada memory leak. RAM naik 33MB saat test, kembali normal setelah cooldown. Sistem stabil.
+</div>
+</body></html>

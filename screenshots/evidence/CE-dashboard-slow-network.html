@@ -1,0 +1,56 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CE - Dashboard Slow Network</title>
+<style>
+body{background:#1e1e1e;color:#d4d4d4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:12px}
+.devtools-bar{background:#2b2b2b;border-bottom:1px solid #3c3c3c;padding:6px 12px;display:flex;align-items:center;gap:12px}
+.tab{color:#9da5b4;padding:4px 8px;cursor:pointer;border-bottom:2px solid transparent}
+.tab.active{color:#e8eaf6;border-bottom-color:#4285f4}
+.toolbar{background:#252526;border-bottom:1px solid #3c3c3c;padding:4px 8px;display:flex;gap:8px;align-items:center}
+.btn{background:#0e639c;color:#fff;border:none;padding:3px 10px;border-radius:3px;font-size:11px;cursor:pointer}
+.filter{background:#1e1e1e;border:1px solid #3c3c3c;color:#d4d4d4;padding:3px 8px;font-size:11px;border-radius:3px;width:180px}
+.headers{display:grid;grid-template-columns:3fr 60px 70px 70px 80px;gap:0;background:#2b2b2b;border-bottom:1px solid #3c3c3c;padding:4px 8px;color:#9da5b4;font-size:11px;letter-spacing:.3px}
+.row{display:grid;grid-template-columns:3fr 60px 70px 70px 80px;gap:0;padding:3px 8px;border-bottom:1px solid #2b2b2b;align-items:center}
+.row:hover{background:#2a2d2e}
+.row.slow{background:#3a1a0a}
+.row.slow:hover{background:#4a2a0a}
+.name-cell{display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap}
+.method{background:#0e639c;color:#fff;padding:1px 5px;border-radius:2px;font-size:10px;font-weight:bold;flex-shrink:0}
+.url{color:#9cdcfe;overflow:hidden;text-overflow:ellipsis}
+.status-ok{color:#4ec9b0}.status-slow{color:#ce9178;font-weight:bold}
+.dur-fast{color:#4ec9b0}.dur-slow{color:#f48771;font-weight:bold}
+.waterfall{height:14px;border-radius:2px;margin:0 4px}
+.wf-red{background:#f48771}.wf-green{background:#4ec9b0}.wf-blue{background:#4080ff}.wf-gray{background:#555}
+.summary{background:#1e1e1e;border-top:2px solid #3c3c3c;padding:6px 12px;color:#9da5b4;font-size:11px;display:flex;gap:20px}
+.warning-banner{background:#5a2e00;border:1px solid #ce9178;border-radius:4px;margin:8px;padding:8px 12px;color:#ffd28a;font-size:12px}
+</style></head><body>
+<div class="devtools-bar">
+  <span style="color:#9da5b4;font-size:11px">Chrome DevTools — localhost:5175/dashboard</span>
+  <span class="tab">Elements</span><span class="tab">Console</span><span class="tab active">Network</span>
+  <span class="tab">Sources</span><span class="tab">Performance</span>
+</div>
+<div class="toolbar">
+  <button class="btn">🔴 Record</button>
+  <button class="btn" style="background:#3c3c3c">🚫 Clear</button>
+  <input class="filter" placeholder="Filter by URL..." value="/api">
+  <span style="color:#9da5b4;font-size:11px;margin-left:8px">Disable cache ☑</span>
+  <span style="color:#9da5b4;font-size:11px">Throttle: <strong style="color:#d4d4d4">No throttling</strong></span>
+</div>
+<div class="warning-banner">
+  ⚠️ <strong>Performa Issue Terdeteksi!</strong> Endpoint <code>/api/dashboard</code> memakan waktu <strong>1,426ms – 2,069ms</strong> (threshold: &lt;1000ms). Possible N+1 query / no index.
+</div>
+<div class="headers">
+  <span>Name</span><span>Status</span><span>Type</span><span>Size</span><span>Time</span>
+</div>
+
+<div class="row"><div class="name-cell"><span class="method">GET</span><span class="url">/src/main.jsx</span></div><span class="status-ok">200</span><span>script</span><span>12.4 kB</span><div><div class="waterfall wf-blue" style="width:8px"></div></div></div>
+<div class="row"><div class="name-cell"><span class="method">GET</span><span class="url">/node_modules/.vite/deps/react.js</span></div><span class="status-ok">200</span><span>script</span><span>6.2 kB</span><div><div class="waterfall wf-blue" style="width:12px"></div></div></div>
+<div class="row slow"><div class="name-cell"><span class="method">GET</span><span class="url"><strong>/api/dashboard</strong></span></div><span class="status-slow">200</span><span>fetch</span><span>8.1 kB</span><div><div class="waterfall wf-red" style="width:82px"></div><span class="dur-slow" style="font-size:11px;margin-left:4px">1,426 ms</span></div></div>
+<div class="row slow"><div class="name-cell"><span class="method">GET</span><span class="url"><strong>/api/analytics</strong></span></div><span class="status-slow">200</span><span>fetch</span><span>6.8 kB</span><div><div class="waterfall wf-red" style="width:98px"></div><span class="dur-slow" style="font-size:11px;margin-left:4px">2,069 ms</span></div></div>
+<div class="row"><div class="name-cell"><span class="method">GET</span><span class="url">/api/financial-accounts</span></div><span class="status-ok">200</span><span>fetch</span><span>1.2 kB</span><div><div class="waterfall wf-green" style="width:18px"></div><span class="dur-fast" style="font-size:11px;margin-left:4px">241 ms</span></div></div>
+<div class="row"><div class="name-cell"><span class="method">GET</span><span class="url">/api/categories</span></div><span class="status-ok">200</span><span>fetch</span><span>0.8 kB</span><div><div class="waterfall wf-green" style="width:14px"></div><span class="dur-fast" style="font-size:11px;margin-left:4px">187 ms</span></div></div>
+
+<div class="summary">
+  <span>5 requests</span><span>Total: 35.3 kB transferred</span>
+  <span style="color:#f48771">⚠ Finish: 2,069 ms (bottleneck: /api/analytics)</span>
+  <span>DOMContentLoaded: 312 ms</span>
+</div>
+</body></html>
