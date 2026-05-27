@@ -1,11 +1,11 @@
-Teknik ini menggabungkan Black Box dan White Box dengan fokus pada integrasi sistem.
+# Teknik Pengujian — Black Box Testing
 
-| Aspek Pengujian       | Deskripsi Teknis Pelaksanaan                                                                 | Target Output & Validasi                                                                 |
-|---------------------|---------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------|
-| Integritas Database | Mengecek data dari UI masuk ke database dengan benar.                                       | Data di database sesuai dengan tampilan UI.                                               |
-| API Integration     | Menguji komunikasi frontend-backend (API).                                                   | Response API sesuai (200, 400, dll).                                                      |
-| Manipulasi State    | Mengubah data langsung di database.                                                         | Perubahan langsung terlihat di frontend.                                                  |
-| End-to-End Flow     | Melacak alur data dari user ke admin.                                                       | Tidak ada data yang hilang.                                                               |
-| Log Analysis        | Mengecek log sistem untuk error tersembunyi.                                                | Error dapat terdeteksi dan dianalisis.                                                    |
+Teknik ini digunakan untuk memvalidasi fungsionalitas aplikasi Midnight Finance dari sudut pandang pengguna akhir tanpa harus mengetahui struktur kode program.
 
----
+| Aspek Pengujian | Deskripsi Teknis Pelaksanaan | Target Output & Validasi |
+|:---|:---|:---|
+| Fungsionalitas Utama | Menguji fitur utama: Login, Registrasi, Catat Transaksi, dan Dashboard | Semua endpoint merespons dengan HTTP status code yang benar dan data yang akurat |
+| Validasi Input Data | Menguji input form registrasi (name, email, password) dan transaksi (amount, type, date) dengan data valid dan tidak valid | Sistem menolak input tidak valid dengan pesan error yang jelas sesuai aturan validasi Laravel |
+| Boundary & Range | Menguji nilai batas pada field nominal transaksi (amount): nilai 0, nilai 1, nilai normal, nilai maksimum | Sistem menerima nilai dalam rentang valid dan menolak nilai di luar batas |
+| Error Handling | Simulasi skenario error: email tidak terdaftar, password salah, token tidak ada, akun belum verifikasi | Sistem tidak crash dan menampilkan pesan error yang informatif dengan HTTP status code yang tepat |
+| Keamanan Akses | Mengakses endpoint privat tanpa token Sanctum | Sistem mengembalikan HTTP 401 Unauthenticated — endpoint tidak dapat diakses tanpa autentikasi |
