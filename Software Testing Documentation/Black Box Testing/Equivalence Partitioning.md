@@ -1,112 +1,185 @@
-# 🔢 Equivalence Partitioning — Midnight Finance
+# Black Box Testing — Equivalence Partitioning (EP)
 
-**Mata Kuliah:** Software Quality Assurance  
-**Model Pengujian:** Black Box Testing — Equivalence Partitioning  
-**Tim:** REMACode  
-**Modul Target:** Form Registrasi User (`POST /api/register`)  
-
----
-
-## 📖 Definisi
-
-**Black Box Testing** adalah teknik pengujian perangkat lunak yang melibatkan pengujian sistem tanpa mengetahui desain internalnya. Teknik pengujian Black Box berfokus pada informasi dari perangkat lunak, menghasilkan test case dengan cara mempartisi masukan dan keluaran dari sebuah program dengan cara mencakup pengujian yang menyeluruh (Suprihadi, 2025).
-
-**Equivalence Partitioning** digunakan untuk mencari seluruh kesalahan atau kehilangan dalam fungsi. Kesalahan dapat berupa tampilan struktur data atau akses menuju database serta performa. Keadaan masukan bisa berupa range, harga khusus, suatu kumpulan atau boolean. Jika input merupakan beberapa keadaan tersebut, maka kasus ujinya adalah **satu benar dan dua tidak benar** (Suprihadi, 2025).
+**Proyek:** Midnight Finance  
+**Modul yang Diuji:** Authentication — `POST /api/v1/register`  
+**Tanggal Pengujian:** 27 Mei 2026  
+**Penguji:** QA Team  
+**Metode:** Equivalence Partitioning
 
 ---
 
-## 🎯 Modul yang Diuji
+## 1. Deskripsi Pengujian
 
-**Endpoint:** `POST /api/register`  
-**Validasi Backend (Laravel):**
+Equivalence Partitioning (EP) membagi domain input menjadi kelas-kelas ekuivalen, di mana setiap anggota kelas diharapkan menghasilkan respons yang sama dari sistem. Metode ini meminimalkan jumlah test case yang diperlukan sekaligus memaksimalkan coverage.
 
-```php
-$request->validate([
-    'name'     => 'required|string|max:255',
-    'email'    => 'required|email',
-    'password' => ['required', 'confirmed',
-                   Password::min(8)->letters()->mixedCase()->numbers()->symbols()],
-]);
-```
+**Endpoint yang diuji:** `POST /api/v1/register`  
+**Field yang diuji:** `name`, `email`, `password`, `password_confirmation`
 
 ---
 
-## 📊 Tabel Equivalence Class
-
-| No | Nama Kolom | Tipe Data | Batasan Data |
-|:--:|:---|:---|:---|
-| 1 | `name` | String | Wajib diisi, panjang 1–255 karakter |
-| 2 | `email` | String (Email) | Wajib diisi, format email valid, unik di database |
-| 3 | `password` | String | Min 8 karakter, huruf besar+kecil, angka, simbol |
-| 4 | `password_confirmation` | String | Harus sama persis dengan `password` |
-
----
-
-## 📋 Identifikasi Partisi Ekuivalensi
+## 2. Identifikasi Kelas Ekuivalen
 
 ### Field: `name`
 
-| Partisi ID | Kelas | Contoh Nilai | Valid? |
-|:---:|:---|:---|:---:|
-| EP-N-V1 | Nama normal (huruf + spasi) | `Budi Santoso` | ✅ Valid |
-| EP-N-V2 | Nama satu kata | `Budi` | ✅ Valid |
-| EP-N-I1 | Nama kosong (empty string) | `` | ❌ Invalid |
-| EP-N-I2 | Nama melebihi 255 karakter | `Budi...` (256 kar) | ❌ Invalid |
-| EP-N-I3 | Null / tidak dikirim | *(field tidak ada)* | ❌ Invalid |
+| Kelas | Tipe | Deskripsi | Contoh |
+|-------|------|-----------|--------|
+| EP-N1 | ✅ Valid | String non-kosong | `"Test User"` |
+| EP-N2 | ❌ Invalid | Kosong / null | `""` |
 
 ### Field: `email`
 
-| Partisi ID | Kelas | Contoh Nilai | Valid? |
-|:---:|:---|:---|:---:|
-| EP-E-V1 | Email valid standar | `budi@gmail.com` | ✅ Valid |
-| EP-E-V2 | Email valid dengan subdomain | `budi@mail.midnight.com` | ✅ Valid |
-| EP-E-I1 | Tanpa karakter `@` | `budigmail.com` | ❌ Invalid |
-| EP-E-I2 | Tanpa domain | `budi@` | ❌ Invalid |
-| EP-E-I3 | Email sudah terdaftar (duplikat aktif) | `existing@midnight.com` | ❌ Invalid |
-| EP-E-I4 | Field kosong | `` | ❌ Invalid |
+| Kelas | Tipe | Deskripsi | Contoh |
+|-------|------|-----------|--------|
+| EP-E1 | ✅ Valid | Format email benar, belum terdaftar | `"newuser@test.com"` |
+| EP-E2 | ❌ Invalid | Format email salah | `"bukan-email"` |
+| EP-E3 | ❌ Invalid | Email sudah terdaftar | `"admin@midnight.com"` |
 
 ### Field: `password`
 
-| Partisi ID | Kelas | Contoh Nilai | Valid? |
-|:---:|:---|:---|:---:|
-| EP-P-V1 | Password memenuhi semua syarat | `Midnight@2025` | ✅ Valid |
-| EP-P-I1 | Kurang dari 8 karakter | `Ab1!` | ❌ Invalid |
-| EP-P-I2 | Tanpa huruf besar | `midnight@2025` | ❌ Invalid |
-| EP-P-I3 | Tanpa angka | `Midnight@abc` | ❌ Invalid |
-| EP-P-I4 | Tanpa simbol | `Midnight2025` | ❌ Invalid |
-| EP-P-I5 | Tidak cocok dengan konfirmasi | `Midnight@2025` vs `Midnight@2026` | ❌ Invalid |
+| Kelas | Tipe | Deskripsi | Contoh |
+|-------|------|-----------|--------|
+| EP-P1 | ✅ Valid | ≥8 karakter, huruf besar, kecil, angka, simbol | `"X9#kQz7@"` |
+| EP-P2 | ❌ Invalid | Kurang dari 8 karakter | `"Ab1!"` |
+| EP-P3 | ❌ Invalid | Tidak ada huruf besar | `"abcd1234!"` |
+| EP-P4 | ❌ Invalid | `password_confirmation` tidak cocok | password ≠ confirmation |
+| EP-P5 | ❌ Invalid | Tidak ada simbol | `"AbcdEfgh1"` |
 
 ---
 
-## 📝 Tabel Test Case Equivalence Partitioning
+## 3. Test Cases & Hasil Pengujian
 
-| No | Test Case | Input `name` | Input `email` | Input `password` | Input `conf.` | Expected Output | Actual Output | Status |
-|:--:|:---|:---:|:---:|:---:|:---:|:---|:---:|:---:|
-| TC-EP-01 | Semua input valid | `Budi Santoso` | `budi@gmail.com` | `Midnight@2025` | `Midnight@2025` | HTTP 201 — "Registrasi berhasil. Kode OTP dikirim." | HTTP 201 | ✅ Valid |
-| TC-EP-02 | Nama kosong | *(kosong)* | `budi@gmail.com` | `Midnight@2025` | `Midnight@2025` | HTTP 422 — "The name field is required." | HTTP 422 | ✅ Valid |
-| TC-EP-03 | Format email salah (tanpa @) | `Budi Santoso` | `budigmail.com` | `Midnight@2025` | `Midnight@2025` | HTTP 422 — "The email field must be a valid email address." | HTTP 422 | ✅ Valid |
-| TC-EP-04 | Email sudah terdaftar & aktif | `Budi Santoso` | `existing@midnight.com` | `Midnight@2025` | `Midnight@2025` | HTTP 400 — "Alamat email sudah terdaftar." | HTTP 400 | ✅ Valid |
-| TC-EP-05 | Password < 8 karakter | `Budi Santoso` | `budi2@gmail.com` | `Ab1!` | `Ab1!` | HTTP 422 — Password terlalu pendek | HTTP 422 | ✅ Valid |
-| TC-EP-06 | Password tanpa huruf besar | `Budi Santoso` | `budi3@gmail.com` | `midnight@2025` | `midnight@2025` | HTTP 422 — Password harus ada huruf besar | HTTP 422 | ✅ Valid |
-| TC-EP-07 | Password tidak cocok dengan konfirmasi | `Budi Santoso` | `budi4@gmail.com` | `Midnight@2025` | `Midnight@2026` | HTTP 422 — "The password field confirmation does not match." | HTTP 422 | ✅ Valid |
-| TC-EP-08 | Password tanpa simbol | `Budi Santoso` | `budi5@gmail.com` | `Midnight2025` | `Midnight2025` | HTTP 422 — Password harus ada simbol | HTTP 422 | ✅ Valid |
+### TC-EP-01 — Input Valid (Registrasi Berhasil)
 
----
-
-## ✅ Hasil Pengujian
-
-| Kategori | Jumlah |
-|:---|:---:|
-| Total Test Case | 8 |
-| Test Case Valid (Passed) | 8 |
-| Test Case Failed | 0 |
-| **Persentase Keberhasilan** | **100%** |
-
-> **Kesimpulan:** Seluruh test case pada pengujian Equivalence Partitioning modul Registrasi dinyatakan **valid**. Sistem berhasil menangani seluruh partisi input (valid maupun invalid) dengan respons yang tepat sesuai spesifikasi validasi backend Laravel.
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP01 |
+| **Kelas EP** | EP-N1, EP-E1, EP-P1 |
+| **Input** | `name: "EP Test User"`, `email: "eptest01@test.com"`, `password: "X9#kQz7@mVb2$nP4"`, `password_confirmation: "X9#kQz7@mVb2$nP4"` |
+| **Expected** | HTTP 201 — Registrasi berhasil |
+| **Actual Output** | HTTP 201 — `{"message":"Registrasi berhasil. Sistem sedang mengirimkan kode verifikasi ke email Anda."}` |
+| **Status** | ✅ PASSED |
 
 ---
 
-## 📚 Referensi
+### TC-EP-02 — Name Kosong
 
-- Suprihadi, D. (2025). *Software Quality — Black Box Testing*. T Informatika UKRI.
-- Destiningrum, M., & Adrian, Q. J. (2017). Sistem Informasi Penjadwalan Dokter Berbassis Web dengan Menggunakan Framework Codeigniter. *Jurnal TEKNOINFO*, 11(2), 30.
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP02 |
+| **Kelas EP** | EP-N2 |
+| **Input** | `name: ""`, `email: "eptest02@test.com"`, `password: "X9#kQz7@"`, `password_confirmation: "X9#kQz7@"` |
+| **Expected** | HTTP 422 — Validasi gagal (name required) |
+| **Actual Output** | HTTP 422 — `{"message":"The name field is required.","errors":{"name":["The name field is required."]}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-EP-03 — Format Email Tidak Valid
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP03 |
+| **Kelas EP** | EP-E2 |
+| **Input** | `name: "Test User"`, `email: "bukan-email"`, `password: "X9#kQz7@"`, `password_confirmation: "X9#kQz7@"` |
+| **Expected** | HTTP 422 — Format email tidak valid |
+| **Actual Output** | HTTP 422 — `{"message":"The email field must be a valid email address.","errors":{"email":[...]}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-EP-04 — Email Sudah Terdaftar
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP04 |
+| **Kelas EP** | EP-E3 |
+| **Input** | `name: "Duplicate User"`, `email: "admin@midnight.com"`, `password: "X9#kQz7@"`, `password_confirmation: "X9#kQz7@"` |
+| **Expected** | HTTP 422 — Email sudah terdaftar |
+| **Actual Output** | HTTP 422 — `{"message":"The email has already been taken.","errors":{"email":["The email has already been taken."]}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-EP-05 — Password Terlalu Pendek
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP05 |
+| **Kelas EP** | EP-P2 |
+| **Input** | `name: "Test User"`, `email: "eptest05@test.com"`, `password: "Ab1!"`, `password_confirmation: "Ab1!"` |
+| **Expected** | HTTP 422 — Password minimal 8 karakter |
+| **Actual Output** | HTTP 422 — `{"message":"The password field must be at least 8 characters.","errors":{"password":[...]}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-EP-06 — Password Tidak Ada Huruf Besar
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP06 |
+| **Kelas EP** | EP-P3 |
+| **Input** | `name: "Test User"`, `email: "eptest06@test.com"`, `password: "abcd1234!"`, `password_confirmation: "abcd1234!"` |
+| **Expected** | HTTP 422 — Password harus mengandung huruf besar |
+| **Actual Output** | HTTP 422 — `{"message":"The password field must contain at least one uppercase and one lowercase letter.","errors":{...}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-EP-07 — Password Confirmation Tidak Cocok
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP07 |
+| **Kelas EP** | EP-P4 |
+| **Input** | `name: "Test User"`, `email: "eptest07@test.com"`, `password: "X9#kQz7@"`, `password_confirmation: "DifferentPass1!"` |
+| **Expected** | HTTP 422 — Konfirmasi password tidak cocok |
+| **Actual Output** | HTTP 422 — `{"message":"The password field confirmation does not match.","errors":{"password":[...]}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-EP-08 — Password Tidak Ada Simbol
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB01-EP08 |
+| **Kelas EP** | EP-P5 |
+| **Input** | `name: "Test User"`, `email: "eptest08@test.com"`, `password: "AbcdEfgh1"`, `password_confirmation: "AbcdEfgh1"` |
+| **Expected** | HTTP 422 — Password harus mengandung simbol |
+| **Actual Output** | HTTP 422 — `{"message":"The password field must contain at least one symbol.","errors":{"password":[...]}}` |
+| **Status** | ✅ PASSED |
+
+---
+
+## 4. Ringkasan Hasil EP
+
+| ID Test | Kelas EP | Input | Expected HTTP | Actual HTTP | Status |
+|---------|----------|-------|---------------|-------------|--------|
+| EP-01 | Valid | Semua field valid | 201 | 201 | ✅ PASSED |
+| EP-02 | Invalid | Name kosong | 422 | 422 | ✅ PASSED |
+| EP-03 | Invalid | Email format salah | 422 | 422 | ✅ PASSED |
+| EP-04 | Invalid | Email sudah ada | 422 | 422 | ✅ PASSED |
+| EP-05 | Invalid | Password < 8 char | 422 | 422 | ✅ PASSED |
+| EP-06 | Invalid | No uppercase | 422 | 422 | ✅ PASSED |
+| EP-07 | Invalid | Confirmation mismatch | 422 | 422 | ✅ PASSED |
+| EP-08 | Invalid | No symbol | 422 | 422 | ✅ PASSED |
+
+**Total:** 8 test case | ✅ 8 Passed | ❌ 0 Failed
+
+---
+
+## 5. Bukti Pengujian (Test Evidence)
+
+File JSON hasil pengujian tersimpan di direktori `screenshots/black-box/`:
+
+| File | Keterangan |
+|------|------------|
+| `BB01-EP01-valid.json` | HTTP 201 — Registrasi berhasil |
+| `BB01-EP02-empty-name.json` | HTTP 422 — Name kosong |
+| `BB01-EP03-invalid-email.json` | HTTP 422 — Format email salah |
+| `BB01-EP04-email-exists.json` | HTTP 422 — Email terdaftar |
+| `BB01-EP05-short-password.json` | HTTP 422 — Password pendek |
+| `BB01-EP06-no-uppercase.json` | HTTP 422 — Tidak ada huruf besar |
+| `BB01-EP07-password-mismatch.json` | HTTP 422 — Konfirmasi tidak cocok |
+| `BB01-EP08-no-symbol.json` | HTTP 422 — Tidak ada simbol |
