@@ -1,0 +1,29 @@
+{
+    "financial_account_id": 13,
+    "category_id": 6,
+    "amount": 300000,
+    "type": "income",
+    "date": "2026-05-27",
+    "description": "RG06 Final Test - No Regression",
+    "user_id": 2,
+    "updated_at": "2026-05-27T08:20:50.000000Z",
+    "created_at": "2026-05-27T08:20:50.000000Z",
+    "id": 65,
+    "category": {
+        "id": 6,
+        "user_id": 2,
+        "name": "Gaji",
+        "type": "income",
+        "created_at": "2026-05-27T08:03:01.000000Z",
+        "updated_at": "2026-05-27T08:03:01.000000Z"
+    },
+    "financial_account": {
+        "id": 13,
+        "user_id": 2,
+        "name": "BCA",
+        "type": "bank",
+        "balance": 3008350000,
+        "created_at": "2026-05-27T08:03:00.000000Z",
+        "updated_at": "2026-05-27T08:20:50.000000Z"
+    }
+}

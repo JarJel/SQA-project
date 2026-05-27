@@ -1,0 +1,8 @@
+{
+    "message": "The selected financial account id is invalid.",
+    "errors": {
+        "financial_account_id": [
+            "The selected financial account id is invalid."
+        ]
+    }
+}

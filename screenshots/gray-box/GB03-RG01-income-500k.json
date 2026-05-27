@@ -1,0 +1,29 @@
+{
+    "financial_account_id": 13,
+    "category_id": 6,
+    "amount": 500000,
+    "type": "income",
+    "date": "2026-05-27",
+    "description": "RG01 Test Income",
+    "user_id": 2,
+    "updated_at": "2026-05-27T08:19:02.000000Z",
+    "created_at": "2026-05-27T08:19:02.000000Z",
+    "id": 62,
+    "category": {
+        "id": 6,
+        "user_id": 2,
+        "name": "Gaji",
+        "type": "income",
+        "created_at": "2026-05-27T08:03:01.000000Z",
+        "updated_at": "2026-05-27T08:03:01.000000Z"
+    },
+    "financial_account": {
+        "id": 13,
+        "user_id": 2,
+        "name": "BCA",
+        "type": "bank",
+        "balance": 3007800000,
+        "created_at": "2026-05-27T08:03:00.000000Z",
+        "updated_at": "2026-05-27T08:19:02.000000Z"
+    }
+}

@@ -1,0 +1,323 @@
+{
+    "data": [
+        {
+            "id": 61,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 1000000000,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "BVA Test amount=1000000000",
+            "created_at": "2026-05-27T08:17:27.000000Z",
+            "updated_at": "2026-05-27T08:17:27.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 60,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 999999999,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "BVA Test amount=999999999",
+            "created_at": "2026-05-27T08:17:25.000000Z",
+            "updated_at": "2026-05-27T08:17:25.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 59,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 999999998,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "BVA Test amount=999999998",
+            "created_at": "2026-05-27T08:17:24.000000Z",
+            "updated_at": "2026-05-27T08:17:24.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 51,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 1000000,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "WB02 Test Income",
+            "created_at": "2026-05-27T08:03:36.000000Z",
+            "updated_at": "2026-05-27T08:03:36.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 53,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 1000000,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "WB02 Test Income",
+            "created_at": "2026-05-27T08:09:26.000000Z",
+            "updated_at": "2026-05-27T08:09:26.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 52,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 500000,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "WB02 Test Income Check",
+            "created_at": "2026-05-27T08:03:37.000000Z",
+            "updated_at": "2026-05-27T08:03:37.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 54,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 7,
+            "amount": 500000,
+            "type": "expense",
+            "date": "2026-05-27",
+            "description": "WB02 Test Expense",
+            "created_at": "2026-05-27T08:09:49.000000Z",
+            "updated_at": "2026-05-27T08:09:49.000000Z",
+            "category": {
+                "id": 7,
+                "user_id": 2,
+                "name": "Makan",
+                "type": "expense",
+                "created_at": "2026-05-27T08:03:02.000000Z",
+                "updated_at": "2026-05-27T08:03:02.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 58,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 500000,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "BVA Test amount=500000",
+            "created_at": "2026-05-27T08:17:22.000000Z",
+            "updated_at": "2026-05-27T08:17:22.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 55,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 7,
+            "amount": 200000,
+            "type": "expense",
+            "date": "2026-05-27",
+            "description": "WB02 Test Expense2",
+            "created_at": "2026-05-27T08:09:50.000000Z",
+            "updated_at": "2026-05-27T08:09:50.000000Z",
+            "category": {
+                "id": 7,
+                "user_id": 2,
+                "name": "Makan",
+                "type": "expense",
+                "created_at": "2026-05-27T08:03:02.000000Z",
+                "updated_at": "2026-05-27T08:03:02.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 57,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 2,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "BVA Test amount=2",
+            "created_at": "2026-05-27T08:17:21.000000Z",
+            "updated_at": "2026-05-27T08:17:21.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        },
+        {
+            "id": 56,
+            "user_id": 2,
+            "financial_account_id": 13,
+            "category_id": 6,
+            "amount": 1,
+            "type": "income",
+            "date": "2026-05-27",
+            "description": "BVA Test amount=1",
+            "created_at": "2026-05-27T08:17:19.000000Z",
+            "updated_at": "2026-05-27T08:17:19.000000Z",
+            "category": {
+                "id": 6,
+                "user_id": 2,
+                "name": "Gaji",
+                "type": "income",
+                "created_at": "2026-05-27T08:03:01.000000Z",
+                "updated_at": "2026-05-27T08:03:01.000000Z"
+            },
+            "financial_account": {
+                "id": 13,
+                "user_id": 2,
+                "name": "BCA",
+                "type": "bank",
+                "balance": 3007300000,
+                "created_at": "2026-05-27T08:03:00.000000Z",
+                "updated_at": "2026-05-27T08:17:27.000000Z"
+            }
+        }
+    ]
+}

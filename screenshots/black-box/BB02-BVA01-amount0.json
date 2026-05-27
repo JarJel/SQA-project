@@ -1,0 +1,8 @@
+{
+    "message": "The amount field must be at least 1.",
+    "errors": {
+        "amount": [
+            "The amount field must be at least 1."
+        ]
+    }
+}

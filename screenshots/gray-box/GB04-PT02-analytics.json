@@ -1,0 +1,46 @@
+{
+    "line_chart": [
+        {
+            "date": "2026-05-21",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-22",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-23",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-24",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-25",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-26",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-27",
+            "income": 3004050000,
+            "expense": 700000
+        }
+    ],
+    "pie_chart": [
+        {
+            "name": "Makan",
+            "total": 700000
+        }
+    ],
+    "savings": []
+}

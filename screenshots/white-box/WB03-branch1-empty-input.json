@@ -1,0 +1,11 @@
+{
+    "message": "The name field is required. (and 1 more error)",
+    "errors": {
+        "name": [
+            "The name field is required."
+        ],
+        "type": [
+            "The type field is required."
+        ]
+    }
+}

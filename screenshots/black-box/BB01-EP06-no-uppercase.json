@@ -1,0 +1,8 @@
+{
+    "message": "The password field must contain at least one uppercase and one lowercase letter.",
+    "errors": {
+        "password": [
+            "The password field must contain at least one uppercase and one lowercase letter."
+        ]
+    }
+}

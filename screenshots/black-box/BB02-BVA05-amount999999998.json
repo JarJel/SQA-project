@@ -1,0 +1,29 @@
+{
+    "financial_account_id": 13,
+    "category_id": 6,
+    "amount": 999999998,
+    "type": "income",
+    "date": "2026-05-27",
+    "description": "BVA Test amount=999999998",
+    "user_id": 2,
+    "updated_at": "2026-05-27T08:17:24.000000Z",
+    "created_at": "2026-05-27T08:17:24.000000Z",
+    "id": 59,
+    "category": {
+        "id": 6,
+        "user_id": 2,
+        "name": "Gaji",
+        "type": "income",
+        "created_at": "2026-05-27T08:03:01.000000Z",
+        "updated_at": "2026-05-27T08:03:01.000000Z"
+    },
+    "financial_account": {
+        "id": 13,
+        "user_id": 2,
+        "name": "BCA",
+        "type": "bank",
+        "balance": 1007300001,
+        "created_at": "2026-05-27T08:03:00.000000Z",
+        "updated_at": "2026-05-27T08:17:24.000000Z"
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "status": "success",
+    "data": {
+        "name": "Transportasi",
+        "type": "income",
+        "user_id": 2,
+        "updated_at": "2026-05-27T08:14:58.000000Z",
+        "created_at": "2026-05-27T08:14:58.000000Z",
+        "id": 12
+    }
+}

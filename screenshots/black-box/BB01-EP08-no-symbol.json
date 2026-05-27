@@ -1,0 +1,8 @@
+{
+    "message": "The password field must contain at least one symbol.",
+    "errors": {
+        "password": [
+            "The password field must contain at least one symbol."
+        ]
+    }
+}

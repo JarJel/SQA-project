@@ -1,0 +1,17 @@
+{
+    "message": "Akses diberikan. Membuka brankas digital Anda...",
+    "access_token": "2|ccEFh8njQdM8tnm07JE60siUszoI09wOjrZtw1ZN0e222267",
+    "user": {
+        "id": 2,
+        "name": "Admin Midnight",
+        "email": "admin@midnight.com",
+        "email_verified_at": null,
+        "status": "active",
+        "otp_code": null,
+        "otp_expires_at": null,
+        "created_at": "2026-05-27T08:00:21.000000Z",
+        "updated_at": "2026-05-27T08:00:21.000000Z",
+        "avatar": null,
+        "avatar_updated_at": null
+    }
+}

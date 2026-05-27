@@ -1,0 +1,58 @@
+{
+    "line_chart": [
+        {
+            "date": "2026-05-21",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-22",
+            "income": 0,
+            "expense": 359000
+        },
+        {
+            "date": "2026-05-23",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-24",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-25",
+            "income": 0,
+            "expense": 0
+        },
+        {
+            "date": "2026-05-26",
+            "income": 6500000,
+            "expense": 461000
+        },
+        {
+            "date": "2026-05-27",
+            "income": 0,
+            "expense": 371000
+        }
+    ],
+    "pie_chart": [
+        {
+            "name": "Belanja & Hiburan",
+            "total": 2955000
+        },
+        {
+            "name": "Makan & Minum",
+            "total": 2847000
+        },
+        {
+            "name": "Tagihan & Kebutuhan Rumah",
+            "total": 2374000
+        },
+        {
+            "name": "Transportasi",
+            "total": 2171000
+        }
+    ],
+    "savings": []
+}

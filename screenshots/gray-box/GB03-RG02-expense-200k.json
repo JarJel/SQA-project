@@ -1,0 +1,29 @@
+{
+    "financial_account_id": 13,
+    "category_id": 7,
+    "amount": 200000,
+    "type": "expense",
+    "date": "2026-05-27",
+    "description": "RG02 Test Expense",
+    "user_id": 2,
+    "updated_at": "2026-05-27T08:19:17.000000Z",
+    "created_at": "2026-05-27T08:19:17.000000Z",
+    "id": 64,
+    "category": {
+        "id": 7,
+        "user_id": 2,
+        "name": "Makan",
+        "type": "expense",
+        "created_at": "2026-05-27T08:03:02.000000Z",
+        "updated_at": "2026-05-27T08:03:02.000000Z"
+    },
+    "financial_account": {
+        "id": 13,
+        "user_id": 2,
+        "name": "BCA",
+        "type": "bank",
+        "balance": 3008100000,
+        "created_at": "2026-05-27T08:03:00.000000Z",
+        "updated_at": "2026-05-27T08:19:17.000000Z"
+    }
+}

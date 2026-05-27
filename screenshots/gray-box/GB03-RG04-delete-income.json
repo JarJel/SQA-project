@@ -1,0 +1,5 @@
+{
+    "message": "Transaksi berhasil dihapus dan saldo dikembalikan",
+    "http_status": 200,
+    "balance_change": -500000
+}
