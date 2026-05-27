@@ -53,6 +53,9 @@ verif" [END-D]
 │
 [END-C]
 
+<img width="1440" height="1120" alt="image" src="https://github.com/user-attachments/assets/b22c7e6b-e6e7-406c-807f-02104128c1de" />
+
+
 **Edge List:**
 1→2, 2→3 (user ada), 2→4 (user tidak ada), 3→5 (pass ok), 3→6 (pass salah), 5→7 (ada OTP), 5→8 (OTP null), 4→END, 6→END, 7→END, 8→END
 **Perhitungan Cyclomatic Complexity:**
