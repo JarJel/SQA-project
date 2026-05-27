@@ -120,6 +120,12 @@ flowchart LR
 
 ---
 
+##  6. Proses Comparison Testing — API Versioning
+
+<img width="1440" height="804" alt="image" src="https://github.com/user-attachments/assets/95b864a6-c471-4822-89b3-7312cce75c0e" />
+
+---
+
 ## 📸 7. Screenshot yang Diperlukan
 
 > **📸 SCREENSHOT NEEDED #1:** **Postman — Response v1 Summary**
