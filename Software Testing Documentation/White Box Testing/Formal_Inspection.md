@@ -84,6 +84,8 @@ flowchart LR
 **Konteks:** Form Request validation untuk endpoint `POST /api/transactions`
 
 > ⚠️ **TODO:** Ganti dengan Form Request asli dari `midnight-finance-backend` saat finalisasi.
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/f262c526-37ea-4c6b-9427-2633c9f35e8c" />
+
 <img width="1024" height="576" alt="image" src="https://github.com/user-attachments/assets/2328714d-f825-43f2-96e9-16c0dd840de3" />
 
 
