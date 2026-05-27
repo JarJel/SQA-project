@@ -1,98 +1,158 @@
-# 📏 Boundary Value Analysis (BVA) — Midnight Finance
+# Black Box Testing — Boundary Value Analysis (BVA)
 
-**Mata Kuliah:** Software Quality Assurance  
-**Model Pengujian:** Black Box Testing — Boundary Value Analysis  
-**Tim:** REMACode  
-**Modul Target:** Input Nominal Transaksi (`POST /api/transactions`, field `amount`)  
-
----
-
-## 📖 Definisi
-
-**Boundary Value Analysis (BVA)** digunakan untuk melakukan validasi fungsionalitas system berdasarkan persyaratan dan spesifikasi, sehingga diperlukan analisis terhadap **Nilai Batas**. BVA merupakan **Perluasan dari Model Equivalence Partitioning**, dengan memasukan nilai sedikit dari minimum dan kurang sedikit dari maksimum (Suprihadi, 2025).
-
-Teknik ini dirancang khusus untuk mendeteksi **off-by-one error** — kesalahan yang sering terjadi tepat di batas kondisi (≤, <, ≥, >) yang tidak terdeteksi oleh Equivalence Partitioning biasa.
+**Proyek:** Midnight Finance  
+**Modul yang Diuji:** Transaction — `POST /api/v1/transactions`  
+**Tanggal Pengujian:** 27 Mei 2026  
+**Penguji:** QA Team  
+**Metode:** Boundary Value Analysis (BVA) — 7-Point Strategy  
 
 ---
 
-## 🎯 Modul yang Diuji
+## 1. Deskripsi Pengujian
 
-**Endpoint:** `POST /api/transactions`  
-**Field yang Diuji:** `amount` — nominal transaksi income/expense  
-**Validasi Backend (Laravel):**
+Boundary Value Analysis (BVA) adalah teknik *black box testing* yang berfokus pada nilai-nilai di batas partisi input. Nilai batas dan nilai tepat di luar batas cenderung menyebabkan lebih banyak kesalahan daripada nilai yang berada di tengah partisi.
 
-```php
-'amount' => 'required|numeric|min:1',
-```
-
-> **Spesifikasi Domain:** Aplikasi keuangan personal, satuan Rupiah (IDR). Nilai minimum adalah Rp 1 (min:1). Nilai maksimum praktis ditetapkan **Rp 999.999.999** sesuai batas wajar transaksi harian personal.
+**Field yang diuji:** `amount` (jumlah transaksi)  
+**Asumsi batas yang valid:** `1 ≤ amount ≤ 999.999.999`  
+**Endpoint:** `POST /api/v1/transactions`  
+**Auth:** Bearer Token (user: admin@midnight.com)
 
 ---
 
-## 📊 Tabel Equivalence Class
+## 2. Strategi 7-Titik Batas
 
-| No | Nama Kolom | Tipe Data | Batasan Data |
-|:--:|:---|:---|:---|
-| 1 | `amount` (Nominal Transaksi) | Numeric | `0 < amount ≤ 999.999.999` (Rupiah) |
+Dengan asumsi range valid `[1, 999.999.999]`, tujuh titik pengujian yang dipilih adalah:
 
----
-
-## 📋 Tabel Batasan Equivalence Class
-
-| No | Field Name | Boundary | Value | Input Data |
-|:--:|:---|:---|:---:|:---:|
-| 1 | `amount` | Batas Bawah (BB) | 0 | 1 |
-| 1 | `amount` | Batas Atas (BA) | 999.999.999 | 1.000.000.000 |
-
----
-
-## 🧪 Strategi 7-Point BVA
-
-Nilai yang diuji pada field `amount`:
-
-| Titik | Nilai | Keterangan |
-|:---:|:---:|:---|
-| BB − 1 | 0 | Di bawah batas minimum (invalid) |
-| BB | 1 | Tepat di batas minimum (valid) |
-| BB + 1 | 2 | Satu langkah di atas minimum (valid) |
-| Normal | 500.000 | Nilai tengah normal (valid) |
-| BA − 1 | 999.999.998 | Satu langkah di bawah maksimum (valid) |
-| BA | 999.999.999 | Tepat di batas maksimum (valid) |
-| BA + 1 | 1.000.000.000 | Di atas batas maksimum (invalid) |
+| Kode | Titik Batas | Nilai | Keterangan |
+|------|-------------|-------|------------|
+| BVA-01 | BB (Batas Bawah − 1) | 0 | Di bawah batas minimum |
+| BVA-02 | BB (Batas Bawah tepat) | 1 | Tepat pada batas minimum |
+| BVA-03 | BB+1 (Batas Bawah + 1) | 2 | Tepat di atas batas minimum |
+| BVA-04 | Normal | 500.000 | Nilai tengah, jauh dari batas |
+| BVA-05 | BA−1 (Batas Atas − 1) | 999.999.998 | Tepat di bawah batas maksimum |
+| BVA-06 | BA (Batas Atas tepat) | 999.999.999 | Tepat pada batas maksimum |
+| BVA-07 | BA+1 (Batas Atas + 1) | 1.000.000.000 | Di atas batas maksimum |
 
 ---
 
-## 📝 Tabel Test Case BVA
+## 3. Test Cases dan Hasil Pengujian
 
-| No | Test Case | Input `amount` | Input `type` | Expected Output | Actual Output | Status |
-|:--:|:---|:---:|:---:|:---|:---:|:---:|
-| TC-BVA-01 | Nilai di bawah batas minimum (0) | `0` | `expense` | HTTP 422 — "The amount field must be at least 1." | HTTP 422 | ✅ Valid |
-| TC-BVA-02 | Tepat di batas minimum (1) | `1` | `expense` | HTTP 201 — Transaksi berhasil dicatat | HTTP 201 | ✅ Valid |
-| TC-BVA-03 | Satu di atas minimum (2) | `2` | `income` | HTTP 201 — Transaksi berhasil dicatat | HTTP 201 | ✅ Valid |
-| TC-BVA-04 | Nilai normal (Rp 500.000) | `500000` | `income` | HTTP 201 — Transaksi berhasil dicatat | HTTP 201 | ✅ Valid |
-| TC-BVA-05 | Satu di bawah maksimum (Rp 999.999.998) | `999999998` | `expense` | HTTP 201 — Transaksi berhasil dicatat | HTTP 201 | ✅ Valid |
-| TC-BVA-06 | Tepat di batas maksimum (Rp 999.999.999) | `999999999` | `income` | HTTP 201 — Transaksi berhasil dicatat | HTTP 201 | ✅ Valid |
-| TC-BVA-07 | Di atas batas maksimum (Rp 1.000.000.000) | `1000000000` | `expense` | HTTP 422 — "The amount field must not be greater than 999999999." | HTTP 422 | ✅ Valid |
+### TC-BVA-01 — Amount = 0 (Di bawah batas minimum)
 
-> **Catatan:** Validasi `max:999999999` perlu ditambahkan secara eksplisit di backend jika belum ada, karena saat ini backend hanya menggunakan `min:1`. Rekomendasi: ubah validasi menjadi `'amount' => 'required|numeric|min:1|max:999999999'`.
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA01 |
+| **Input** | `amount: 0` |
+| **Expected Output** | HTTP 422 — Validasi gagal (`amount must be at least 1`) |
+| **Actual Output** | HTTP 422 — `{"message":"The amount field must be at least 1.","errors":{"amount":["The amount field must be at least 1."]}}` |
+| **Status** | ✅ PASSED |
 
 ---
 
-## ✅ Hasil Pengujian
+### TC-BVA-02 — Amount = 1 (Batas minimum tepat)
 
-| Kategori | Jumlah |
-|:---|:---:|
-| Total Test Case | 7 |
-| Test Case Valid (Passed) | 7 |
-| Test Case Failed | 0 |
-| Nilai Boundary yang Terdeteksi Benar | 7/7 |
-| **Persentase Keberhasilan** | **100%** |
-
-> **Kesimpulan:** Seluruh test case BVA pada field `amount` dinyatakan **valid**. Sistem menangani nilai boundary dengan benar — menolak nilai ≤ 0 dan menerima seluruh nilai dalam rentang valid (1 s/d 999.999.999). Tidak ditemukan *off-by-one error* pada batas bawah. Rekomendasi: tambahkan validasi `max` di backend untuk batas atas.
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA02 |
+| **Input** | `amount: 1` |
+| **Expected Output** | HTTP 201 — Transaksi berhasil dibuat |
+| **Actual Output** | HTTP 201 — Transaksi berhasil, `id: 56`, balance akun diperbarui |
+| **Status** | ✅ PASSED |
 
 ---
 
-## 📚 Referensi
+### TC-BVA-03 — Amount = 2 (Batas minimum + 1)
 
-- Suprihadi, D. (2025). *Software Quality — Black Box Testing*. T Informatika UKRI.
-- Nurudin, M., et al. (2019). Pengujian Black Box pada Aplikasi Penjualan Berbasis Web Menggunakan Teknik Boundary Value Analysis. *Jurnal Informatika Universitas Pamulang*, 4(4), 143.
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA03 |
+| **Input** | `amount: 2` |
+| **Expected Output** | HTTP 201 — Transaksi berhasil dibuat |
+| **Actual Output** | HTTP 201 — Transaksi berhasil, `id: 57`, balance akun diperbarui |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-BVA-04 — Amount = 500.000 (Nilai normal)
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA04 |
+| **Input** | `amount: 500000` |
+| **Expected Output** | HTTP 201 — Transaksi berhasil dibuat |
+| **Actual Output** | HTTP 201 — Transaksi berhasil, `id: 58`, balance akun diperbarui |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-BVA-05 — Amount = 999.999.998 (Batas maksimum − 1)
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA05 |
+| **Input** | `amount: 999999998` |
+| **Expected Output** | HTTP 201 — Transaksi berhasil dibuat |
+| **Actual Output** | HTTP 201 — Transaksi berhasil, `id: 59`, balance akun diperbarui |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-BVA-06 — Amount = 999.999.999 (Batas maksimum tepat)
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA06 |
+| **Input** | `amount: 999999999` |
+| **Expected Output** | HTTP 201 — Transaksi berhasil dibuat |
+| **Actual Output** | HTTP 201 — Transaksi berhasil, `id: 60`, balance akun diperbarui |
+| **Status** | ✅ PASSED |
+
+---
+
+### TC-BVA-07 — Amount = 1.000.000.000 (Di atas batas maksimum) 🐛
+
+| Atribut | Detail |
+|---------|--------|
+| **ID Test** | BB02-BVA07 |
+| **Input** | `amount: 1000000000` |
+| **Expected Output** | HTTP 422 — Validasi gagal (`amount melebihi batas maksimum`) |
+| **Actual Output** | HTTP 201 — **Transaksi BERHASIL dibuat** (`id: 61`, amount: 1.000.000.000 tersimpan ke database) |
+| **Status** | ❌ **FAILED — BUG DITEMUKAN** |
+
+> **⚠️ BUG #001 — Missing Max Validation on Amount Field**  
+> Sistem menerima `amount = 1.000.000.000` yang seharusnya ditolak. Validasi di `TransactionController.php` hanya memiliki aturan `'amount' => 'required|numeric|min:1'` tanpa constraint `max`. Nilai miliaran dapat tersimpan ke database tanpa pembatasan, berpotensi menyebabkan overflow pada kolom balance atau ketidakakuratan laporan keuangan.  
+>
+> **Root Cause:** `app/Http/Controllers/API/TransactionController.php` — rule validasi `amount` tidak memiliki `max:999999999`  
+> **Rekomendasi Fix:** Tambahkan `'amount' => 'required|numeric|min:1|max:999999999'`
+
+---
+
+## 4. Ringkasan Hasil BVA
+
+| ID Test | Nilai Amount | Expected HTTP | Actual HTTP | Status |
+|---------|-------------|---------------|-------------|--------|
+| BVA-01 | 0 | 422 | 422 | ✅ PASSED |
+| BVA-02 | 1 | 201 | 201 | ✅ PASSED |
+| BVA-03 | 2 | 201 | 201 | ✅ PASSED |
+| BVA-04 | 500.000 | 201 | 201 | ✅ PASSED |
+| BVA-05 | 999.999.998 | 201 | 201 | ✅ PASSED |
+| BVA-06 | 999.999.999 | 201 | 201 | ✅ PASSED |
+| BVA-07 | 1.000.000.000 | 422 | **201** | ❌ **FAILED** |
+
+**Total:** 7 test case | ✅ 6 Passed | ❌ 1 Failed | 🐛 1 Bug Ditemukan
+
+---
+
+## 5. Bukti Pengujian (Test Evidence)
+
+File JSON hasil pengujian tersimpan di direktori `screenshots/black-box/`:
+
+| File | Keterangan |
+|------|------------|
+| `BB02-BVA01-amount0.json` | HTTP 422 — amount 0 ditolak |
+| `BB02-BVA02-amount1.json` | HTTP 201 — amount 1 diterima |
+| `BB02-BVA03-amount2.json` | HTTP 201 — amount 2 diterima |
+| `BB02-BVA04-amount500000.json` | HTTP 201 — amount 500.000 diterima |
+| `BB02-BVA05-amount999999998.json` | HTTP 201 — amount 999.999.998 diterima |
+| `BB02-BVA06-amount999999999.json` | HTTP 201 — amount 999.999.999 diterima |
+| `BB02-BVA07-amount1000000000.json` | HTTP 201 — **BUG: amount 1 miliar diterima** |
