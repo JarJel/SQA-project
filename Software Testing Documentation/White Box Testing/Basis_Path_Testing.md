@@ -20,38 +20,6 @@ V(G) = E − N + 2P
 ---
 ## WB-01: Login (`AuthController@login`)
 ### Flowgraph
-    [START]
-       │
-   [1] Node 1: Terima email & password
-       │
-   [2] Node 2: Cari user by email
-       │
-  ┌────┴────┐
-[Ya] [Tidak]
-user ada? user tidak ada
-│ │
-[Node 3] [Node 4]
-Periksa Return 404
-password "Email tidak
-│ ditemukan"
-┌────┴────┐ │
-[Ya] [Tidak] [END-A]
-pass ok? pass salah
-│ │
-[Node 5] [Node 6]
-Cek OTP Return 401
-│ "Kata sandi salah"
-┌───┴───┐ │
-[Ada] [Null] [END-B]
-OTP? OTP?
-│ │
-[N7] [N8]
-Return Return 200
-403 OTP + Token
-"Belum │
-verif" [END-D]
-│
-[END-C]
 
 <img width="1440" height="1120" alt="image" src="https://github.com/user-attachments/assets/b22c7e6b-e6e7-406c-807f-02104128c1de" />
 
