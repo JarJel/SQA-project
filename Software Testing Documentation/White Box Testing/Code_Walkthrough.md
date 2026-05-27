@@ -1,325 +1,166 @@
-#  Code Walkthrough
+# White Box Testing — Code Walkthrough
 
-**Model White Box Testing \#2** — *Static Testing* **Modul Target:** Autentikasi & Login Flow (Laravel Sanctum) **Tim:** REMACode
-
----
-
-##  1\. Definisi
-
-**Code Walkthrough** adalah teknik review kode secara **formal maupun informal** yang dilakukan bersama-sama antara developer dan tim terkait untuk **memahami logika kode**, mengidentifikasi potensi error, dan meningkatkan kualitas keseluruhan program (Suprihadi, 2025). Berbeda dengan Desk Checking yang dilakukan individual, Code Walkthrough bersifat **kolaboratif** dan menggunakan diskusi tim sebagai mekanisme deteksi error.
-
-*"Teknik review kode secara formal atau informal yang dilakukan bersama-sama antara developer dan tim terkait untuk memahami logika kode, kemudian mengidentifikasi potensi error, dan meningkatkan kualitas keseluruhan program."* — (Suprihadi, 2025\)
-
-### Perbedaan dengan Desk Checking
-
-| Aspek | Desk Checking | Code Walkthrough |
-| :---- | :---- | :---- |
-| Pelaku | Individu (developer sendiri) | Tim (developer \+ reviewer) |
-| Sifat | Privat | Kolaboratif |
-| Fokus | Trace variabel | Diskusi logika & arsitektur |
-| Output | Tabel trace | Notulen review \+ action items |
+**Proyek:** Midnight Finance  
+**Modul yang Dikaji:** Authentication — `AuthController.php`  
+**Tanggal:** 27 Mei 2026  
+**Penguji:** QA Team  
+**Metode:** Code Walkthrough (Static White Box Testing)
 
 ---
 
-##  2\. Tujuan Pengujian
+## 1. Deskripsi
 
-| No | Tujuan |
-| :---- | :---- |
-| 1 | Memastikan semua anggota tim memahami logika kode yang ditulis |
-| 2 | Menemukan bug, code smell, dan security issue secara dini |
-| 3 | Knowledge sharing antar developer (mengurangi *bus factor*) |
-| 4 | Memvalidasi adherence terhadap coding standard tim |
-| 5 | Mengidentifikasi *edge case* yang belum di-handle |
+Code Walkthrough adalah teknik *static white box testing* di mana tim QA menelusuri kode sumber secara manual bersama pengembang untuk menemukan potensi kesalahan logika, keamanan, atau pelanggaran standar — **tanpa menjalankan program**.
+
+**File yang dikaji:** `app/Http/Controllers/API/AuthController.php`  
+**Metode yang ditelaah:** `login()`, `register()`, `checkCooldown()`
 
 ---
 
-##  3\. Peserta Review (Tim REMACode)
+## 2. Source Code yang Dikaji (Kode Asli)
 
-| Peran | Nama | Tanggung Jawab |
-| :---- | :---- | :---- |
-| **Author** | Muhammad Dzaki Awaludin | Penulis kode yang akan di-review |
-| **Moderator** | Muhammad Fajar Munandar | Memimpin sesi review, mencatat issue |
-| **Reviewer 1** | Mochamad Fikri Ghifari | Fokus arsitektur & desain |
-| **Reviewer 2** | Raka Zilva Inggia | Fokus security & validasi logika |
-
----
-
-##  4\. Source Code yang Direview
-
-**File:** `app/Http/Controllers/Api/AuthController.php` **Method:** `login()` — autentikasi user via email & password menggunakan Sanctum.
-
- **TODO:** Ganti dengan controller asli dari `midnight-finance-backend` saat finalisasi.
-
+```php
+// AuthController.php — Method: login()
 public function login(Request $request)
-
 {
+$request->validate(['email' => 'required|email', 'password' => 'required']);
+$user = User::where('email', $request->email)->first();
 
-    $credentials \= $request-\>validate(\[
-
-        'email'    \=\> 'required|email',
-
-        'password' \=\> 'required|string|min:8',
-
-    \]);
-
-    $user \= User::where('email', $credentials\['email'\])-\>first();
-
-    if (\!$user) {
-
-        return response()-\>json(\['message' \=\> 'User not found'\], 404);
-
-    }
-
-    if (\!Hash::check($credentials\['password'\], $user-\>password)) {
-
-        return response()-\>json(\['message' \=\> 'Invalid password'\], 401);
-
-    }
-
-    $token \= $user-\>createToken('auth\_token')-\>plainTextToken;
-
-    return response()-\>json(\[
-
-        'access\_token' \=\> $token,
-
-        'token\_type'   \=\> 'Bearer',
-
-        'user'         \=\> $user,
-
-    \], 200);
-
+if (!$user) 
+    return response()->json(['message' => 'Alamat email tidak ditemukan...'], 404);
+if (!Hash::check($request->password, $user->password)) 
+    return response()->json(['message' => 'Kata sandi yang Anda masukkan salah.'], 401);
+if ($user->otp_code) 
+    return response()->json(['message' => 'Akun belum diverifikasi...', 'need_otp' => true], 403);
+return response()->json([
+    'message' => 'Akses diberikan. Membuka brankas digital Anda...',
+    'access_token' => $user->createToken('auth_token')->plainTextToken,
+    'user' => $user
+]);
 }
 
----
-
-##  5\. Proses Walkthrough
-
-### 5.1 Penjelasan Author (Step-by-Step)
-
-flowchart TD
-
-<img width="1440" height="1240" alt="image" src="https://github.com/user-attachments/assets/aae0e38f-e0d8-40bb-9faf-c9fd2a4b0d21" />
-
-
-**Narasi author:**
-
-*"Method `login` menerima request berisi email dan password. Setelah validasi format, kami query user berdasarkan email. Jika tidak ditemukan return 404, jika password salah return 401\. Jika valid, generate token Sanctum dan return ke client."*
-
-### 5.2 Diskusi Tim — Issue yang Diidentifikasi
-
-####  Issue \#1: User Enumeration Vulnerability
-
-**Pengamat:** Raka Zilva Inggia (Security)
-
-**Masalah:**
-
-if (\!$user) {
-
-    return response()-\>json(\['message' \=\> 'User not found'\], 404);
-
-}
-
-if (\!Hash::check(...)) {
-
-    return response()-\>json(\['message' \=\> 'Invalid password'\], 401);
-
-}
-
-**Dampak:** Attacker dapat **enumerate email valid** dengan membandingkan response. Email yang ada return 401, yang tidak ada return 404\. Ini violation terhadap **OWASP A07:2021 — Identification & Authentication Failures**.
-
-**Rekomendasi:** Gunakan pesan generic yang sama untuk kedua kasus:
-
-return response()-\>json(\['message' \=\> 'Invalid credentials'\], 401);
-
-####  Issue \#2: Tidak Ada Rate Limiting
-
-**Pengamat:** Raka Zilva Inggia (Security)
-
-**Masalah:** Endpoint `/api/login` tidak memiliki throttle middleware, rentan terhadap **brute force attack**.
-
-**Rekomendasi:** Tambahkan middleware throttle pada route:
-
-Route::post('/login', \[AuthController::class, 'login'\])
-
-    \-\>middleware('throttle:5,1'); // 5 attempt per menit
-
-####  Issue \#3: Token Tidak Punya Expiration
-
-**Pengamat:** Mochamad Fikri Ghifari (Architecture)
-
-**Masalah:** Token Sanctum di-generate tanpa `expiresAt`, artinya token valid selamanya sampai user logout manual.
-
-**Rekomendasi:**
-
-$token \= $user-\>createToken('auth\_token', \['\*'\], now()-\>addDays(7))
-
-    \-\>plainTextToken;
-
-####  Issue \#4: Mengembalikan Seluruh Data User
-
-**Pengamat:** Mochamad Fikri Ghifari (Architecture)
-
-**Masalah:** `return ... 'user' => $user` mengembalikan **semua field** termasuk timestamp internal dan kemungkinan field sensitif.
-
-**Rekomendasi:** Gunakan API Resource:
-
-'user' \=\> new UserResource($user),
-
-####  Issue \#5: Inconsistent HTTP Status Code
-
-**Pengamat:** Mochamad Fikri Ghifari (Architecture)
-
-**Masalah:** Status `404 User not found` untuk login endpoint kurang tepat secara semantik. Standar RESTful menggunakan `401 Unauthorized` untuk semua kegagalan autentikasi.
-
----
-
-##  6\. Ringkasan Temuan
-
-| ID | Severity | Issue | Kategori | Reviewer |
-| :---- | :---- | :---- | :---- | :---- |
-| `CW-001` |  High | User enumeration vulnerability | Security | Raka |
-| `CW-002` |  High | Tidak ada rate limiting | Security | Raka |
-| `CW-003` |  Medium | Token tanpa expiration | Architecture | Fikri |
-| `CW-004` |  Medium | Expose seluruh data user | Architecture | Fikri |
-| `CW-005` |  Low | Inconsistent HTTP status code | Code Quality | Fikri |
-
-**Total Issue:** 5 (2 High, 2 Medium, 1 Low)
-
----
-
-##  7\. Rekomendasi Perbaikan Kode
-
-public function login(Request $request)
-
+// AuthController.php — Method: register()
+public function register(Request $request)
 {
+$request->validate([
+'name' => 'required|string|max:255',
+'email' => 'required|email',
+'password' => ['required', 'confirmed',
+Password::min(8)->letters()->mixedCase()->numbers()->symbols()->uncompromised()
+],
+]);
 
-    $credentials \= $request-\>validate(\[
-
-        'email'    \=\> 'required|email',
-
-        'password' \=\> 'required|string|min:8',
-
-    \]);
-
-    $user \= User::where('email', $credentials\['email'\])-\>first();
-
-    // Generic error message — prevent user enumeration
-
-    if (\!$user || \!Hash::check($credentials\['password'\], $user-\>password)) {
-
-        return response()-\>json(\[
-
-            'message' \=\> 'Invalid credentials',
-
-        \], 401);
-
-    }
-
-    // Token dengan expiration 7 hari
-
-    $token \= $user-\>createToken(
-
-        'auth\_token',
-
-        \['\*'\],
-
-        now()-\>addDays(7)
-
-    )-\>plainTextToken;
-
-    return response()-\>json(\[
-
-        'access\_token' \=\> $token,
-
-        'token\_type'   \=\> 'Bearer',
-
-        'expires\_at'   \=\> now()-\>addDays(7)-\>toIso8601String(),
-
-        'user'         \=\> new UserResource($user),
-
-    \], 200);
-
+$user = User::where('email', $request->email)->first();
+if ($user && $user->status === 'active') {
+    return response()->json(['message' => 'Alamat email sudah terdaftar...'], 400);
+}
+if ($cooldownMsg = $this->checkCooldown($user)) {
+    return response()->json(['message' => $cooldownMsg], 429);
+}
+$otp = rand(100000, 999999);
+$user = User::updateOrCreate(
+    ['email' => $request->email],
+    ['name' => $request->name, 'password' => Hash::make($request->password),
+     'status' => 'inactive', 'otp_code' => (string) $otp,
+     'otp_expires_at' => now()->addMinutes(10)]
+);
+Mail::send('emails.otp', ['otp' => $otp, 'user' => $user], function($msg) use ($user) {
+    $msg->to($user->email)->subject('Kode Verifikasi Keamanan - Midnight Finance');
+});
+return response()->json(['message' => 'Registrasi berhasil...'], 201);
 }
 
-**Tambahan di `routes/api.php`:**
-
-Route::post('/login', \[AuthController::class, 'login'\])
-
-    \-\>middleware('throttle:5,1')
-
-    \-\>name('auth.login');
-
----
-
-##  8\. Checklist Walkthrough
-
-Checklist standar yang digunakan Tim REMACode dalam sesi walkthrough:
-
-| Kategori | Item | Status |
-| :---- | :---- | :---- |
-| **Functionality** | Logika sesuai requirement? | ✅ |
-| **Functionality** | Edge case ter-handle? | ⚠️ Partial |
-| **Security** | Input divalidasi? | ✅ |
-| **Security** | Tidak ada SQL injection risk? | ✅ |
-| **Security** | Tidak expose informasi sensitif? | ❌ |
-| **Security** | Ada rate limiting? | ❌ |
-| **Performance** | Tidak ada N+1 query? | ✅ |
-| **Performance** | Index database sesuai? | ✅ |
-| **Maintainability** | Coding style konsisten? | ✅ |
-| **Maintainability** | Method tidak terlalu panjang? | ✅ |
-| **Maintainability** | Penamaan variabel jelas? | ✅ |
-| **Testing** | Sudah ada unit test? | ❌ |
-
-**Skor Walkthrough:** 9/12 (75%) — perlu perbaikan di Security dan Testing.
-
----
-
-##  9\. Kelebihan & Kekurangan
-
-###  Kelebihan
-
-- Mendapatkan **multiple perspective** sekaligus  
-- Knowledge transfer antar developer berjalan natural  
-- Membangun *coding standard* tim secara konsisten  
-- Lebih efektif menemukan bug *security* yang sulit terlihat sendirian  
-- Mengurangi *bus factor* (tidak ada single point of knowledge)
-
-###  Kekurangan
-
-- **Membutuhkan waktu** semua peserta secara sinkron  
-- Bisa menjadi tidak produktif jika tidak ada moderator  
-- Risiko *bikeshedding* — diskusi panjang untuk hal trivial  
-- Bergantung pada skill reviewer (junior reviewer kurang efektif)  
-- Tidak menggantikan testing otomatis
+// AuthController.php — Helper: checkCooldown()
+private function checkCooldown($user)
+{
+if ($user && $user->otp_code && $user->updated_at) {
+s
+e
+c
+o
+n
+d
+s
+P
+a
+s
+s
+e
+d
+=
+n
+o
+w
+(
+)
+−
+>
+d
+i
+f
+f
+I
+n
+S
+e
+c
+o
+n
+d
+s
+(
+secondsPassed=now()−>diffInSeconds(user->updated_at);
+if ($secondsPassed < 180) {
+$wait = ceil((180 - $secondsPassed) / 60);
+return "Tunggu {$wait} menit lagi sebelum meminta kode verifikasi baru.";
+}
+}
+return false;
+}
 
 ---
-
-##  10\. Tools Pendukung
-
-| Tool | Kegunaan |
-| :---- | :---- |
-| **GitHub Pull Request** | Async code review dengan comment thread |
-| **GitLab Merge Request** | Alternatif PR dengan inline discussion |
-| **VS Code Live Share** | Real-time collaborative review |
-| **Zoom / Google Meet** | Sesi walkthrough sinkron |
-| **Notion / Confluence** | Dokumentasi notulen & action items |
-
+## 3. Temuan Walkthrough
+### Temuan #1 — `login()`: Status Akun Tidak Dicek
+| Atribut | Detail |
+|---------|--------|
+| **Lokasi** | `login()` — kondisi ketiga |
+| **Kondisi** | Cek `$user->otp_code` bukan `$user->status` |
+| **Risiko** | User dengan `status = 'inactive'` yang OTP-nya sudah null (expired dibersihkan) bisa login |
+| **Tingkat** | 🟠 Medium |
+| **Rekomendasi** | Tambahkan `if ($user->status !== 'active') return response()->json([...], 403)` |
+### Temuan #2 — `register()`: Email Validation Tidak Cek `unique`
+| Atribut | Detail |
+|---------|--------|
+| **Lokasi** | `register()` — rule validasi |
+| **Kondisi** | Tidak ada rule `unique:users,email` di `$request->validate()` |
+| **Risiko** | Logika duplikat ditangani manual (`if ($user && $user->status === 'active')`), lebih rawan error dibanding menggunakan Laravel's built-in unique rule |
+| **Tingkat** | 🟡 Low |
+| **Rekomendasi** | Ini desain yang disengaja (untuk `updateOrCreate`), tapi perlu comment penjelasan |
+### Temuan #3 — `checkCooldown()`: `diffInSeconds` bisa Negatif
+| Atribut | Detail |
+|---------|--------|
+| **Lokasi** | `checkCooldown()` |
+| **Kondisi** | `now()->diffInSeconds($user->updated_at)` bisa bernilai negatif jika clock server tidak sinkron |
+| **Risiko** | Cooldown bisa bypass jika server time bermasalah |
+| **Tingkat** | 🟡 Low |
+| **Rekomendasi** | Gunakan `abs(now()->diffInSeconds($user->updated_at))` |
+### Temuan #4 — `register()`: OTP Menggunakan `rand()` bukan `random_int()`
+| Atribut | Detail |
+|---------|--------|
+| **Lokasi** | `register()` — baris `$otp = rand(100000, 999999)` |
+| **Kondisi** | `rand()` adalah pseudo-random, tidak cryptographically secure |
+| **Risiko** | OTP berpotensi diprediksi pada sistem dengan seed yang dapat ditebak |
+| **Tingkat** | 🟠 Medium |
+| **Rekomendasi** | Gunakan `random_int(100000, 999999)` — PHP CSPRNG |
 ---
-
-##  11\. Template Notulen Walkthrough
-
-<img width="1440" height="1560" alt="image" src="https://github.com/user-attachments/assets/9087d32b-17bd-428f-9e3e-0a6db832c700" />
-
-
-##  Referensi
-
-1. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10*. Universitas Kristen Indonesia.  
-2. Fagan, M. E. (1976). *Design and code inspections to reduce errors in program development*. IBM Systems Journal.  
-3. OWASP Foundation. (2021). *OWASP Top 10:2021 — A07: Identification and Authentication Failures*. [https://owasp.org/Top10/](https://owasp.org/Top10/)  
-4. Pressman, R. S., & Maxim, B. R. (2020). *Software Engineering: A Practitioner's Approach* (9th ed.). McGraw-Hill.
-
+## 4. Ringkasan Temuan
+| ID | Metode | Temuan | Tingkat |
+|----|--------|--------|---------|
+| CW-01 | `login()` | Status akun tidak dicek secara eksplisit | 🟠 Medium |
+| CW-02 | `register()` | Tidak ada `unique:users,email` rule | 🟡 Low |
+| CW-03 | `checkCooldown()` | `diffInSeconds` tanpa `abs()` | 🟡 Low |
+| CW-04 | `register()` | `rand()` tidak cryptographically secure | 🟠 Medium |
+**Total:** 4 temuan | 🟠 2 Medium | 🟡 2 Low | 🔴 0 Critical
 ---
-
-[ Desk Checking](http://./Desk_Checking.md) · [Kembali ke README](http://./README.md) · [Lanjut ke Formal Inspection ➡](http://./Formal_Inspection.md)
-
-**Tim REMACode** — Midnight Finance SQA Documentation  
+## 5. Kesimpulan
+Code Walkthrough pada `AuthController.php` menemukan **4 potensi perbaikan**. Tidak ada temuan critical yang memblokir sistem. Temuan CW-01 dan CW-04 direkomendasikan untuk diperbaiki sebelum production deployment. Keseluruhan alur autentikasi logis dan terstruktur dengan baik menggunakan Laravel's built-in security features (Hash, Password rules, Sanctum tokens).
