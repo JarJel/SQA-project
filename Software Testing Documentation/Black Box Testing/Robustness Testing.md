@@ -146,25 +146,9 @@ Input dengan panjang jauh melebihi spesifikasi:
 
 ## 📸 6. Screenshot yang Diperlukan
 
-> **📸 SCREENSHOT NEEDED #1:** **Login Form — Default State**
-> Screenshot halaman login Midnight Finance dalam kondisi form kosong.
-> *File suggested name:* `screenshot/RT-login-form-default.png`
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1c5ee425-99de-4006-9c8b-678b1ec20784" />
 
-> **📸 SCREENSHOT NEEDED #2:** **SQL Injection Ditolak (RT-SQL-01)**
-> Masukkan `' OR '1'='1` di field email, submit, screenshot response — pastikan sistem menolak dengan 401, BUKAN berhasil login.
-> *File suggested name:* `screenshot/RT-sql-injection-blocked.png`
-
-> **📸 SCREENSHOT NEEDED #3:** **XSS Ditolak (RT-XSS-01)**
-> Masukkan `<script>alert('XSS')</script>` di field email, screenshot error validation yang muncul.
-> *File suggested name:* `screenshot/RT-xss-blocked.png`
-
-> **📸 SCREENSHOT NEEDED #4:** **Input Panjang Ditolak (RT-LEN-02)**
-> Paste 1000 karakter di field email, screenshot error validasi.
-> *File suggested name:* `screenshot/RT-long-input-blocked.png`
-
-> **📸 SCREENSHOT NEEDED #5:** **Response JSON (via Postman)**
-> Screenshot Postman response untuk SQL injection attempt — tunjukkan HTTP 401 dan message "Invalid credentials" (BUKAN error DB atau stack trace).
-> *File suggested name:* `screenshot/RT-postman-sql-response.png`
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/163f1548-9f92-4e75-9edb-34b63b840fba" />
 
 ---
 
