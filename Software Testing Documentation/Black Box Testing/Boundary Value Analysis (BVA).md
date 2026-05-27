@@ -59,7 +59,7 @@ graph LR
     style A fill:#ffcccc,stroke:#cc0000,color:#7a0000
     style B fill:#ccffcc,stroke:#007700,color:#004400
     style C fill:#ccffcc,stroke:#007700,color:#004400
-    D fill:#ccffcc,stroke:#007700,color:#004400
+    style D fill:#ccffcc,stroke:#007700,color:#004400
     style E fill:#ccffcc,stroke:#007700,color:#004400
     style F fill:#ccffcc,stroke:#007700,color:#004400
     style G fill:#ff9900,stroke:#cc6600,color:#5c2d00
@@ -177,12 +177,6 @@ flowchart TD
 ---
 
 ## 7. Ringkasan Hasil Pengujian
-
-```mermaid
-pie title Hasil BVA — 7 Test Case
-    "Passed (6)" : 6
-    "Failed/Bug (1)" : 1
-```
 
 | ID Test | Nilai Amount | Expected HTTP | Actual HTTP | Status |
 |:---:|:---:|:---:|:---:|:---:|
