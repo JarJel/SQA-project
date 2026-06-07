@@ -1,251 +1,215 @@
-#  Desk Checking
-
-**Model White Box Testing \#1** — *Static Testing* **Modul Target:** Kalkulasi Saldo Transaksi (Income & Expense) **Tim:** REMACode
-
----
-
-##  1\. Definisi
-
-**Desk Checking** adalah teknik pengujian *static* paling fundamental dalam White Box Testing, di mana developer atau penguji **menelusuri (trace) kode secara manual baris demi baris** tanpa menjalankan program. Pemeriksaan ini berfokus pada **logika kode dan perubahan nilai variabel** saat program dieksekusi secara hipotetis di atas kertas (Pressman & Maxim, 2020).
-
-*"Desk Checking adalah salah satu pengujian bagi para pembuat software yang telah mempelajari bahasa pemrograman dengan sangat baik, karena pemeriksaan berfokus pada logika dan nilai variabel pada input dan output yang diperlukan oleh aplikasi."* — (Suprihadi, 2025\)
+# White Box Testing — 01 Desk Checking
+**Proyek:** SaPoPoe Finance  
+**Teknik:** Desk Checking — pembacaan kode manual tanpa eksekusi  
+**Modul:** Auth · Transfer · Transaksi · Tabungan  
+**Screenshot:** ❌ Tidak ada
 
 ---
 
-##  2\. Tujuan Pengujian
-
-| No | Tujuan |
-| :---- | :---- |
-| 1 | Memverifikasi logika kode sebelum dieksekusi |
-| 2 | Melacak perubahan nilai variabel pada setiap langkah eksekusi |
-| 3 | Menemukan kesalahan logika dan *off-by-one error* |
-| 4 | Memvalidasi kesesuaian output dengan ekspektasi |
-| 5 | Mengurangi biaya debugging di tahap lanjut |
+## Apa itu Desk Checking?
+Pembacaan kode secara manual oleh penguji untuk menemukan bug logika, celah keamanan, dan inkonsistensi **sebelum program dijalankan**.
 
 ---
 
-##  3\. Source Code yang Diuji
+## Modul A — Autentikasi (`AuthController.php`)
 
-**File:** `app/Http/Controllers/Api/TransactionController.php` **Method:** `store()` — fungsi menambah transaksi income/expense yang otomatis update saldo akun.
+**Metode:** `register()`, `verifyOtp()`, `resendOtp()`, `login()`, `setup()`, `forgotPassword()`, `resetPassword()`, `logout()`
 
- **TODO:** Snippet di bawah adalah representasi pola umum Laravel. Ganti dengan controller asli dari `midnight-finance-backend` saat finalisasi.
+### Temuan DC-AUTH-01 — OTP Tidak Cryptographically Secure
+```php
+$otp = rand(100000, 999999);  // ← MASALAH
+```
+> `rand()` bukan CSPRNG (Cryptographically Secure Pseudo Random Number Generator). Pada sistem 32-bit, range-nya terbatas dan dapat diprediksi.  
+> **Rekomendasi:** Ganti ke `random_int(100000, 999999)`.  
+> **Severity:** 🔴 Tinggi
 
-public function store(Request $request)
+### Temuan DC-AUTH-02 — Email Dikirim Secara Sinkron
+```php
+Mail::send('emails.otp', [...], function($msg) { ... });  // blocking
+```
+> `Mail::send()` memblokir response hingga email terkirim. Jika SMTP lambat, user menunggu lama.  
+> **Rekomendasi:** Ganti ke `Mail::queue()` + setup queue worker.  
+> **Severity:** 🟡 Sedang
 
-{
+### Temuan DC-AUTH-03 — Sibling Detection OTP via `created_at`
+```php
+$siblings = Transaction::where('user_id', $user->id)
+    ->where('created_at', $baseTransaction->created_at)->get();
+```
+> (di TransferController, tapi pola ini mirip OTP yang juga berbasis timestamp)  
+> OTP cooldown hanya cek `updated_at` — bukan token unik. Potensi timing collision pada beban tinggi.  
+> **Severity:** 🟡 Sedang
 
-    $validated \= $request-\>validate(\[
+### Temuan DC-AUTH-04 — `$user` Didefinisikan Dua Kali di `register()`
+```php
+$user = User::where('email', $request->email)->first();   // D1: cek apakah ada
+// ... validasi cooldown ...
+$user = User::updateOrCreate([...]);                       // D2: overwrite
+```
+> Pola intentional (D1 untuk validasi, D2 untuk simpan), tapi membingungkan karena `$user` berubah tipe dari nullable ke pasti ada.  
+> **Severity:** 🟢 Rendah
 
-        'account\_id'   \=\> 'required|exists:accounts,id',
+---
 
-        'category\_id'  \=\> 'required|exists:categories,id',
+## Modul B — Transfer (`TransferController.php`)
 
-        'type'         \=\> 'required|in:income,expense',
+**Metode:** `store()`, `update()`, `destroy()`
 
-        'amount'       \=\> 'required|numeric|min:0.01',
-
-        'description'  \=\> 'nullable|string|max:255',
-
-    \]);
-
-    $account \= Account::findOrFail($validated\['account\_id'\]);
-
-    $currentBalance \= $account-\>balance;
-
-    $amount \= $validated\['amount'\];
-
-    // Core logic: hitung saldo akhir berdasarkan tipe transaksi
-
-    if ($validated\['type'\] \=== 'income') {
-
-        $newBalance \= $currentBalance \+ $amount;
-
-    } else {
-
-        $newBalance \= $currentBalance \- $amount;
-
-    }
-
-    $account-\>update(\['balance' \=\> $newBalance\]);
-
-    return Transaction::create(\[
-
-        ...$validated,
-
-        'user\_id' \=\> auth()-\>id(),
-
-    \]);
-
+### Temuan DC-TRF-01 — Kategori Dibuat di Luar Transaksi DB
+```php
+// store() — baris 37-55
+$transferCategory = Category::where(...)->first();
+if (!$transferCategory) {
+    $transferCategory = new Category();
+    $transferCategory->save();   // ← Di luar DB::beginTransaction()!
 }
+// ...
+DB::beginTransaction();         // Baru mulai transaksi di sini
+```
+> Jika transfer gagal di dalam transaksi, `DB::rollBack()` hanya me-revert data di dalam transaksi. Kategori yang baru dibuat **tidak ikut di-rollback** → data orphan di tabel `categories`.  
+> **Rekomendasi:** Pindahkan pembuatan kategori ke dalam blok `DB::beginTransaction()`.  
+> **Severity:** 🔴 Tinggi
+
+### Temuan DC-TRF-02 — Sibling Detection via `created_at` (Race Condition)
+```php
+$siblings = Transaction::where('user_id', $user->id)
+    ->where('created_at', $baseTransaction->created_at)->get();
+```
+> Jika dua transfer terjadi di detik yang sama (concurrent requests), siblings bisa saling tercampur → saldo salah terhitung.  
+> **Rekomendasi:** Tambahkan kolom `transfer_group_id UUID` untuk menandai pasangan transaksi.  
+> **Severity:** 🔴 Tinggi
+
+### Temuan DC-TRF-03 — `FinancialAccount::find()` Tanpa Filter `user_id`
+```php
+// destroy() dan update() — di dalam foreach loop
+$acc = FinancialAccount::find($trx->financial_account_id);  // tanpa user_id
+```
+> Tidak ada verifikasi kepemilikan akun di dalam loop. Jika data transaksi korup, bisa mengubah saldo akun milik user lain.  
+> **Rekomendasi:** `FinancialAccount::where('id', ...)->where('user_id', $user->id)->first()`  
+> **Severity:** 🟡 Sedang
+
+### Temuan DC-TRF-04 — DRY Violation: Foreach Revert Terduplikasi
+```php
+// update() baris 144–158 dan destroy() baris 235–248 — kode identik
+foreach ($siblings as $trx) { ... }
+```
+> Logika revert saldo sama persis di dua tempat. Bug yang diperbaiki di satu method harus diperbaiki juga di method lain.  
+> **Severity:** 🟢 Rendah
 
 ---
 
-##  4\. Proses Desk Checking
+## Modul C — Transaksi (`TransactionController.php`)
 
-### 4.1 Identifikasi Variabel Kunci
+**Metode:** `index()`, `store()`, `update()`, `destroy()`
 
-| Variabel | Tipe | Sumber | Peran |
-| :---- | :---- | :---- | :---- |
-| `$currentBalance` | decimal | DB (`accounts.balance`) | Saldo awal akun |
-| `$amount` | decimal | Request input | Nominal transaksi |
-| `$validated['type']` | string | Request input | `income` atau `expense` |
-| `$newBalance` | decimal | Computed | Saldo akhir |
-
-### 4.2 Trace Eksekusi — Skenario Income
-
-**Input:** `currentBalance = 1.000.000`, `amount = 500.000`, `type = income` **Ekspektasi:** `newBalance = 1.500.000`
-
-| Step | Baris Kode | $currentBalance | $amount | $newBalance | Kondisi | Status |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| 1 | `$currentBalance = $account->balance` | 1.000.000 | — | — | — | ✓ |
-| 2 | `$amount = $validated['amount']` | 1.000.000 | 500.000 | — | — | ✓ |
-| 3 | `if (type === 'income')` | 1.000.000 | 500.000 | — | TRUE | ✓ |
-| 4 | `$newBalance = $currentBalance + $amount` | 1.000.000 | 500.000 | 1.500.000 | — | ✓ |
-| 5 | `$account->update(...)` | 1.000.000 | 500.000 | 1.500.000 | — | ✅ **PASSED** |
-
-### 4.3 Trace Eksekusi — Skenario Expense
-
-**Input:** `currentBalance = 1.000.000`, `amount = 300.000`, `type = expense` **Ekspektasi:** `newBalance = 700.000`
-
-| Step | Baris Kode | $currentBalance | $amount | $newBalance | Kondisi | Status |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| 1 | `$currentBalance = $account->balance` | 1.000.000 | — | — | — | ✓ |
-| 2 | `$amount = $validated['amount']` | 1.000.000 | 300.000 | — | — | ✓ |
-| 3 | `if (type === 'income')` | 1.000.000 | 300.000 | — | FALSE | ✓ |
-| 4 | `$newBalance = $currentBalance - $amount` | 1.000.000 | 300.000 | 700.000 | — | ✓ |
-| 5 | `$account->update(...)` | 1.000.000 | 300.000 | 700.000 | — | ✅ **PASSED** |
-
-### 4.4 Trace Eksekusi — Skenario Edge Case (Saldo Tidak Cukup)
-
-**Input:** `currentBalance = 100.000`, `amount = 500.000`, `type = expense` **Ekspektasi:** Harus ada validasi (saldo negatif tidak boleh terjadi)
-
-| Step | Baris Kode | $currentBalance | $amount | $newBalance | Kondisi | Status |
-| :---- | :---- | :---- | :---- | :---- | :---- | :---- |
-| 1 | `$currentBalance = $account->balance` | 100.000 | — | — | — | ✓ |
-| 2 | `$amount = $validated['amount']` | 100.000 | 500.000 | — | — | ✓ |
-| 3 | `if (type === 'income')` | 100.000 | 500.000 | — | FALSE | ✓ |
-| 4 | `$newBalance = $currentBalance - $amount` | 100.000 | 500.000 | **\-400.000** | — | ❌ **FAILED** |
-| 5 | `$account->update(...)` | 100.000 | 500.000 | \-400.000 | — | ⚠️ **BUG** |
-
----
-
-##  5\. Temuan Bug
-
-| ID | Severity | Deskripsi | Lokasi | Rekomendasi |
-| :---- | :---- | :---- | :---- | :---- |
-| `DC-001` |  High | Saldo dapat bernilai negatif saat expense melebihi balance | Line: `if/else` block | Tambahkan validasi `$amount <= $currentBalance` untuk type expense |
-| `DC-002` |  Medium | Tidak ada database transaction (rollback) | Seluruh method | Wrap dalam `DB::transaction()` agar atomic |
-| `DC-003` |  Low | Tidak ada logging perubahan saldo | Setelah `$account->update()` | Tambahkan audit log untuk traceability |
-
----
-
-##  6\. Rekomendasi Perbaikan Kode
-
-public function store(Request $request)
-
-{
-
-    $validated \= $request-\>validate(\[
-
-        'account\_id'   \=\> 'required|exists:accounts,id',
-
-        'category\_id'  \=\> 'required|exists:categories,id',
-
-        'type'         \=\> 'required|in:income,expense',
-
-        'amount'       \=\> 'required|numeric|min:0.01',
-
-        'description'  \=\> 'nullable|string|max:255',
-
-    \]);
-
-    return DB::transaction(function () use ($validated) {
-
-        $account \= Account::lockForUpdate()-\>findOrFail($validated\['account\_id'\]);
-
-        $amount \= $validated\['amount'\];
-
-        // Validasi saldo cukup untuk expense
-
-        if ($validated\['type'\] \=== 'expense' && $account-\>balance \< $amount) {
-
-            throw new InsufficientBalanceException('Saldo tidak mencukupi');
-
-        }
-
-        $newBalance \= $validated\['type'\] \=== 'income'
-
-            ? $account-\>balance \+ $amount
-
-            : $account-\>balance \- $amount;
-
-        $account-\>update(\['balance' \=\> $newBalance\]);
-
-        return Transaction::create(\[
-
-            ...$validated,
-
-            'user\_id' \=\> auth()-\>id(),
-
-        \]);
-
-    });
-
+### Temuan DC-TRX-01 — Tidak Ada Pengecekan Saldo Negatif
+```php
+// store() — langsung kurangi saldo tanpa cek kecukupan
+if ($validated['type'] === 'income') {
+    $account->balance += $validated['amount'];
+} else {
+    $account->balance -= $validated['amount'];  // ← bisa negatif!
 }
+```
+> Berbeda dengan Transfer yang mengecek saldo sebelum eksekusi, Transaksi langsung mengurangi tanpa validasi. Saldo bisa menjadi negatif.  
+> **Rekomendasi:** Tambahkan `if ($account->balance < $validated['amount']) return 400;` sebelum deduction.  
+> **Severity:** 🔴 Tinggi
+
+### Temuan DC-TRX-02 — `findOrFail()` Tanpa Filter `user_id`
+```php
+// update() baris 106, destroy() baris 144
+$oldAccount = FinancialAccount::findOrFail($transaction->financial_account_id);
+$account    = FinancialAccount::findOrFail($transaction->financial_account_id);
+```
+> Sama seperti Transfer — tidak memfilter `user_id`. Data integrity bergantung pada asumsi bahwa `transaction->financial_account_id` selalu milik user yang sama.  
+> **Severity:** 🟡 Sedang
+
+### Temuan DC-TRX-03 — `index()` Tidak Ada Pagination
+```php
+$transactions = $query->get();  // ambil SEMUA tanpa limit
+return response()->json(['data' => $transactions], 200);
+```
+> Jika user memiliki ribuan transaksi, `get()` tanpa pagination bisa timeout dan menghabiskan memori.  
+> **Rekomendasi:** Ganti ke `$query->paginate(50)`.  
+> **Severity:** 🟡 Sedang (performance)
+
+### Temuan DC-TRX-04 — Kolom `sort_by` Tidak Divalidasi (SQL Injection Risk)
+```php
+$sortBy    = $request->input('sort_by', 'date');    // langsung dari user
+$sortOrder = $request->input('sort_order', 'desc'); // langsung dari user
+$query->orderBy($sortBy, $sortOrder);               // ← tidak divalidasi!
+```
+> `$sortBy` langsung dimasukkan ke `orderBy()` tanpa whitelist. Eloquent memang menggunakan parameter binding untuk nilai, tapi nama kolom di `orderBy()` **tidak di-binding** → potensi SQL injection via column name injection.  
+> **Rekomendasi:** Whitelist: `$allowed = ['date','amount','created_at']; $sortBy = in_array($sortBy, $allowed) ? $sortBy : 'date';`  
+> **Severity:** 🔴 Tinggi
 
 ---
 
-##  7\. Ringkasan Hasil Pengujian
+## Modul D — Tabungan (`SavingController.php`)
 
-| Skenario | Input | Expected | Actual | Status |
-| :---- | :---- | :---- | :---- | :---- |
-| Income normal | balance=1jt, amount=500rb | 1.5jt | 1.5jt | ✅ PASSED |
-| Expense normal | balance=1jt, amount=300rb | 700rb | 700rb | ✅ PASSED |
-| Expense \> balance | balance=100rb, amount=500rb | Error | \-400rb | ❌ FAILED |
-| Amount \= 0 | balance=1jt, amount=0 | Validation error | Validation error | ✅ PASSED |
+**Metode:** `index()`, `store()`, `show()`, `update()`, `destroy()` + `getSavingCategory()`
 
-**Total:** 4 skenario | **Passed:** 3 | **Failed:** 1 | **Coverage:** 75%
+### Temuan DC-SAV-01 — `getSavingCategory()` Dipanggil di Luar Transaksi DB
+```php
+// store() baris 53
+$category = $this->getSavingCategory($user->id, 'expense');  // di dalam try, tapi getSavingCategory->save() tidak terproteksi
+```
+```php
+// getSavingCategory() baris 19-25
+if (!$category) {
+    $category = new Category();
+    $category->save();  // ← save() di dalam private method, tapi apakah ini di dalam scope transaksi?
+}
+```
+> `getSavingCategory()` melakukan `Category::save()` — jika ini dipanggil di dalam blok `try` yang sudah ada `beginTransaction()`, maka terproteksi. Namun jika pernah dipanggil di luar transaksi, ini bisa membuat kategori orphan.  
+> **Status:** Perlu verifikasi konteks pemanggilan.  
+> **Severity:** 🟡 Sedang
 
----
+### Temuan DC-SAV-02 — Tidak Ada Pengecekan Saldo di `store()`
+```php
+// store() baris 50
+$account->balance -= $validated['current_amount'];  // ← bisa negatif
+```
+> Sama seperti Transaksi — tidak ada pengecekan apakah saldo mencukupi sebelum dikurangi untuk alokasi tabungan awal.  
+> **Severity:** 🔴 Tinggi
 
-##  8\. Kelebihan & Kekurangan
+### Temuan DC-SAV-03 — `FinancialAccount::findOrFail()` Tanpa Filter `user_id`
+```php
+// store() baris 49, update() baris 91, destroy() baris 135
+$account = FinancialAccount::findOrFail($saving->financial_account_id);
+```
+> Tidak ada filter `user_id`. Sama polanya dengan Transaksi dan Transfer.  
+> **Severity:** 🟡 Sedang
 
-###  Kelebihan
-
-- Murah dan tidak butuh tools khusus (cukup pen & paper atau spreadsheet)  
-- Mendeteksi bug logika lebih awal sebelum runtime  
-- Meningkatkan pemahaman developer terhadap kode sendiri  
-- Cocok untuk fungsi kecil dengan logika linear
-
-###  Kekurangan
-
-- **Tidak scalable** untuk codebase besar  
-- Rentan terhadap *human error* — developer bisa "mengasumsikan" hasil yang salah  
-- Tidak menangkap error runtime (DB connection, network, dll)  
-- Bias: developer cenderung yakin kode-nya sudah benar  
-- Tidak menguji integrasi antar modul
-
----
-
-##  9\. Tools Pendukung
-
-| Tool | Kegunaan dalam Desk Checking |
-| :---- | :---- |
-| **Spreadsheet (Excel/Sheets)** | Tabel trace variabel |
-| **VS Code Debugger** | Step-through manual saat curiga |
-| **PHPStan / Larastan** | Otomatis cek tipe & logic statik |
-| **Pen & Paper** | Tracing tradisional |
-
----
-
-##  Referensi
-
-1. Pressman, R. S., & Maxim, B. R. (2020). *Software Engineering: A Practitioner's Approach* (9th ed.). McGraw-Hill.  
-2. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10*. Universitas Kristen Indonesia.  
-3. Ndaumanu, R. I. (2023). *Pengujian Sistem Informasi Perpustakaan Berbasis Website dengan Basis Path Testing*. Justek.
+### Temuan DC-SAV-04 — Status `completed`/`canceled` dari Query Parameter Tidak Divalidasi
+```php
+// destroy() baris 128
+$status = $request->query('status', 'canceled');  // langsung dari URL
+// ...
+$desc = $status === 'completed' ? 'Target Tercapai...' : 'Batal/Kepepet Cair...';
+```
+> `$status` hanya dipakai untuk string deskripsi, bukan operasi berbahaya. Tidak ada injection risk, tapi sebaiknya tetap divalidasi untuk kejelasan.  
+> **Severity:** 🟢 Rendah
 
 ---
 
-[ Kembali ke README](http://./README.md) · [Lanjut ke Code Walkthrough ➡](http://./Code_Walkthrough.md)
+## Ringkasan Temuan Lintas Modul
 
-**Tim REMACode** — Midnight Finance SQA Documentation  
+| ID | Modul | Severity | Temuan |
+|---|---|---|---|
+| DC-AUTH-01 | Auth | 🔴 Tinggi | `rand()` untuk OTP — tidak aman |
+| DC-AUTH-02 | Auth | 🟡 Sedang | `Mail::send()` sinkron — blocking |
+| DC-TRF-01 | Transfer | 🔴 Tinggi | Kategori dibuat di luar DB transaction |
+| DC-TRF-02 | Transfer | 🔴 Tinggi | Sibling detection via `created_at` — race condition |
+| DC-TRF-03 | Transfer | 🟡 Sedang | `find()` tanpa filter `user_id` di loop |
+| DC-TRF-04 | Transfer | 🟢 Rendah | Duplikasi foreach revert |
+| DC-TRX-01 | Transaksi | 🔴 Tinggi | Tidak ada cek saldo negatif |
+| DC-TRX-02 | Transaksi | 🟡 Sedang | `findOrFail()` tanpa `user_id` |
+| DC-TRX-03 | Transaksi | 🟡 Sedang | Tidak ada pagination di `index()` |
+| DC-TRX-04 | Transaksi | 🔴 Tinggi | `sort_by` dari user input langsung ke `orderBy()` — SQL injection |
+| DC-SAV-01 | Tabungan | 🟡 Sedang | `getSavingCategory()` perlu verifikasi scope transaksi |
+| DC-SAV-02 | Tabungan | 🔴 Tinggi | Tidak ada cek saldo negatif di alokasi awal |
+| DC-SAV-03 | Tabungan | 🟡 Sedang | `findOrFail()` tanpa `user_id` |
+
+**Total Temuan:** 13  
+**Kritis (🔴):** 6 — **Sedang (🟡):** 5 — **Rendah (🟢):** 2
