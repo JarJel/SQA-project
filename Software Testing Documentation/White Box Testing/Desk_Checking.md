@@ -1,6 +1,6 @@
-# White Box Testing — 02 Code Walkthrough
+# White Box Testing — 01 Desk Checking
 **Proyek:** SaPoPoe Finance  
-**Teknik:** Code Walkthrough  
+**Teknik:** Desk Checking  
 **Modul:** Auth · Transfer · Transaksi · Tabungan  
 **Screenshot:** ❌ Tidak ada (analisis statis)
 
@@ -8,250 +8,130 @@
 
 ## Definisi
 
-> **Teknik review kode secara formal atau informal yang dilakukan bersama-sama antara developer dan tim terkait untuk memahami logika kode, kemudian mengidentifikasi potensi error, dan meningkatkan kualitas keseluruhan program.**
+> **Desk Checking adalah salah satu pengujian bagi para pembuat software yang telah mempelajari bahasa pemrograman dengan sangat baik, karena Pemeriksaan berfokus pada logika dan nilai variabel, pada input dan output yang diperlukan oleh aplikasi.**
 >
 > — Materi Pertemuan 10, Software Quality, T Informatika UKRI
 
 ---
 
-## Modul A — Autentikasi: Walkthrough `register()` → `verifyOtp()` → `login()`
+## Modul A — Autentikasi (`AuthController.php`)
 
-**Skenario:** User baru mendaftar, verifikasi OTP, lalu login.
+### Skenario: Method `login()`
 
-```
-[STEP 1] POST /api/register
-  Input: { name:"Dzaki", email:"dzaki@mail.com", password:"Midnight@2026", password_confirmation:"Midnight@2026" }
+**Test Data:**
+- Input Email = `dzaki@mail.com`
+- Input Password = `Midnight@2026`
+- Data di DB: user ada, password hash cocok, `otp_code` = NULL (sudah terverifikasi)
+- Output yang diharapkan = `200 OK` + `access_token`
 
-  → validate() → OK
-  → User::where(email)->first() → null (belum ada)
-  → checkCooldown(null) → return false (tidak ada cooldown)
-  → $otp = rand(100000, 999999) → misal: 847291
-  → User::updateOrCreate(
-      ['email' => 'dzaki@mail.com'],
-      ['name','password'=>Hash::make(...),'otp_code'=>'847291','otp_expires_at'=>+10min]
-    ) → INSERT baris baru
-  → Mail::send(..., ['otp'=>847291]) → email terkirim (sinkron, blocking)
-  → return 201 "Registrasi berhasil"
+| $email | $password | $user | $otp\_code | Condition | Input / Output | Status / Hasil |
+|---|---|---|---|---|---|---|
+| "dzaki@mail.com" | | | | | | |
+| | "Midnight@2026" | | | | | |
+| | | {id:1, email:"dzaki@mail.com", password:"\$2y\$..."} | | | | |
+| | | | NULL | | | |
+| | | | | C1 : `$user === null` ? Is T | return 404 "Alamat email tidak ditemukan" | Passed |
+| | | | | C1 : `$user === null` ? Is F | Lanjut validasi password → C2 | Passed |
+| | | | | C2 : `!Hash::check($password, $user->password)` ? Is T | return 401 "Kata sandi salah" | Passed |
+| | | | | C2 : `!Hash::check($password, $user->password)` ? Is F | Lanjut cek verifikasi → C3 | Passed |
+| | | | | C3 : `$user->otp_code != null` ? Is T | return 403 "Akun belum diverifikasi" | Passed |
+| | | | | C3 : `$user->otp_code != null` ? Is F | `$user->createToken('auth_token')` | Passed |
+| | | | | | return 200 { access\_token, user } | Passed |
 
-  STATE DB: users: { email, otp_code:'847291', otp_expires_at: +10min, status:'inactive' }
-
-[STEP 2] POST /api/verify-otp
-  Input: { email:"dzaki@mail.com", otp_code:"847291" }
-
-  → validate() → OK
-  → User::where(email)->first() → ada ✅
-  → $user->otp_code !== "847291" → FALSE (cocok) → lanjut
-  → now()->greaterThan(otp_expires_at) → FALSE (belum expired) → lanjut
-  → $user->update([otp_code:null, otp_expires_at:null, email_verified_at:now()])
-  → return 200 "Verifikasi berhasil"
-
-  STATE DB: users: { otp_code:NULL, email_verified_at: timestamp, status:'inactive' }
-
-[STEP 3] POST /api/login
-  Input: { email:"dzaki@mail.com", password:"Midnight@2026" }
-
-  → validate() → OK
-  → User::where(email)->first() → ada ✅
-  → !$user → FALSE → lanjut
-  → !Hash::check("Midnight@2026", $user->password) → FALSE (cocok) → lanjut
-  → $user->otp_code → NULL → FALSE (sudah verifikasi) → lanjut
-  → $user->createToken('auth_token')->plainTextToken → "3|abc123..."
-  → return 200 { access_token, user }
-
-  STATE AKHIR: User dapat access_token, bisa akses endpoint auth:sanctum
-```
-
-### Diagram Alur Auth
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant AC as AuthController
-    participant DB as Database
-    participant M as Mail
-
-    U->>AC: POST /register
-    AC->>DB: User::where(email)->first() → null
-    AC->>AC: checkCooldown(null) → false
-    AC->>AC: rand() → OTP
-    AC->>DB: User::updateOrCreate() → INSERT
-    AC->>M: Mail::send(OTP) [blocking]
-    AC-->>U: 201 Registrasi berhasil
-
-    U->>AC: POST /verify-otp
-    AC->>DB: User::where(email)->first()
-    AC->>AC: compare otp_code → cocok
-    AC->>DB: update(otp_code=null)
-    AC-->>U: 200 Verifikasi berhasil
-
-    U->>AC: POST /login
-    AC->>DB: User::where(email)->first()
-    AC->>AC: Hash::check() → cocok
-    AC->>AC: otp_code = null → verified
-    AC->>DB: createToken()
-    AC-->>U: 200 { access_token }
-```
+**Kesimpulan:** Semua jalur logika login() berjalan sesuai ekspektasi. Variabel `$user` dan `$otp_code` digunakan dengan tepat sebagai penjaga akses.
 
 ---
 
-## Modul B — Transfer: Walkthrough `store()` dengan Admin Fee
+## Modul B — Transfer (`TransferController.php`)
 
-**Skenario:** Transfer Rp 200.000 dari BCA ke Mandiri, admin fee Rp 5.000. Saldo BCA = Rp 600.000.
+### Skenario: Method `store()` — Transfer dengan Biaya Admin
 
-```
-[store() Execution]
+**Test Data:**
+- Saldo BCA (from) = Rp 600.000
+- Nominal Transfer = Rp 200.000
+- Admin Fee = Rp 5.000
+- Total Deduction = 200.000 + 5.000 = Rp 205.000
+- Output yang diharapkan = `200 OK` "Transfer berhasil! Biaya admin Rp 5.000 dicatat."
 
-  → $adminFee = 5000
-  → $totalDeduction = 200000 + 5000 = 205000
+| $saldoBCA | $amount | $adminFee | $totalDeduction | Condition | Input / Output | Status / Hasil |
+|---|---|---|---|---|---|---|
+| 600000 | | | | | | |
+| | 200000 | | | | | |
+| | | 5000 | | | | |
+| | | | 205000 | | | |
+| | | | | C1 : `$saldoBCA < $totalDeduction` ? Is T | return 400 "Saldo tidak mencukupi" | Passed |
+| | | | | C1 : `$saldoBCA < $totalDeduction` ? Is F | Lanjut proses transfer → DB::beginTransaction() | Passed |
+| | | | | C2 : `$adminFee > 0` ? Is T | INSERT trx biaya admin Rp 5.000 ke tabel transactions | Passed |
+| | | | | C2 : `$adminFee > 0` ? Is F | Transfer selesai tanpa biaya admin | Passed |
+| | | | | | Saldo BCA = 600.000 − 205.000 = **395.000** | Passed |
+| | | | | | Saldo Mandiri = 100.000 + 200.000 = **300.000** | Passed |
+| | | | | | return 200 "Transfer berhasil! Biaya admin Rp 5.000 dicatat." | Passed |
 
-  → fromAccount = BCA { balance:600000 }    ← user_id checked ✅
-  → toAccount   = Mandiri { balance:100000 } ← user_id checked ✅
-
-  → 600000 < 205000? → FALSE → lanjut
-
-  → transferCategory = Category::where('Transfer Internal')->first()
-    → misal belum ada → CREATE baru (di luar transaksi DB! ⚠️)
-
-  → adminFee > 0 → TRUE
-    → adminCategory = Category::where('Biaya Admin Bank')->first()
-    → belum ada → CREATE baru (di luar transaksi DB! ⚠️)
-
-  → DB::beginTransaction()
-    → BCA.balance = 600000 − 205000 = 395000 → save()
-    → Mandiri.balance = 100000 + 200000 = 300000 → save()
-    → INSERT trx { type:transfer, desc:'Transfer Keluar ke Mandiri', amount:200000, account:BCA }
-    → INSERT trx { type:transfer, desc:'Transfer Masuk dari BCA', amount:200000, account:Mandiri }
-    → adminFee > 0 → INSERT trx { type:expense, desc:'Biaya admin...', amount:5000, account:BCA }
-  → DB::commit()
-
-  → return 200 "Transfer berhasil! Biaya admin Rp 5.000 dicatat."
-
-  STATE AKHIR:
-    BCA:     600.000 → 395.000
-    Mandiri: 100.000 → 300.000
-    Transaksi baru: 3 record
-```
+**Kesimpulan:** Logika pemotongan saldo dan pencatatan biaya admin berjalan benar. Variabel `$totalDeduction` menggabungkan amount + adminFee dengan tepat.
 
 ---
 
-## Modul C — Transaksi: Walkthrough `update()` Ganti Tipe
+## Modul C — Transaksi (`TransactionController.php`)
 
-**Skenario:** Transaksi income Rp 100.000 di akun BCA diubah menjadi expense Rp 50.000 di akun Mandiri.
+### Skenario: Method `store()` — Transaksi Income
 
-```
-[update() Execution]
+**Test Data:**
+- Saldo Awal BCA = Rp 300.000
+- Nominal = Rp 100.000
+- Tipe = `income`
+- Saldo Akhir yang diharapkan = 300.000 + 100.000 = Rp 400.000
 
-  STATE AWAL:
-    BCA: +100000 (dari income sebelumnya) → BCA.balance sudah bertambah 100000
-    Transaksi lama: { type:income, amount:100000, account:BCA }
+| $saldoAwal | $amount | $type | $saldoAkhir | Condition | Input / Output | Status / Hasil |
+|---|---|---|---|---|---|---|
+| 300000 | | | | | | |
+| | 100000 | | | | | |
+| | | "income" | | | | |
+| | | | | C1 : `$type === 'income'` ? Is T | `$account->balance += 100000` → saldo bertambah | Passed |
+| | | | | C1 : `$type === 'income'` ? Is F | `$account->balance -= 100000` → saldo berkurang | Passed |
+| | | | 400000 | | | |
+| | | | | | `Transaction::create({type:'income', amount:100000})` | Passed |
+| | | | | | return 201 { transaksi, saldo\_akhir: 400.000 } | Passed |
 
-  → validate() → OK
-  → Transaction::where(id)->where(user_id)->firstOrFail() → transaksi lama ✅
+> ⚠️ **Catatan Desk Checking:** Pada Is F (type=expense), tidak ada pengecekan apakah `$saldoAwal >= $amount` sebelum pengurangan. Saldo bisa menjadi negatif jika `$amount > $saldoAwal`.
 
-  → DB::beginTransaction()
-
-  FASE 1 — REVERT:
-    → $oldAccount = FinancialAccount::findOrFail(BCA.id)  ← TANPA user_id check ⚠️
-    → type lama = 'income' → oldAccount.balance -= 100000
-    → BCA.balance berkurang 100000 kembali ke kondisi sebelum income
-    → oldAccount.save()
-
-  FASE 2 — APPLY:
-    → $newAccount = FinancialAccount::findOrFail(Mandiri.id) ← TANPA user_id check ⚠️
-    → type baru = 'expense' → newAccount.balance -= 50000
-    → Mandiri.balance berkurang 50000
-    → newAccount.save()
-
-  FASE 3 — UPDATE HISTORI:
-    → $transaction->update({ type:'expense', amount:50000, account:Mandiri })
-
-  → DB::commit()
-  → return 200 { transaksi baru }
-```
+**Kesimpulan:** Logika percabangan income/expense benar, namun ditemukan tidak adanya validasi saldo minimum untuk kasus expense — berpotensi menghasilkan saldo negatif.
 
 ---
 
-## Modul D — Tabungan: Walkthrough `destroy()` dengan Status `completed`
+## Modul D — Tabungan (`SavingController.php`)
 
-**Skenario:** User menyelesaikan tabungan "Liburan" senilai Rp 500.000 (status=completed).
+### Skenario: Method `update()` — Top Up Tabungan
 
-```
-[destroy() Execution]
+**Test Data:**
+- Saldo BCA = Rp 1.500.000
+- Tabungan "Dana Darurat" current_amount lama = Rp 200.000
+- Tabungan current_amount baru = Rp 350.000
+- Selisih = 350.000 − 200.000 = Rp 150.000 (top up)
+- Output yang diharapkan: Saldo BCA berkurang 150.000 → Rp 1.350.000
 
-  Input: DELETE /api/savings/{id}?status=completed
+| $oldAmount | $newAmount | $selisih | $saldoBCA | Condition | Input / Output | Status / Hasil |
+|---|---|---|---|---|---|---|
+| 200000 | | | | | | |
+| | 350000 | | | | | |
+| | | 150000 | | | | |
+| | | | 1500000 | | | |
+| | | | | C1 : `$newAmount !== $oldAmount` ? Is T | Proses kalkulasi selisih dan update saldo | Passed |
+| | | | | C1 : `$newAmount !== $oldAmount` ? Is F | Tidak ada perubahan saldo, hanya update metadata | Passed |
+| | | | | C2 : `$selisih > 0` ? Is T (top up) | `$saldoBCA -= 150000` → BCA = 1.350.000 | Passed |
+| | | | | C2 : `$selisih > 0` ? Is F (penarikan) | `$saldoBCA += abs($selisih)` → BCA bertambah | Passed |
+| | | | 1350000 | | | |
+| | | | | | INSERT trx { type:'expense', amount:150000, desc:'Top Up Tabungan Dana Darurat' } | Passed |
+| | | | | | return 200 { saving, saldo\_bca: 1.350.000 } | Passed |
 
-  → $status = $request->query('status', 'canceled') → 'completed'
-
-  → DB::beginTransaction()
-
-  → $saving = user->savings()->findOrFail(id)
-    → { name:'Liburan', current_amount:500000, financial_account_id:BCA.id }
-
-  → current_amount > 0 → TRUE
-    → $account = FinancialAccount::findOrFail(BCA.id) ← TANPA user_id ⚠️
-    → account.balance += 500000  ← saldo dikembalikan
-    → account.save()
-
-    → $category = getSavingCategory(user_id, 'income')
-      → Category::where('Pencairan Tabungan')->first()
-      → (di dalam blok try yang sudah beginTransaction → aman ✅)
-
-    → $desc = status === 'completed'
-            ? 'Target Tercapai & Cair: Liburan'
-            : 'Batal/Kepepet Cair: Liburan'
-    → 'Target Tercapai & Cair: Liburan'
-
-    → INSERT trx { type:income, amount:500000, desc:'Target Tercapai & Cair: Liburan' }
-
-  → $saving->delete()
-  → DB::commit()
-  → return 200 "Target diselesaikan/dihapus"
-
-  STATE AKHIR:
-    BCA: balance += 500000
-    Saving 'Liburan': terhapus
-    Transaksi baru: 1 income record
-```
-
-### Diagram Alur Tabungan — store() vs destroy()
-
-```mermaid
-flowchart LR
-    subgraph store["store() — Buat Tabungan"]
-        S1[Validate] --> S2[savings.create]
-        S2 --> S3{current_amount > 0?}
-        S3 -- Ya --> S4[account.balance -= amount]
-        S4 --> S5[getSavingCategory expense]
-        S5 --> S6[INSERT trx Alokasi Tabungan]
-        S3 -- Tidak --> S7[commit]
-        S6 --> S7
-    end
-
-    subgraph destroy["destroy() — Cairkan Tabungan"]
-        D1[query status] --> D2{current_amount > 0?}
-        D2 -- Ya --> D3[account.balance += amount]
-        D3 --> D4[getSavingCategory income]
-        D4 --> D5{status=completed?}
-        D5 -- Ya --> D6[desc: Target Tercapai]
-        D5 -- Tidak --> D7[desc: Batal/Kepepet]
-        D6 --> D8[INSERT trx Pencairan]
-        D7 --> D8
-        D2 -- Tidak --> D9[saving.delete]
-        D8 --> D9[saving.delete → commit]
-    end
-
-    style S4 fill:#ef4444,color:#fff
-    style D3 fill:#22c55e,color:#fff
-```
+**Kesimpulan:** Logika percabangan top up vs penarikan pada `update()` berjalan benar. Variabel `$selisih` menentukan arah perubahan saldo dengan tepat.
 
 ---
 
-## Pola Berulang yang Ditemukan Lintas Modul
+## Ringkasan Temuan Desk Checking
 
-| Pola | Auth | Transfer | Transaksi | Tabungan |
-|---|---|---|---|---|
-| DB::beginTransaction | ✅ setup() | ✅ store/update/destroy | ✅ store/update/destroy | ✅ store/update/destroy |
-| findOrFail tanpa user_id | — | ⚠️ loop | ⚠️ update/destroy | ⚠️ store/update/destroy |
-| Cek saldo sebelum deduct | — | ✅ store/update | ❌ tidak ada | ❌ tidak ada |
-| Rollback di catch | ✅ | ✅ | ✅ | ✅ |
-| Pagination di index() | — | — | ❌ tidak ada | — |
+| Modul | Method | Temuan | Severity |
+|---|---|---|---|
+| Auth | `login()` | Semua kondisi (C1, C2, C3) berfungsi sebagai gatekeeper yang tepat | ✅ OK |
+| Transfer | `store()` | Pengecekan saldo dan pencatatan admin fee berjalan benar | ✅ OK |
+| Transaksi | `store()` | Tidak ada validasi saldo minimum sebelum expense — saldo bisa negatif | 🔴 Bug |
+| Tabungan | `update()` | Logika top up / penarikan menggunakan `$selisih` dengan benar | ✅ OK |
