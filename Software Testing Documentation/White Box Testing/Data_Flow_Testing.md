@@ -1,527 +1,207 @@
-# 🌊 Data Flow Testing
-
-**Model White Box Testing #6** — *Dynamic Testing*  
-**Modul Target:** Transfer Antar Wallet (Source Account → Destination Account)  
-**Tim:** REMACode
-
----
-
-## 📖 1. Definisi
-
-**Data Flow Testing** adalah teknik pengujian yang berfokus pada **aliran data** — bagaimana variabel sistem **dikarakterisasi dan digunakan** sepanjang siklus hidupnya, sehingga teridentifikasi apakah program menangani data dengan benar atau menyebabkan error/perilaku tidak terduga (Suprihadi, 2025). Berbeda dengan Control Flow yang fokus pada *alur eksekusi*, Data Flow fokus pada **define-use pattern** variabel.
-
-> "Teknik yang berfokus pada aliran data diklarifikasi dengan ketatapan bagaimana variabel sistem dikarakterisasi dan digunakan serta teridentifikasi skenario yang telah ditetapkan." — (Suprihadi, 2025)
-
-### Konsep Fundamental
-
-| Konsep | Definisi | Notasi |
-| :--- | :--- | :--- |
-| **Define (d)** | Variabel diberi nilai (assignment, input, increment) | `$x = 10` |
-| **Use (u)** | Variabel dibaca/digunakan dalam ekspresi | `if ($x > 5)` |
-| **Kill (k)** | Variabel di-redefine atau keluar scope | `$x = 20` (over previous) |
-| **C-use** | Computational use — dalam perhitungan | `$y = $x * 2` |
-| **P-use** | Predicate use — dalam kondisi | `if ($x > 0)` |
-| **DU-pair** | Pasangan (define, use) tanpa redefinisi di antaranya | `(d:line 5, u:line 8)` |
+# White Box Testing — 06 Data Flow Testing
+**Proyek:** SaPoPoe Finance  
+**Teknik:** Data Flow Testing  
+**Modul:** Auth · Transfer · Transaksi · Tabungan
 
 ---
 
-## 🎯 2. Tujuan Pengujian
+## Definisi
 
-| No | Tujuan |
-| :--- | :--- |
-| 1 | Mendeteksi variabel yang **digunakan sebelum didefinisikan** (uninitialized) |
-| 2 | Menemukan variabel yang **didefinisikan tapi tidak pernah dipakai** (dead variable) |
-| 3 | Memvalidasi semua **DU-pair** dieksekusi minimal sekali |
-| 4 | Mendeteksi **race condition** pada variabel yang di-share |
-| 5 | Memastikan **state consistency** pada operasi transaksional |
+> **Teknik yang berfokus pada aliran data diklarifikasi dengan ketatapan bagaimana variabel sistem dikarakterisasi dan digunakan serta teridentifikasi skenario yang telah ditetapkan, sehingga diketahui program apa menangani data dengan benar, dan menyebabkan error atau perilaku tidak terduga.**
+>
+> — Materi Pertemuan 10, Software Quality, T Informatika UKRI
 
----
-
-## 💻 3. Source Code yang Diuji
-
-**File:** `app/Services/TransferService.php`  
-**Method:** `transfer()` — transfer saldo dari satu akun ke akun lain.
-
-⚠️ **TODO:** Ganti dengan service asli dari `midnight-finance-backend` saat finalisasi.
-
-```php
-public function transfer(
-    int $sourceId,
-    int $destId,
-    float $amount,
-    ?string $note = null
-): Transfer {
-    $source = Account::lockForUpdate()->findOrFail($sourceId);     // line 1: define $source
-    $dest   = Account::lockForUpdate()->findOrFail($destId);       // line 2: define $dest
-    $sourceBalance = $source->balance;                             // line 3: define $sourceBalance
-    $destBalance   = $dest->balance;                               // line 4: define $destBalance
-    $fee = $this->calculateFee($amount);                           // line 5: define $fee
-    $totalDeducted = $amount + $fee;                               // line 6: define $totalDeducted
-
-    if ($sourceBalance < $totalDeducted) {                         // line 7: p-use $sourceBalance, $totalDeducted
-        throw new InsufficientBalanceException();                  // line 8
-    }
-
-    $newSourceBalance = $sourceBalance - $totalDeducted;           // line 9: define $newSourceBalance
-    $newDestBalance   = $destBalance + $amount;                    // line 10: define $newDestBalance
-
-    $source->update(['balance' => $newSourceBalance]);             // line 11: c-use $newSourceBalance
-    $dest->update(['balance' => $newDestBalance]);                 // line 12: c-use $newDestBalance
-
-    return Transfer::create([                                      // line 13: c-use $sourceId, $destId, $amount, $fee, $note
-        'source_account_id' => $sourceId,
-        'dest_account_id'   => $destId,
-        'amount'            => $amount,
-        'fee'               => $fee,
-        'note'              => $note,
-    ]);
-}
-```
+**Notasi yang digunakan:**
+- **D** (Define) = variabel diberi nilai / didefinisikan
+- **U-C** (Use-Computation) = variabel digunakan dalam kalkulasi / ekspresi
+- **U-P** (Use-Predicate) = variabel digunakan dalam kondisi if / while
+- **K** (Kill) = variabel keluar scope atau di-null-kan
 
 ---
 
-## 🗺️ 4. Data Flow Diagram
+## Modul A — Autentikasi (`AuthController.php`)
+
+### Alur Data: Proses Registrasi dan Verifikasi OTP
 
 ```mermaid
 flowchart TD
-    START([Mulai]) --> D1[D: source, dest]
-    D1 --> D2[D: sourceBalance, destBalance]
-    D2 --> D3[D: fee, totalDeducted]
-    D3 --> P1{P-use: sourceBalance < totalDeducted?}
-    P1 -->|TRUE| E[Throw Exception]
-    P1 -->|FALSE| D4[D: newSourceBalance, newDestBalance]
-    D4 --> U1[C-use: source.update with newSourceBalance]
-    U1 --> U2[C-use: dest.update with newDestBalance]
-    U2 --> U3[C-use: Transfer.create with sourceId, destId, amount, fee, note]
-    U3 --> END([End])
-    E --> END
-
-    style D1 fill:#1e3a8a,stroke:#3b82f6,color:#fff
-    style D2 fill:#1e3a8a,stroke:#3b82f6,color:#fff
-    style D3 fill:#1e3a8a,stroke:#3b82f6,color:#fff
-    style D4 fill:#1e3a8a,stroke:#3b82f6,color:#fff
-    style P1 fill:#7c2d12,stroke:#ea580c,color:#fff
-    style U1 fill:#14532d,stroke:#22c55e,color:#fff
-    style U2 fill:#14532d,stroke:#22c55e,color:#fff
-    style U3 fill:#14532d,stroke:#22c55e,color:#fff
-    style E fill:#7f1d1d,stroke:#ef4444,color:#fff
+    A([START register]) --> B[GET INPUT\nemail, password, name]
+    B --> C{$user =\nUser::where\nemail->first}
+    C -- null --> D[D: $otp = rand\n100000-999999]
+    C -- ada → D1[U-P: cek status\n& cooldown]
+    D --> E[D: $user =\nUser::updateOrCreate]
+    E --> F[U-C: Mail::send\notp ke email]
+    F --> G([END register\n201 OK])
+    G --> H([START verifyOtp])
+    H --> I{U-P: otp_code\n=== input?}
+    I -- Ya --> J[K: otp_code = null\nemail_verified_at = now]
+    I -- Tidak --> K([return 401])
+    J --> L([END verifyOtp\n200 OK])
 ```
 
-**Legenda:**
-- 🔵 **D** = Define (variabel di-assign)  
-- 🟠 **P-use** = Predicate use (dalam kondisi)  
-- 🟢 **C-use** = Computational use (dalam perhitungan/operasi)  
-- 🔴 **E** = Exception path
+| Komponen | Definisi | Penggunaan | Deskripsi |
+|---|---|---|---|
+| Input Pengguna | `email` (string), `password` (string), `name` (string) | `validate()`, `User::where(email)`, `Hash::make(password)` | Data yang dikirim user melalui form registrasi. Email menjadi kunci unik pencarian user. |
+| `$otp` | `$otp = rand(100000, 999999)` — integer 6 digit | `'otp_code' => (string)$otp`, `Mail::send(['otp' => $otp])` | Kode verifikasi sementara. Didefinisikan sekali, digunakan dua kali (simpan ke DB dan kirim email), lalu di-kill saat scope selesai. |
+| `$user` | D1: `User::where(email)->first()` (bisa null) | U-P: cek `$user->status`, U-C: `checkCooldown($user)` | Anomali DD: `$user` didefinisikan ulang di D2: `User::updateOrCreate()`. Ini intentional — D1 untuk validasi, D2 untuk simpan. |
+| `$user->otp_code` | D: di-set saat register dengan nilai OTP | U-P: di `login()` → blokir jika tidak null; U-P: di `verifyOtp()` → bandingkan dengan input | K: di-null-kan setelah verifikasi berhasil. Ini adalah variabel lintas-request yang paling kritis di sistem Auth. |
+| Output Sistem | `access_token` (Sanctum token string) | Return 200 di `login()` setelah semua kondisi lolos | Token ini menjadi credentials untuk semua endpoint yang dilindungi `auth:sanctum`. |
 
 ---
 
-## 📋 5. Define-Use Table (DU Analysis)
-
-### 5.1 Tabel Variabel & Lokasi
-
-| Variabel | Define (line) | Use (line) | Tipe Use | Kill (line) |
-| :--- | :--- | :--- | :--- | :--- |
-| `$sourceId` | 0 (param) | 13 | C-use | — |
-| `$destId` | 0 (param) | 13 | C-use | — |
-| `$amount` | 0 (param) | 5, 6, 10, 13 | C-use | — |
-| `$note` | 0 (param) | 13 | C-use | — |
-| `$source` | 1 | 3, 11 | C-use | — |
-| `$dest` | 2 | 4, 12 | C-use | — |
-| `$sourceBalance` | 3 | 7, 9 | P-use, C-use | — |
-| `$destBalance` | 4 | 10 | C-use | — |
-| `$fee` | 5 | 6, 13 | C-use | — |
-| `$totalDeducted` | 6 | 7, 9 | P-use, C-use | — |
-| `$newSourceBalance` | 9 | 11 | C-use | — |
-| `$newDestBalance` | 10 | 12 | C-use | — |
-
-### 5.2 DU-Pair Enumeration
-
-| Pair ID | Variabel | Define | Use | Path | Tipe |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `DU-01` | `$source` | L1 | L3 | L1→L3 | C-use |
-| `DU-02` | `$source` | L1 | L11 | L1→L11 | C-use |
-| `DU-03` | `$dest` | L2 | L4 | L2→L4 | C-use |
-| `DU-04` | `$dest` | L2 | L12 | L2→L12 | C-use |
-| `DU-05` | `$sourceBalance` | L3 | L7 | L3→L7 | **P-use** |
-| `DU-06` | `$sourceBalance` | L3 | L9 | L3→L9 | C-use |
-| `DU-07` | `$destBalance` | L4 | L10 | L4→L10 | C-use |
-| `DU-08` | `$fee` | L5 | L6 | L5→L6 | C-use |
-| `DU-09` | `$fee` | L5 | L13 | L5→L13 | C-use |
-| `DU-10` | `$totalDeducted` | L6 | L7 | L6→L7 | **P-use** |
-| `DU-11` | `$totalDeducted` | L6 | L9 | L6→L9 | C-use |
-| `DU-12` | `$newSourceBalance` | L9 | L11 | L9→L11 | C-use |
-| `DU-13` | `$newDestBalance` | L10 | L12 | L10→L12 | C-use |
-| `DU-14` | `$amount` | L0 (param) | L5, L6, L10, L13 | multi | C-use |
-
-**Total DU-pair:** 14 pasangan yang harus di-cover.
+> ### 📋 Analisis SQA — Modul Auth
+>
+> **Kondisi Sistem Saat Ini**
+> Aliran data di Auth mengikuti pola yang baik: input diterima → divalidasi → diolah → disimpan → digunakan → di-kill. Variabel `$user->otp_code` adalah variabel paling kompleks karena hidupnya melintas beberapa HTTP request dan method berbeda. Anomali yang ditemukan: `$user` didefinisikan dua kali (DD) dalam satu method `register()` — ini intentional tapi membingungkan bagi reviewer baru.
+>
+> **Dampak**
+> Anomali DD pada `$user` tidak berbahaya secara fungsional, tetapi meningkatkan cognitive load reviewer. Risiko nyata ada di `$otp`: menggunakan `rand()` berarti variabel ini memiliki **entropi rendah** — predictable dalam skenario tertentu. Jika attacker dapat menduga nilai `$otp`, mereka bisa memverifikasi akun orang lain.
+>
+> **Cara Baca Tabel dan Diagram**
+> Tabel menampilkan **komponen** (bukan hanya variabel tunggal) beserta lifecycle-nya. Kolom "Penggunaan" menunjukkan di mana dalam kode komponen tersebut dikonsumsi. Diagram flowchart menunjukkan aliran data secara visual — kotak berwarna gelap adalah titik Define (D), berlian adalah titik Use-Predicate (U-P). Tanda K pada otp_code menunjukkan titik di mana variabel "dibunuh" (di-null-kan).
 
 ---
 
-## 🐛 6. Data Flow Anomaly Detection
+## Modul B — Transfer (`TransferController.php`)
 
-Klasifikasi anomali standar Data Flow Testing:
-
-| Anomali | Pola | Deskripsi | Risiko |
-| :--- | :--- | :--- | :--- |
-| **du** | define → use | Normal | ✅ OK |
-| **dd** | define → define (tanpa use) | Re-assignment tanpa pakai | ⚠️ Suspicious |
-| **dk** | define → kill (tanpa use) | Define lalu hilang | 🔴 Bug |
-| **ud** | use sebelum define | Uninitialized | 🔴 Critical |
-| **uu** | use → use | Normal | ✅ OK |
-| **kd** | kill → define | Out-of-scope lalu redefine | ⚠️ Check |
-| **ku** | kill → use | Use after kill | 🔴 Bug |
-
-### 6.1 Analisis Anomali pada Kode
-
-| Variabel | Pola | Status | Catatan |
-| :--- | :--- | :--- | :--- |
-| `$source` | d → u → u | ✅ OK | Define di L1, use di L3, L11 |
-| `$dest` | d → u → u | ✅ OK | Define di L2, use di L4, L12 |
-| `$sourceBalance` | d → p-use → c-use | ✅ OK | Konsisten |
-| `$destBalance` | d → c-use | ✅ OK | Single use |
-| `$fee` | d → c-use → c-use | ✅ OK | Konsisten |
-| `$totalDeducted` | d → p-use → c-use | ✅ OK | Konsisten |
-| `$newSourceBalance` | d → c-use | ✅ OK | Single use |
-| `$newDestBalance` | d → c-use | ✅ OK | Single use |
-
-**Hasil:** Tidak ada anomali statis terdeteksi di method ini.
-
----
-
-## ⚠️ 7. Race Condition Analysis (Critical)
-
-Karena ini operasi transaksional, perlu analisis **inter-process data flow**:
-
-### 7.1 Skenario Race Condition Tanpa Lock
+### Alur Data: Method `store()` dengan Admin Fee
 
 ```mermaid
-sequenceDiagram
-    participant T1 as Transaction 1
-    participant DB as Database
-    participant T2 as Transaction 2
-
-    T1->>DB: Read source.balance (1.000.000)
-    T2->>DB: Read source.balance (1.000.000)
-    T1->>DB: Update source.balance = 700.000
-    T2->>DB: Update source.balance = 500.000
-    Note over DB: ❌ T1 update hilang!
+flowchart TD
+    A([START]) --> B[GET REQUEST\namount, adminFee,\nfromAccountId, toAccountId]
+    B --> C[D: $adminFee =\nreq.admin_fee ?? 0]
+    C --> D[D: $totalDeduction =\namount + adminFee]
+    D --> E[D: $fromAccount =\nfindOrFail fromId]
+    E --> F{U-P: balance <\ntotalDeduction?}
+    F -- Ya --> G([return 400])
+    F -- Tidak --> H[D: $transferCategory =\nCategory::where->first]
+    H --> I{U-P: !transferCategory?}
+    I -- Ya --> J[D: $transferCategory =\nnew Category save]
+    I -- Tidak --> K[D: $siblings=tidak ada di store]
+    J --> K
+    K --> L[DB::beginTransaction]
+    L --> M[U-C: fromAccount.balance\n-= totalDeduction]
+    M --> N[U-C: toAccount.balance\n+= amount]
+    N --> O{U-P: adminFee > 0?}
+    O -- Ya --> P[U-C: INSERT trx adminFee]
+    O -- Tidak --> Q[commit]
+    P --> Q
+    Q --> R([return 200])
 ```
 
-### 7.2 Mitigasi dengan `lockForUpdate()`
+| Komponen | Definisi | Penggunaan | Deskripsi |
+|---|---|---|---|
+| Input Transfer | `amount`, `admin_fee`, `from_account_id`, `to_account_id` | Validasi, kalkulasi totalDeduction, lookup akun | Data inti transaksi yang menentukan seluruh alur pemrosesan. |
+| `$adminFee` | `$adminFee = $validated['admin_fee'] ?? 0` | U-C: `$totalDeduction = amount + $adminFee`; U-P: `if ($adminFee > 0)` — 2x | Digunakan sebagai predikat dua kali (C3 dan C5) tanpa perubahan nilai di antara keduanya — redundan tapi tidak berbahaya. |
+| `$totalDeduction` | `$totalDeduction = amount + $adminFee` | U-P: `$fromAccount->balance < $totalDeduction`; U-C: `$fromAccount->balance -= $totalDeduction` | Variabel agregat yang menggabungkan dua komponen biaya. Jika `$adminFee = 0`, nilainya sama dengan `amount`. |
+| `$transferCategory` | D1: `Category::where()->first()` (bisa null) | U-P: `if (!$transferCategory)` | Anomali DD: jika null, di-define ulang dengan `new Category()`. Kode di luar scope transaction — berpotensi orphan jika rollback. |
+| `$siblings` (update/destroy) | `Transaction::where(created_at)->get()` | U-P: cek ada KELUAR/MASUK; U-C: foreach revert saldo | Variabel koleksi kritis. Didefinisikan menggunakan `created_at` sebagai key — rawan race condition. |
+| Output | `fromAccount.balance` baru, 2–3 record transaksi | Return 200 + pesan konfirmasi | State akhir yang harus diverifikasi: saldo berkurang tepat sebesar `totalDeduction`, saldo tujuan bertambah sebesar `amount`. |
 
-Kode sudah menggunakan `Account::lockForUpdate()` di L1 & L2 — ini **PESSIMISTIC LOCK** yang mencegah race condition. Namun, **harus dijalankan dalam DB transaction** agar lock efektif:
+---
 
-```php
-DB::transaction(function () use (...) {
-    $source = Account::lockForUpdate()->findOrFail($sourceId);
-    // ...
-});
+> ### 📋 Analisis SQA — Modul Transfer
+>
+> **Kondisi Sistem Saat Ini**
+> Aliran data Transfer melibatkan banyak komponen yang berinteraksi: dua akun, dua atau tiga record transaksi, satu atau dua kategori. Variabel `$adminFee` mengalami anomali U-P redundan — dicek dua kali dengan kondisi identik tanpa perubahan nilai di antaranya. Variabel `$siblings` menggunakan `created_at` sebagai discriminator, yang merupakan anomali keamanan data.
+>
+> **Dampak**
+> Race condition pada `$siblings` bisa terjadi ketika dua transfer diproses dalam detik yang sama: sistem akan salah mengidentifikasi sibling dan me-revert saldo yang salah. Ini adalah bug concurrency yang sangat sulit direproduksi di development tapi bisa terjadi di production dengan traffic tinggi.
+>
+> **Cara Baca Tabel**
+> Tabel menampilkan komponen sebagai unit aliran data — bukan hanya variabel primitif. Perhatikan kolom "Penggunaan": komponen yang muncul di U-P adalah yang menentukan jalur eksekusi (decision-maker), sedangkan U-C adalah yang menentukan nilai output. Anomali yang paling perlu diperhatikan adalah komponen yang memiliki lebih dari satu titik Define (D) — ini menandakan variabel yang di-overwrite.
+
+---
+
+## Modul C — Transaksi (`TransactionController.php`)
+
+### Alur Data: Variable `$sortBy` — Anomali Keamanan
+
+```mermaid
+flowchart LR
+    A[D: $sortBy =\nrequest.input\n'sort_by','date'] --> B[U-C LANGSUNG:\nquery.orderBy\nsortBy, sortOrder]
+    B --> C([Potensi SQL\nInjection ⚠️])
+
+    style C fill:#ef4444,color:#fff
 ```
 
-⚠️ **TEMUAN PENTING:** Kode di atas **TIDAK dibungkus `DB::transaction()`** — lock tidak efektif!
+| Komponen | Definisi | Penggunaan | Deskripsi |
+|---|---|---|---|
+| Input Filter | `start_date`, `end_date`, `financial_account_id`, `category_id`, `type` | U-P: `$request->filled()` di index() | Semua filter divalidasi keberadaannya (`filled`) sebelum ditambahkan ke query. Aman. |
+| `$sortBy` | `$sortBy = $request->input('sort_by', 'date')` — langsung dari user | U-C: `$query->orderBy($sortBy, $sortOrder)` | **ANOMALI KRITIS:** D langsung ke U-C tanpa validasi whitelist. Nama kolom tidak di-binding oleh Eloquent. |
+| `$sortOrder` | `$sortOrder = $request->input('sort_order', 'desc')` | U-C: `$query->orderBy($sortBy, $sortOrder)` | Sama dengan `$sortBy` — tidak ada whitelist validasi. |
+| `$account` (store) | `FinancialAccount::where(id)->where(user_id)->firstOrFail()` | U-C: `$account->balance +=/-=` | Sudah memfilter `user_id` — aman. |
+| `$oldAccount` (update) | `FinancialAccount::findOrFail($transaction->financial_account_id)` | U-C: `$oldAccount->balance -=/+=` | **ANOMALI:** findOrFail tanpa filter user_id. Berpotensi IDOR. |
+| Output Transaksi | `$account->balance` baru, 1 record transaksi | Return 200/201 | Saldo berubah sesuai tipe transaksi — tanpa guard minimum saldo untuk expense. |
 
 ---
 
-## 🧪 8. Test Case Design (DU-Pair Coverage)
-
-### 8.1 Test Case Matrix
-
-| TC ID | Skenario | DU-Pair yang Di-cover | Expected |
-| :--- | :--- | :--- | :--- |
-| `DF-TC-01` | Transfer normal (saldo cukup) | DU-01,02,03,04,05,06,07,08,09,10,11,12,13 | Sukses |
-| `DF-TC-02` | Transfer saldo tidak cukup | DU-01,03,05,08,10 (stop di throw) | Exception |
-| `DF-TC-03` | Transfer dengan fee = 0 | DU-08,09 (fee=0) | Sukses, fee=0 |
-| `DF-TC-04` | Transfer tepat saldo (balance == totalDeducted) | Boundary di DU-05, DU-10 | Sukses |
-| `DF-TC-05` | Transfer balance < totalDeducted by 0.01 | Boundary DU-05, DU-10 | Exception |
-| `DF-TC-06` | Concurrent transfer (race condition) | Multi-process DU-flow | Sukses dengan lock |
-
-### 8.2 Detail Test Case
-
-#### `DF-TC-01`: Transfer Normal
-
-| Input | Value |
-| :--- | :--- |
-| `$sourceId` | 1 (balance: 1.000.000) |
-| `$destId` | 2 (balance: 500.000) |
-| `$amount` | 200.000 |
-| `$fee` (calculated) | 2.000 |
-| `$totalDeducted` | 202.000 |
-
-**Expected:**
-- `source.balance` → 798.000  
-- `dest.balance` → 700.000  
-- Transfer record terbuat
+> ### 📋 Analisis SQA — Modul Transaksi
+>
+> **Kondisi Sistem Saat Ini**
+> Transaksi memiliki dua anomali data flow yang paling kritis di seluruh sistem: (1) `$sortBy` langsung dari request ke `orderBy()` tanpa whitelist, dan (2) `$oldAccount` diambil tanpa verifikasi `user_id`. Ini adalah dua kerentanan yang dapat dieksploitasi secara aktif.
+>
+> **Dampak**
+> Anomali `$sortBy` → SQL Injection: attacker bisa mengirim `sort_by=(SELECT%20password%20FROM%20users%20LIMIT%201)` dan jika query error terekspos, password bisa terbaca. Anomali `$oldAccount` → IDOR: attacker yang berhasil memanipulasi `transaction.financial_account_id` bisa mengubah saldo akun user lain. Kedua kerentanan ini masuk kategori **OWASP Top 10**.
+>
+> **Cara Baca Diagram**
+> Diagram anomali `$sortBy` sengaja dibuat sederhana (dua node saja) untuk memperjelas betapa pendeknya jalur data dari input user ke query SQL — tanpa filter apapun di antara keduanya. Node merah menunjukkan titik kerentanan. Dalam data flow yang sehat, seharusnya ada node validasi/whitelist di antara D dan U-C.
 
 ---
 
-## 🚀 9. Implementasi PHPUnit Test
+## Modul D — Tabungan (`SavingController.php`)
 
-```php
-<?php
+### Alur Data: `$selisih` di Method `update()`
 
-namespace Tests\Unit\Services;
-
-use App\Models\Account;
-use App\Models\Transfer;
-use App\Services\TransferService;
-use App\Exceptions\InsufficientBalanceException;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class TransferServiceDataFlowTest extends TestCase
-{
-    use RefreshDatabase;
-
-    private TransferService $service;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->service = app(TransferService::class);
-    }
-
-    /** @test DF-TC-01: Transfer normal — covers DU-01 to DU-13 */
-    public function it_transfers_amount_and_deducts_fee_correctly(): void
-    {
-        $source = Account::factory()->create(['balance' => 1_000_000]);
-        $dest   = Account::factory()->create(['balance' => 500_000]);
-
-        $transfer = $this->service->transfer(
-            sourceId: $source->id,
-            destId:   $dest->id,
-            amount:   200_000,
-            note:     'Test transfer',
-        );
-
-        $source->refresh();
-        $dest->refresh();
-
-        // Verify final balance (D → U chain valid)
-        $this->assertEquals(798_000, $source->balance);  // 1jt - (200rb + 2rb)
-        $this->assertEquals(700_000, $dest->balance);    // 500rb + 200rb
-        $this->assertInstanceOf(Transfer::class, $transfer);
-        $this->assertEquals(2_000, $transfer->fee);
-    }
-
-    /** @test DF-TC-02: Insufficient balance — covers DU-05 (P-use) */
-    public function it_throws_exception_when_source_balance_insufficient(): void
-    {
-        $this->expectException(InsufficientBalanceException::class);
-
-        $source = Account::factory()->create(['balance' => 100_000]);
-        $dest   = Account::factory()->create(['balance' => 0]);
-
-        $this->service->transfer(
-            sourceId: $source->id,
-            destId:   $dest->id,
-            amount:   200_000,
-        );
-
-        // Verify balance tidak berubah (D didefine tapi tidak sampai U)
-        $source->refresh();
-        $this->assertEquals(100_000, $source->balance);
-    }
-
-    /** @test DF-TC-04: Boundary — balance tepat sama dengan totalDeducted */
-    public function it_allows_transfer_when_balance_exactly_matches(): void
-    {
-        $source = Account::factory()->create(['balance' => 202_000]);
-        $dest   = Account::factory()->create(['balance' => 0]);
-
-        $this->service->transfer(
-            sourceId: $source->id,
-            destId:   $dest->id,
-            amount:   200_000,
-        );
-
-        $source->refresh();
-        $this->assertEquals(0, $source->balance);
-    }
-
-    /** @test DF-TC-05: Boundary — balance kurang 0.01 */
-    public function it_throws_when_balance_short_by_one_cent(): void
-    {
-        $this->expectException(InsufficientBalanceException::class);
-
-        $source = Account::factory()->create(['balance' => 201_999.99]);
-        $dest   = Account::factory()->create(['balance' => 0]);
-
-        $this->service->transfer(
-            sourceId: $source->id,
-            destId:   $dest->id,
-            amount:   200_000,
-        );
-    }
-
-    /** @test DF-TC-06: Race condition test (concurrent transfer) */
-    public function it_handles_concurrent_transfer_correctly(): void
-    {
-        $source = Account::factory()->create(['balance' => 1_000_000]);
-        $dest1  = Account::factory()->create(['balance' => 0]);
-        $dest2  = Account::factory()->create(['balance' => 0]);
-
-        // Simulasi 2 transfer concurrent — pakai pcntl_fork atau parallel testing
-        // Dengan lock yang benar, hanya 1 yang sukses jika total > saldo
-        // (Implementation note: butuh parallel test runner seperti paratest)
-        $this->markTestIncomplete('Requires parallel test runner');
-    }
-}
+```mermaid
+flowchart TD
+    A([START update]) --> B[D: $oldAmount =\nsaving.current_amount]
+    B --> C[validate request]
+    C --> D{U-P: newAmount\n!= oldAmount?}
+    D -- Tidak --> E([skip → update metadata])
+    D -- Ya --> F[D: $selisih =\nnewAmount - oldAmount]
+    F --> G{U-P: selisih > 0?}
+    G -- Ya → Top Up --> H[U-C: balance -= selisih]
+    G -- Tidak → Tarik --> I[U-C: balance += abs selisih]
+    H & I --> J[U-C: amount = abs selisih\nINSERT trx]
+    J --> K[U-C: saving.update\ncurrent_amount = newAmount]
+    K --> L([K: $selisih keluar scope\nreturn 200])
 ```
 
----
-
-## 📊 10. Hasil Eksekusi & Coverage
-
-### 10.1 Test Results
-
-| TC ID | Skenario | DU-Pair Covered | Status |
-| :--- | :--- | :--- | :--- |
-| `DF-TC-01` | Transfer normal | 13/14 | ✅ PASSED |
-| `DF-TC-02` | Insufficient balance | 5/14 | ✅ PASSED |
-| `DF-TC-03` | Fee = 0 | 13/14 | ✅ PASSED |
-| `DF-TC-04` | Boundary exact | 13/14 | ✅ PASSED |
-| `DF-TC-05` | Boundary minus 0.01 | 5/14 | ✅ PASSED |
-| `DF-TC-06` | Race condition | — | ⏭️ SKIPPED |
-
-### 10.2 DU-Pair Coverage Summary
-
-| DU-Pair | Variabel | Covered by | Status |
-| :--- | :--- | :--- | :--- |
-| DU-01 | `$source` (L1→L3) | TC-01, 02, 03, 04 | ✅ |
-| DU-02 | `$source` (L1→L11) | TC-01, 03, 04 | ✅ |
-| DU-03 | `$dest` (L2→L4) | TC-01, 02, 03, 04 | ✅ |
-| DU-04 | `$dest` (L2→L12) | TC-01, 03, 04 | ✅ |
-| DU-05 | `$sourceBalance` P-use | All TC | ✅ |
-| DU-06 | `$sourceBalance` C-use | TC-01, 03, 04 | ✅ |
-| DU-07 | `$destBalance` | TC-01, 03, 04 | ✅ |
-| DU-08 | `$fee` (L5→L6) | All TC | ✅ |
-| DU-09 | `$fee` (L5→L13) | TC-01, 03, 04 | ✅ |
-| DU-10 | `$totalDeducted` P-use | All TC | ✅ |
-| DU-11 | `$totalDeducted` C-use | TC-01, 03, 04 | ✅ |
-| DU-12 | `$newSourceBalance` | TC-01, 03, 04 | ✅ |
-| DU-13 | `$newDestBalance` | TC-01, 03, 04 | ✅ |
-| DU-14 | `$amount` (multi) | All TC | ✅ |
-
-**Coverage:** 14/14 DU-pair = **100%**
+| Komponen | Definisi | Penggunaan | Deskripsi |
+|---|---|---|---|
+| Input Pengguna | `current_amount` (baru), `name`, `target_amount`, `deadline` | validate(), perbandingan dengan oldAmount | `current_amount` adalah satu-satunya field yang mempengaruhi saldo rekening. |
+| `$oldAmount` | `$oldAmount = $saving->current_amount` — nilai sebelum update | U-P: `isset($newAmount) && $oldAmount !== $newAmount`; U-C: `$selisih = newAmount - oldAmount` | Dibaca dari DB sebelum update — snapshot kondisi sebelum perubahan. |
+| `$selisih` | `$selisih = $validated['current_amount'] - $oldAmount` | U-P: `if ($selisih > 0)` (top up/tarik); U-C: `balance -= $selisih`; U-C: `balance += abs($selisih)`; U-C: `'amount' => abs($selisih)` | Variabel pivotal — menentukan arah dan besaran perubahan. Digunakan 4x setelah didefinisikan. `abs()` memastikan amount transaksi selalu positif. |
+| `$account` | `FinancialAccount::findOrFail(saving->financial_account_id)` | U-C: `$account->balance` dikurangi/ditambah | **ANOMALI:** findOrFail tanpa user_id filter — berpotensi IDOR. |
+| `getSavingCategory()` | Private method yang return Category object | U-C: `'category_id' => $category->id` di INSERT trx | Method idempoten: dipanggil berkali-kali tidak membuat duplikat kategori. Aman. |
+| Output | `saving.current_amount` baru, `account.balance` baru, 1 trx | Return 200 | Dua tabel terupdate secara atomik dalam satu DB transaction. |
 
 ---
 
-## 🐛 11. Temuan & Analisis
-
-| ID | Severity | Deskripsi | Rekomendasi |
-| :--- | :--- | :--- | :--- |
-| `DF-001` | 🔴 Critical | Tidak ada `DB::transaction()` — lock tidak efektif, race condition mungkin | Wrap seluruh logic dalam `DB::transaction()` |
-| `DF-002` | 🔴 High | Tidak ada validasi `$sourceId !== $destId` — user bisa transfer ke akun sendiri | Tambah check di awal method |
-| `DF-003` | 🟡 Medium | Float precision untuk `$amount`, `$fee` — bisa kehilangan presisi | Gunakan `decimal` di DB + BCMath |
-| `DF-004` | 🟡 Medium | Tidak ada validasi `$amount > 0` di service layer | Tambah guard clause |
-| `DF-005` | 🟢 Low | Tidak ada audit log untuk transfer | Tambah event/log |
-
----
-
-## ✅ 12. Rekomendasi Perbaikan Kode
-
-```php
-public function transfer(
-    int $sourceId,
-    int $destId,
-    string $amount,  // ✅ DF-003: string untuk BCMath precision
-    ?string $note = null
-): Transfer {
-    // ✅ DF-002: cek source != dest
-    if ($sourceId === $destId) {
-        throw new InvalidArgumentException('Tidak bisa transfer ke akun sendiri');
-    }
-
-    // ✅ DF-004: validasi amount positif
-    if (bccomp($amount, '0', 2) <= 0) {
-        throw new InvalidArgumentException('Amount harus lebih dari 0');
-    }
-
-    // ✅ DF-001: wrap dalam DB transaction
-    return DB::transaction(function () use ($sourceId, $destId, $amount, $note) {
-        $source = Account::lockForUpdate()->findOrFail($sourceId);
-        $dest   = Account::lockForUpdate()->findOrFail($destId);
-
-        $fee = $this->calculateFee($amount);
-        $totalDeducted = bcadd($amount, $fee, 2);
-
-        if (bccomp($source->balance, $totalDeducted, 2) < 0) {
-            throw new InsufficientBalanceException();
-        }
-
-        $newSourceBalance = bcsub($source->balance, $totalDeducted, 2);
-        $newDestBalance   = bcadd($dest->balance, $amount, 2);
-
-        $source->update(['balance' => $newSourceBalance]);
-        $dest->update(['balance' => $newDestBalance]);
-
-        $transfer = Transfer::create([
-            'source_account_id' => $sourceId,
-            'dest_account_id'   => $destId,
-            'amount'            => $amount,
-            'fee'               => $fee,
-            'note'              => $note,
-        ]);
-
-        // ✅ DF-005: audit log
-        event(new TransferCompleted($transfer));
-
-        return $transfer;
-    });
-}
-```
+> ### 📋 Analisis SQA — Modul Tabungan
+>
+> **Kondisi Sistem Saat Ini**
+> Aliran data Tabungan menggunakan pendekatan yang elegan dengan variabel `$selisih` sebagai "pivot" yang menentukan arah eksekusi. Variabel ini didefinisikan sekali dan digunakan empat kali berbeda — tidak ada anomali DD atau DU. Satu-satunya anomali kritis adalah `$account` yang diambil tanpa filter `user_id`.
+>
+> **Dampak**
+> `getSavingCategory()` bersifat idempoten — ini adalah praktik yang baik dan tidak menghasilkan anomali data flow. Namun tidak adanya validasi batas pada `$selisih` berarti kalkulasi saldo yang dihasilkan bisa menghasilkan nilai negatif di kedua tabel (`balance` di `financial_accounts` dan `current_amount` di `savings`).
+>
+> **Cara Baca Diagram**
+> Diagram menunjukkan `$selisih` sebagai variabel yang "mengalir" melalui beberapa tahap penggunaan. Perhatikan bahwa nilai `$selisih` tidak pernah diubah setelah definisi (tidak ada re-assignment) — ini adalah pola aliran data yang bersih. `abs($selisih)` di dua tempat terakhir adalah transformasi satu arah untuk memastikan nilai positif. Kill (K) terjadi secara implisit saat method selesai dan scope berakhir.
 
 ---
 
-## ⚖️ 13. Kelebihan & Kekurangan
+## Ringkasan Anomali Data Flow Seluruh Sistem
 
-### ✅ Kelebihan
-- Mendeteksi **uninitialized variable** dan **dead variable** dengan presisi  
-- Lebih efektif untuk **transaksi finansial** karena fokus pada state variabel  
-- Menangkap bug yang tidak terlihat oleh Control Flow (DU-anomaly)  
-- Visualisasi DU-chain memudahkan debugging  
-- Cocok untuk **race condition detection** pada concurrent code
-
-### ❌ Kekurangan
-- **Sangat verbose** — banyak DU-pair untuk method besar  
-- Sulit di-otomasi penuh (perlu static analyzer)  
-- Tidak menangkap semua bug runtime (DB error, network)  
-- Kombinasi dengan loop bisa eksplodes (per iterasi punya DU)  
-- Memerlukan deep understanding variable scope
-
----
-
-## 🛠️ 14. Tools Pendukung
-
-| Tool | Kegunaan |
-| :--- | :--- |
-| **PHPStan / Larastan** | Detect undefined variable, unused variable |
-| **PHP_CodeSniffer** | Naming convention + scope check |
-| **PHPMD** | Detect dead variable |
-| **Xdebug** | Step-debug untuk verify DU runtime |
-| **ParaTest** | Parallel testing untuk race condition |
-| **Mermaid** | DU diagram visualization |
-
-```bash
-# Detect unused variables
-./vendor/bin/phpstan analyse app/ --level=max
-
-# Run parallel tests for concurrency
-./vendor/bin/paratest --processes=4
-```
-
----
-
-## 📚 Referensi
-
-1. Rapps, S., & Weyuker, E. J. (1985). *Selecting software test data using data flow information*. IEEE Transactions on Software Engineering.  
-2. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10*. Universitas Kristen Indonesia.  
-3. Beizer, B. (1990). *Software Testing Techniques* (2nd ed.). Van Nostrand Reinhold.  
-4. Pressman, R. S., & Maxim, B. R. (2020). *Software Engineering: A Practitioner's Approach* (9th ed.). McGraw-Hill.  
-5. Frankl, P. G., & Weyuker, E. J. (1988). *An applicable family of data flow testing criteria*. IEEE Transactions on Software Engineering.
-
----
-
-[⬅ Basis Path Testing](./Basis_Path_Testing.md) · [Kembali ke README](./README.md) · [Lanjut ke Loop Testing ➡](./Loop_Testing.md)
-
-**Tim REMACode** — Midnight Finance SQA Documentation
+| ID | Modul | Variabel | Tipe Anomali | Severity | Keterangan |
+|---|---|---|---|---|---|
+| DF-AUTH-01 | Auth | `$user` di `register()` | DD (define dua kali) | 🟢 Rendah | Intentional: D1=cek, D2=simpan |
+| DF-AUTH-02 | Auth | `$user->otp_code` | D→K lintas method | 🟢 Normal | By design: register D, verifyOtp K |
+| DF-TRF-01 | Transfer | `$transferCategory` | DD | 🟢 Rendah | Null-coalescing pattern |
+| DF-TRF-02 | Transfer | `$adminFee` | U-P redundan (2x) | 🟢 Rendah | Dicek dua kali identik tanpa reassign |
+| DF-TRF-03 | Transfer | `$siblings` | D via `created_at` | 🔴 Tinggi | Race condition — harus pakai UUID |
+| DF-TRX-01 | Transaksi | `$sortBy` | D→U-C tanpa validasi | 🔴 Tinggi | SQL Injection via column name |
+| DF-TRX-02 | Transaksi | `$oldAccount` | D tanpa user_id | 🟡 Sedang | Berpotensi IDOR |
+| DF-SAV-01 | Tabungan | `$account` | D tanpa user_id | 🟡 Sedang | Sama dengan DF-TRX-02 |
+| DF-SAV-02 | Tabungan | `$selisih` | Tidak ada validasi batas | 🔴 Tinggi | Saldo bisa negatif |
