@@ -1,501 +1,307 @@
-# 🔁 Loop Testing
-
-**Model White Box Testing #7** — *Dynamic Testing*  
-**Modul Target:** Kalkulasi Cicilan Hutang & Penambahan Bunga  
-**Tim:** REMACode
-
----
-
-## 📖 1. Definisi
-
-**Loop Testing** adalah teknik pengujian yang berfokus pada **pemeriksaan dan identifikasi error yang terkait dengan loop (perulangan)** dalam program. Loop digunakan untuk mengulang eksekusi blok kode tertentu beberapa kali, dan error bisa terjadi jika loop tidak diimplementasikan dengan benar (Suprihadi, 2025).
-
-> *"Teknik pengujian yang berfokus pada pemeriksaan dan identifikasi error yang terkait dengan loop (perulangan) dalam program. Loop digunakan untuk mengulang eksekusi blok kode tertentu beberapa kali, dan error bisa terjadi jika loop tidak diimplementasikan dengan benar."*
-> — (Suprihadi, 2025)
-
-### Kategori Loop (Beizer, 1990)
-
-| Tipe Loop | Karakteristik | Contoh |
-| :---- | :---- | :---- |
-| **Simple Loop** | Loop tunggal tanpa nesting | `for ($i = 0; $i < 12; $i++)` |
-| **Nested Loop** | Loop di dalam loop | Loop tahun × Loop bulan |
-| **Concatenated Loop** | Loop berurutan independen | Loop validasi → Loop kalkulasi |
-| **Unstructured Loop** | Loop dengan jump (`break`, `continue`, `goto`) | While + break condition |
+# White Box Testing — 07 Loop Testing
+**Proyek:** SaPoPoe Finance  
+**Teknik:** Loop Testing  
+**Modul:** Auth · Transfer · Transaksi · Tabungan
 
 ---
 
-## 🎯 2. Tujuan Pengujian
+## Definisi
 
-| No | Tujuan |
-| :---- | :---- |
-| 1 | Memastikan loop **terminasi** dengan benar (tidak infinite) |
-| 2 | Memvalidasi **boundary iteration** (0, 1, n, n+1) |
-| 3 | Memverifikasi **state variabel** sebelum, selama, dan setelah loop |
-| 4 | Mendeteksi **off-by-one error** |
-| 5 | Memastikan **performance** loop pada input besar |
+> **Teknik pengujian yang berfokus pada pemeriksaan dan identifikasi error yang terkait dengan loop (perulangan) dalam program. Loop digunakan untuk mengulang eksekusi blok kode tertentu beberapa kali, dan error bisa terjadi jika loop tidak diimplementasikan dengan benar.**
+>
+> — Materi Pertemuan 10, Software Quality, T Informatika UKRI
 
----
-
-## 📊 3. Beizer's Loop Testing Strategy
-
-Untuk **simple loop** dengan batas atas `n`, uji minimal test case berikut:
-
-| Test Case | Iterasi | Tujuan |
-| :---- | :---- | :---- |
-| **TC-A** | 0 (skip loop) | Loop tidak masuk |
-| **TC-B** | 1 (single pass) | Loop sekali |
-| **TC-C** | 2 (multiple pass) | Loop normal |
-| **TC-D** | n − 1 (typical) | Mendekati batas |
-| **TC-E** | n (exact bound) | Tepat di batas |
-| **TC-F** | n + 1 (overflow) | Melebihi batas (harus reject) |
-
-**Catatan:** Untuk **nested loop**, uji dari **inner loop dulu** dengan outer di-pin pada nilai minimum, lalu sebaliknya.
+**Kasus Uji yang diterapkan pada setiap loop:**
+- **Kasus Uji 1** — 0 iterasi: loop tidak dieksekusi (array/collection kosong)
+- **Kasus Uji 2** — 1 iterasi: loop berjalan tepat satu kali
+- **Kasus Uji 3** — n iterasi: loop berjalan jumlah normal (representatif)
+- **Kasus Uji 4** — kondisi batas: nilai tepat di ambang kondisi loop
 
 ---
 
-## 💻 4. Source Code yang Diuji
+## Modul A — Autentikasi (`AuthController.php`)
 
-**File:** `app/Services/InstallmentCalculatorService.php`  
-**Method:** `generateSchedule()` — generate jadwal cicilan + bunga per bulan.
-
-> ⚠️ **TODO:** Ganti dengan service asli dari `midnight-finance-backend` saat finalisasi.
+### Loop: `foreach ($request->accounts)` dan `foreach ($request->categories)` di `setup()`
 
 ```php
-public function generateSchedule(
-    float $principal,
-    float $annualInterestRate,
-    int $tenorMonths
-): array {
-    if ($tenorMonths <= 0) {                                          // line 1: guard
-        throw new InvalidArgumentException('Tenor harus > 0');
-    }
+// setup() — baris 142–143
+foreach ($request->accounts as $acc)
+    FinancialAccount::create(['user_id' => $user->id] + $acc);
 
-    if ($tenorMonths > 360) {                                         // line 2: guard (max 30 tahun)
-        throw new InvalidArgumentException('Tenor maksimal 360 bulan');
-    }
-
-    $monthlyRate    = $annualInterestRate / 12 / 100;                 // line 3
-    $monthlyPayment = $this->calculateMonthlyPayment(                 // line 4
-        $principal,
-        $monthlyRate,
-        $tenorMonths
-    );
-
-    $schedule         = [];                                           // line 5
-    $remainingBalance = $principal;                                   // line 6
-
-    for ($month = 1; $month <= $tenorMonths; $month++) {              // line 7: LOOP
-        $interestAmount   = $remainingBalance * $monthlyRate;         // line 8
-        $principalAmount  = $monthlyPayment - $interestAmount;        // line 9
-        $remainingBalance -= $principalAmount;                        // line 10
-
-        // Adjust last installment for rounding errors
-        if ($month === $tenorMonths) {                                // line 11
-            $principalAmount  += $remainingBalance;                   // line 12
-            $remainingBalance  = 0;                                   // line 13
-        }
-
-        $schedule[] = [                                               // line 14
-            'month'             => $month,
-            'payment'           => round($monthlyPayment, 2),
-            'principal'         => round($principalAmount, 2),
-            'interest'          => round($interestAmount, 2),
-            'remaining_balance' => round($remainingBalance, 2),
-        ];
-    }
-
-    return $schedule;                                                 // line 15
-}
+foreach ($request->categories as $cat)
+    Category::create(['user_id' => $user->id] + $cat);
 ```
-
----
-
-## 🗺️ 5. Flow Diagram
 
 ```mermaid
 flowchart TD
-    START([Start]) --> G1{tenor <= 0?}
-    G1 -->|TRUE| EX1[Throw InvalidArgument]
-    G1 -->|FALSE| G2{tenor > 360?}
-    G2 -->|TRUE| EX2[Throw InvalidArgument]
-    G2 -->|FALSE| INIT[Initialize: monthlyRate, monthlyPayment,<br/>schedule = empty, remaining = principal]
-
-    INIT --> LOOP_CHECK{month <= tenorMonths?}
-    LOOP_CHECK -->|FALSE| RETURN([Return schedule])
-    LOOP_CHECK -->|TRUE| CALC[Calculate interest, principal,<br/>update remaining]
-
-    CALC --> LAST{month == tenor?}
-    LAST -->|TRUE| ADJUST[Adjust last payment<br/>remaining = 0]
-    LAST -->|FALSE| APPEND
-
-    ADJUST --> APPEND[Append to schedule]
-    APPEND --> INC[month++]
-    INC --> LOOP_CHECK
-
-    EX1 --> END_ERR([End: Exception])
-    EX2 --> END_ERR
-    RETURN --> END_OK([End: Success])
-
-    style LOOP_CHECK fill:#7c2d12,stroke:#ea580c,color:#fff
-    style EX1 fill:#7f1d1d,stroke:#ef4444,color:#fff
-    style EX2 fill:#7f1d1d,stroke:#ef4444,color:#fff
-    style RETURN fill:#14532d,stroke:#22c55e,color:#fff
-    style ADJUST fill:#854d0e,stroke:#eab308,color:#fff
+    A([START setup]) --> B{status\nsudah active?}
+    B -- Ya --> C[return 400]
+    B -- Tidak --> D[validate]
+    D --> E[beginTransaction]
+    E --> F{accounts\narray kosong?}
+    F -- Ya, 0 item --> G[lewati foreach]
+    F -- Tidak --> H[foreach accounts → create]
+    H --> I{item tersisa?}
+    I -- Ya --> H
+    I -- Tidak --> G
+    G --> J{categories\narray kosong?}
+    J -- Ya --> K[lewati foreach]
+    J -- Tidak --> L[foreach categories → create]
+    L --> M{item tersisa?}
+    M -- Ya --> L
+    M -- Tidak --> K
+    K --> N[user.status = active → commit]
+    N --> O[return 200]
 ```
 
----
+**Kasus Uji 1 — 0 Iterasi (Array Kosong)**
+Input: `accounts: [], categories: []`
 
-## 🔍 6. Loop Analysis
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Loop accounts: 0 item → tidak dieksekusi | Setup berhasil, 0 akun dibuat, 0 kategori dibuat → 200 | Setup berhasil tanpa insert apapun → 200 | Passed |
 
-### 6.1 Karakterisasi Loop
+> ⚠️ Validasi hanya mensyaratkan `required|array` — array kosong tetap valid dan setup tetap sukses. Tidak ada guard `min:1`.
 
-| Atribut | Nilai |
-| :---- | :---- |
-| **Tipe Loop** | Simple Loop |
-| **Counter Variable** | `$month` |
-| **Initial Value** | 1 |
-| **Boundary Condition** | `$month <= $tenorMonths` |
-| **Increment** | `$month++` |
-| **Min Iteration** | 1 (jika tenor=1) |
-| **Max Iteration** | 360 (guard di line 2) |
-| **Termination** | Deterministik via counter |
-| **Side Effect** | Modifies `$remainingBalance`, `$schedule` |
+**Kasus Uji 2 — 1 Iterasi**
+Input: `accounts: [{name:"BCA", balance:500000}], categories: [{name:"Gaji", type:"income"}]`
 
-### 6.2 Invariant Loop
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Loop accounts: 1 item → 1x eksekusi | 1 FinancialAccount dibuat, 1 Category dibuat → 200 | 1 akun + 1 kategori berhasil dibuat → 200 | Passed |
 
-**Loop invariant** yang harus dijaga di setiap iterasi:
+**Kasus Uji 3 — n Iterasi (Normal)**
+Input: `accounts: [BCA, Mandiri, Tunai]`, `categories: [Gaji, Investasi]`
 
-| Invariant | Ekspektasi |
-| :---- | :---- |
-| `$remainingBalance >= 0` | Saldo tidak boleh negatif |
-| `$schedule.length == $month - 1` (sebelum append) | Sinkronisasi index |
-| `$interestAmount >= 0` | Bunga selalu non-negatif |
-| `$principalAmount > 0` (untuk normal case) | Pokok cicilan positif |
-| Setelah iterasi terakhir: `$remainingBalance == 0` | Saldo lunas tepat |
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Loop accounts: 3 item → 3x eksekusi | 3 FinancialAccount dibuat → 200 | 3 akun berhasil dibuat → 200 | Passed |
+| Loop categories: 2 item → 2x eksekusi | 2 Category dibuat → 200 | 2 kategori berhasil dibuat → 200 | Passed |
 
----
+**Kasus Uji 4 — Kondisi Cooldown (Loop Waktu)**
+Input: Register dua kali dalam interval < 180 detik
 
-## 🧪 7. Test Case Design (Beizer Strategy)
-
-### 7.1 Loop Boundary Test Cases
-
-| TC ID | Skenario Beizer | tenor | principal | rate (%) | Expected |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| `LT-TC-01` | **TC-A: 0 iteration** | 0 | 1.000.000 | 12 | Throw Exception |
-| `LT-TC-02` | **TC-A: negative tenor** | -5 | 1.000.000 | 12 | Throw Exception |
-| `LT-TC-03` | **TC-B: 1 iteration** | 1 | 1.000.000 | 12 | 1 schedule, lunas |
-| `LT-TC-04` | **TC-C: 2 iterations** | 2 | 1.000.000 | 12 | 2 schedule |
-| `LT-TC-05` | **TC-D: typical (12)** | 12 | 10.000.000 | 12 | 12 schedule |
-| `LT-TC-06` | **TC-E: max (360)** | 360 | 100.000.000 | 6 | 360 schedule |
-| `LT-TC-07` | **TC-F: overflow (361)** | 361 | 1.000.000 | 12 | Throw Exception |
-
-### 7.2 Edge Case Test Cases
-
-| TC ID | Skenario | Input | Expected |
-| :---- | :---- | :---- | :---- |
-| `LT-EC-01` | Interest rate = 0% | tenor=6, rate=0 | Cicilan flat = principal/tenor |
-| `LT-EC-02` | Principal = 0 | tenor=12, principal=0 | All zeros, lunas |
-| `LT-EC-03` | Very high rate (50%) | tenor=12, rate=50 | Schedule tetap valid |
-| `LT-EC-04` | Float precision | tenor=3, principal=10000 | Rounding accuracy check |
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Request ke-2 dalam < 180 detik | return 429 "Tunggu X menit lagi sebelum mendaftar ulang" | return 429 + pesan cooldown | Passed |
+| Request ke-2 setelah tepat ≥ 180 detik | OTP baru dikirim → return 201 | OTP baru terkirim → 201 | Passed |
 
 ---
 
-## 🚀 8. Implementasi PHPUnit Test
+> ### 📋 Analisis SQA — Modul Auth
+>
+> **Kondisi Sistem Saat Ini**
+> Dua `foreach` di `setup()` memproses array accounts dan categories. Tidak ada risiko infinite loop karena keduanya berbasis array finite yang sudah diambil dari request sebelum loop dimulai. Array kosong (0 iterasi) diizinkan oleh validasi `required|array` — ini adalah celah kecil: user bisa selesai setup tanpa satu pun akun keuangan atau kategori.
+>
+> **Dampak**
+> Setup tanpa akun keuangan (Kasus Uji 1) menghasilkan user dengan status `active` tapi tanpa rekening — kondisi yang akan menyebabkan error di modul Transfer dan Transaksi karena tidak ada `financial_account_id` yang valid untuk dipilih. Ini adalah bug edge case yang tidak terlihat dari happy path testing.
+>
+> **Cara Baca Kasus Uji**
+> Kasus Uji 1–4 mengikuti prinsip *boundary testing* untuk loop: selalu uji kondisi ekstrem (0 dan maksimum) sebelum kondisi normal (n). Setiap Kasus Uji memiliki tabel sendiri dengan format yang sama (Kondisi → Hasil Yang Diharapkan → Hasil → Status). Kasus Uji 4 menguji loop waktu (cooldown) — bukan foreach tradisional, tapi prinsipnya sama: verifikasi perilaku di batas kondisi.
+
+---
+
+## Modul B — Transfer (`TransferController.php`)
+
+### Loop: `foreach ($siblings as $trx)` di `update()` dan `destroy()`
 
 ```php
-<?php
-
-namespace Tests\Unit\Services;
-
-use App\Services\InstallmentCalculatorService;
-use InvalidArgumentException;
-use Tests\TestCase;
-
-class InstallmentCalculatorLoopTest extends TestCase
-{
-    private InstallmentCalculatorService $service;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->service = new InstallmentCalculatorService();
+// update() dan destroy() — pola identik
+foreach ($siblings as $trx) {
+    $acc = FinancialAccount::find($trx->financial_account_id);
+    if ($acc) {
+        if ($trx->type === 'transfer' && str_contains(strtoupper($trx->description), 'KELUAR'))
+            $acc->balance += $trx->amount;
+        elseif ($trx->type === 'transfer' && str_contains(strtoupper($trx->description), 'MASUK'))
+            $acc->balance -= $trx->amount;
+        elseif ($trx->type === 'expense' && str_contains(strtoupper($trx->description), 'BIAYA ADMIN'))
+            $acc->balance += $trx->amount;
+        $acc->save();
     }
-
-    /** @test LT-TC-01: TC-A — tenor = 0 */
-    public function it_throws_exception_when_tenor_is_zero(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Tenor harus > 0');
-        $this->service->generateSchedule(1_000_000, 12, 0);
-    }
-
-    /** @test LT-TC-02: TC-A — negative tenor */
-    public function it_throws_exception_when_tenor_is_negative(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->service->generateSchedule(1_000_000, 12, -5);
-    }
-
-    /** @test LT-TC-03: TC-B — single iteration */
-    public function it_generates_one_schedule_when_tenor_is_one(): void
-    {
-        $schedule = $this->service->generateSchedule(1_000_000, 12, 1);
-
-        $this->assertCount(1, $schedule);
-        $this->assertEquals(1, $schedule[0]['month']);
-        $this->assertEquals(0, $schedule[0]['remaining_balance']);
-    }
-
-    /** @test LT-TC-04: TC-C — two iterations */
-    public function it_generates_two_schedules_when_tenor_is_two(): void
-    {
-        $schedule = $this->service->generateSchedule(1_000_000, 12, 2);
-
-        $this->assertCount(2, $schedule);
-        $this->assertEquals(1, $schedule[0]['month']);
-        $this->assertEquals(2, $schedule[1]['month']);
-        $this->assertEquals(0, $schedule[1]['remaining_balance']);
-    }
-
-    /** @test LT-TC-05: TC-D — typical tenor 12 */
-    public function it_generates_12_schedules_for_one_year_tenor(): void
-    {
-        $schedule = $this->service->generateSchedule(10_000_000, 12, 12);
-
-        $this->assertCount(12, $schedule);
-        $this->assertEquals(0, $schedule[11]['remaining_balance']);
-
-        // Verify monotonic decrease of remaining_balance
-        for ($i = 1; $i < 12; $i++) {
-            $this->assertLessThan(
-                $schedule[$i - 1]['remaining_balance'],
-                $schedule[$i]['remaining_balance']
-            );
-        }
-    }
-
-    /** @test LT-TC-06: TC-E — max boundary 360 */
-    public function it_generates_360_schedules_for_max_tenor(): void
-    {
-        $schedule = $this->service->generateSchedule(100_000_000, 6, 360);
-
-        $this->assertCount(360, $schedule);
-        $this->assertEquals(0, $schedule[359]['remaining_balance']);
-    }
-
-    /** @test LT-TC-07: TC-F — over boundary 361 */
-    public function it_throws_exception_when_tenor_exceeds_360(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Tenor maksimal 360 bulan');
-        $this->service->generateSchedule(1_000_000, 12, 361);
-    }
-
-    /** @test LT-EC-01: Zero interest rate */
-    public function it_generates_flat_installment_when_rate_is_zero(): void
-    {
-        $schedule = $this->service->generateSchedule(1_200_000, 0, 12);
-
-        foreach ($schedule as $row) {
-            $this->assertEquals(0, $row['interest']);
-            $this->assertEquals(100_000, $row['principal']);
-        }
-    }
-
-    /** @test LT-EC-04: Float precision — sum equals principal */
-    public function it_maintains_principal_sum_accuracy(): void
-    {
-        $principal = 10_000;
-        $schedule  = $this->service->generateSchedule($principal, 12, 3);
-
-        $totalPrincipal = array_sum(array_column($schedule, 'principal'));
-
-        // Allow 0.01 tolerance for rounding
-        $this->assertEqualsWithDelta($principal, $totalPrincipal, 0.01);
-    }
-
-    /** @test Performance — 360 iterations under 100ms */
-    public function it_completes_max_tenor_within_acceptable_time(): void
-    {
-        $startTime = microtime(true);
-        $this->service->generateSchedule(1_000_000_000, 12, 360);
-        $duration = (microtime(true) - $startTime) * 1000; // ms
-
-        $this->assertLessThan(100, $duration, "Loop too slow: {$duration}ms");
-    }
+    $trx->delete();
 }
 ```
 
----
+**Kasus Uji 1 — 0 Siblings (Tidak Mungkin Terjadi)**
 
-## 📊 9. Hasil Eksekusi
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| siblings kosong (transfer tidak ditemukan) | return 400 "Data transfer korup atau tidak lengkap" (dicegah sebelum loop) | return 400 sebelum foreach dieksekusi | Passed |
 
-### 9.1 Test Results
+> Kasus 0 iterasi dicegah oleh guard sebelum loop: jika siblings tidak memiliki transaksi KELUAR, langsung return 400 dan loop tidak pernah dieksekusi.
 
-| TC ID | Beizer Category | Iterasi | Expected | Status |
-| :---- | :---- | :---- | :---- | :---- |
-| `LT-TC-01` | TC-A: zero | 0 | Exception | ✅ PASSED |
-| `LT-TC-02` | TC-A: negative | -5 | Exception | ✅ PASSED |
-| `LT-TC-03` | TC-B: single | 1 | 1 row | ✅ PASSED |
-| `LT-TC-04` | TC-C: multiple | 2 | 2 rows | ✅ PASSED |
-| `LT-TC-05` | TC-D: typical | 12 | 12 rows | ✅ PASSED |
-| `LT-TC-06` | TC-E: max | 360 | 360 rows | ✅ PASSED |
-| `LT-TC-07` | TC-F: overflow | 361 | Exception | ✅ PASSED |
-| `LT-EC-01` | Edge: zero rate | 12 | Flat installment | ✅ PASSED |
-| `LT-EC-02` | Edge: zero principal | 12 | All zeros | ✅ PASSED |
-| `LT-EC-03` | Edge: high rate | 12 | Valid schedule | ✅ PASSED |
-| `LT-EC-04` | Edge: precision | 3 | Sum match | ✅ PASSED |
-| Performance | 360 iter < 100ms | 360 | < 100ms | ✅ PASSED |
+**Kasus Uji 2 — 2 Siblings (Transfer Tanpa Admin Fee)**
+Input: Transfer BCA → Mandiri tanpa biaya admin. Siblings = [trx KELUAR, trx MASUK]
 
-**Total:** 12 test case | **Passed:** 12 | **Failed:** 0 | **Pass Rate: 100%**
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Loop 2x: KELUAR → balance BCA += amount; MASUK → balance Mandiri -= amount | Saldo kedua akun di-revert ke sebelum transfer, kedua trx dihapus | Saldo di-revert dengan benar, 2 trx terhapus | Passed |
 
-### 9.2 Coverage Report
+**Kasus Uji 3 — 3 Siblings (Transfer dengan Admin Fee)**
+Input: Transfer dengan biaya admin. Siblings = [trx KELUAR, trx MASUK, trx BIAYA ADMIN]
 
-| Metric | Coverage |
-| :---- | :---- |
-| Statement Coverage | 100% |
-| Branch Coverage | 100% (4/4 branches) |
-| Loop Coverage | 100% (all Beizer categories) |
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Loop 3x: KELUAR → balance BCA += amount; MASUK → balance Mandiri -= amount; BIAYA ADMIN → balance BCA += adminFee | Saldo ketiga komponen di-revert, 3 trx dihapus | Saldo di-revert benar, 3 trx terhapus | Passed |
+
+**Kasus Uji 4 — Akun Tidak Ditemukan di Dalam Loop**
+
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| `FinancialAccount::find()` return null (akun dihapus) | Loop melanjutkan ke iterasi berikutnya, hanya trx yang dihapus | `$acc = null` → skip balance update, `$trx->delete()` tetap berjalan | Passed |
 
 ---
 
-## 🐛 10. Temuan & Analisis
-
-| ID | Severity | Deskripsi | Rekomendasi |
-| :---- | :---- | :---- | :---- |
-| `LT-001` | 🟡 Medium | Float arithmetic untuk `$monthlyRate`, `$remainingBalance` — bisa accumulating error | Gunakan BCMath (`bcmul`, `bcsub`) untuk precision finansial |
-| `LT-002` | 🟢 Low | Max tenor 360 hardcoded | Pindahkan ke config |
-| `LT-003` | 🟢 Low | Tidak ada validasi `$annualInterestRate >= 0` | Tambah guard clause |
-| `LT-004` | 🟢 Low | Loop tidak memvalidasi `$remainingBalance >= 0` (invariant) | Tambah assert/exception |
-
-### Catatan Positif
-
-- ✅ Tidak ada **infinite loop risk** (counter increment deterministik)
-- ✅ **Off-by-one** sudah di-handle dengan `<= $tenorMonths`
-- ✅ **Last iteration adjustment** untuk rounding sudah benar
-- ✅ Performance acceptable (< 100ms untuk 360 iterasi)
+> ### 📋 Analisis SQA — Modul Transfer
+>
+> **Kondisi Sistem Saat Ini**
+> Loop di Transfer selalu berjalan minimal 2x (KELUAR + MASUK) dan maksimal 3x (+ BIAYA ADMIN). Tidak ada potensi 0 iterasi karena sudah diproteksi guard sebelum loop. Tidak ada potensi infinite loop karena `$siblings` adalah Collection tetap dari query DB. Guard `if ($acc)` melindungi dari null pointer jika akun sudah dihapus.
+>
+> **Dampak**
+> Kasus Uji 4 mengungkap skenario menarik: jika akun dihapus setelah transfer terjadi, loop tetap berjalan dan hanya menghapus record transaksi tanpa me-revert saldo (karena `$acc` null). Ini menyebabkan ketidakseimbangan — transaksi terhapus tapi saldo tidak dikembalikan. Kondisi ini tidak ditangani sebagai error.
+>
+> **Cara Baca Kasus Uji**
+> Transfer tidak memiliki Kasus Uji 1 yang valid (0 iterasi tidak bisa terjadi secara normal) — ini sendiri adalah temuan: loop tidak pernah diuji dengan 0 iterasi karena guard menolaknya lebih awal. Kasus Uji 2 dan 3 menunjukkan variasi jumlah siblings yang mungkin, dan Kasus Uji 4 menguji kondisi null di dalam loop.
 
 ---
 
-## ✅ 11. Rekomendasi Perbaikan Kode
+## Modul C — Transaksi (`TransactionController.php`)
+
+### Loop Implisit: Filter Chaining di `index()`
 
 ```php
-public function generateSchedule(
-    string $principal,           // ✅ string untuk BCMath precision
-    string $annualInterestRate,
-    int $tenorMonths
-): array {
-    // Guard clauses
-    if ($tenorMonths <= 0) {
-        throw new InvalidArgumentException('Tenor harus > 0');
+// index() — conditional chaining, bukan foreach
+if ($request->filled('start_date'))           $query->where('date', '>=', ...);
+if ($request->filled('end_date'))             $query->where('date', '<=', ...);
+if ($request->filled('financial_account_id')) $query->where(...);
+if ($request->filled('category_id'))          $query->where(...);
+if ($request->filled('type'))                 $query->where(...);
+```
+
+> Ini bukan `foreach` tradisional, melainkan **conditional chaining** — 5 kondisi yang secara kumulatif menambahkan clause ke query. Prinsip pengujiannya sama dengan loop: uji 0 filter, 1 filter, dan semua filter aktif.
+
+**Kasus Uji 1 — 0 Filter Aktif**
+Input: `GET /api/transactions` (tanpa parameter)
+
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Semua 5 kondisi = FALSE, tidak ada filter | Semua transaksi milik user dikembalikan tanpa filter | Seluruh transaksi user (bisa ribuan) tanpa pagination | Passed |
+
+> ⚠️ **Catatan:** Tidak ada pagination — respons bisa sangat besar jika user punya banyak transaksi.
+
+**Kasus Uji 2 — 1 Filter Aktif**
+Input: `GET /api/transactions?type=income`
+
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| C5=TRUE (type=income), C1–C4=FALSE | Hanya transaksi bertipe income | Hanya transaksi income dikembalikan | Passed |
+
+**Kasus Uji 3 — n Filter (Semua Aktif)**
+Input: `GET /api/transactions?start_date=2026-01-01&end_date=2026-06-01&type=income&category_id=1`
+
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| C1, C2, C4, C5=TRUE — 4 filter aktif | Transaksi income dalam rentang tanggal, kategori tertentu | Hasil sangat tersaring sesuai kombinasi filter | Passed |
+
+**Kasus Uji 4 — Filter sort_by (Kondisi Batas Keamanan)**
+Input: `GET /api/transactions?sort_by=password`
+
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| sort_by dengan nama kolom yang tidak valid | Error / query gagal / diabaikan | `orderBy('password', 'desc')` dieksekusi — SQL injection risk | **Failed** |
+
+---
+
+> ### 📋 Analisis SQA — Modul Transaksi
+>
+> **Kondisi Sistem Saat Ini**
+> Filter chaining di `index()` bekerja dengan benar untuk Kasus Uji 1–3: semua kombinasi filter menghasilkan query yang benar. Kasus Uji 4 adalah pengujian batas keamanan yang mengungkap celah: nilai `sort_by` tidak divalidasi, sehingga nilai arbitrer bisa dimasukkan ke `orderBy()`.
+>
+> **Dampak**
+> Kasus Uji 4 (Failed) adalah konfirmasi dari temuan di Data Flow Testing: `$sortBy` tidak memiliki whitelist. Dalam konteks Loop Testing, ini mengungkap bahwa "kondisi batas" dari parameter sorting belum diproteksi. Nilai seperti `(SELECT password FROM users)` bisa mengakibatkan error SQL yang mengekspos informasi database.
+>
+> **Cara Baca Kasus Uji**
+> Filter chaining diuji layaknya loop dengan menghitung berapa "iterasi" (berapa filter) yang aktif. 0 filter = loop tanpa iterasi, 1 filter = 1 iterasi, semua filter = maksimum iterasi. Kasus Uji 4 adalah pengujian batas khusus yang tidak termasuk jumlah iterasi, melainkan **nilai ekstrem** yang tidak valid — ini adalah prinsip boundary testing yang diperluas.
+
+---
+
+## Modul D — Tabungan (`SavingController.php`)
+
+### Loop Idempoten: `getSavingCategory()` dipanggil berulang
+
+```php
+// Private method dipanggil dari store(), update(), destroy()
+private function getSavingCategory($userId, $type) {
+    $category = Category::where('user_id', $userId)
+                        ->where('name', 'LIKE', "%{$type}%")->first();
+    if (!$category) {
+        $category = new Category([...]);
+        $category->save();    // INSERT hanya jika belum ada
     }
-
-    $maxTenor = config('loan.max_tenor_months', 360);  // ✅ LT-002
-    if ($tenorMonths > $maxTenor) {
-        throw new InvalidArgumentException("Tenor maksimal {$maxTenor} bulan");
-    }
-
-    // ✅ LT-003: validate rate
-    if (bccomp($annualInterestRate, '0', 4) < 0) {
-        throw new InvalidArgumentException('Bunga tidak boleh negatif');
-    }
-
-    // ✅ LT-001: BCMath untuk precision
-    $monthlyRate    = bcdiv(bcdiv($annualInterestRate, '12', 8), '100', 8);
-    $monthlyPayment = $this->calculateMonthlyPayment(
-        $principal,
-        $monthlyRate,
-        $tenorMonths
-    );
-
-    $schedule         = [];
-    $remainingBalance = $principal;
-
-    for ($month = 1; $month <= $tenorMonths; $month++) {
-        $interestAmount   = bcmul($remainingBalance, $monthlyRate, 4);
-        $principalAmount  = bcsub($monthlyPayment, $interestAmount, 4);
-        $remainingBalance = bcsub($remainingBalance, $principalAmount, 4);
-
-        // Adjust last installment
-        if ($month === $tenorMonths) {
-            $principalAmount  = bcadd($principalAmount, $remainingBalance, 4);
-            $remainingBalance = '0';
-        }
-
-        // ✅ LT-004: assert invariant
-        if (bccomp($remainingBalance, '0', 4) < 0) {
-            throw new RuntimeException(
-                "Loop invariant violated at month {$month}: negative balance"
-            );
-        }
-
-        $schedule[] = [
-            'month'             => $month,
-            'payment'           => (float) bcround($monthlyPayment, 2),
-            'principal'         => (float) bcround($principalAmount, 2),
-            'interest'          => (float) bcround($interestAmount, 2),
-            'remaining_balance' => (float) bcround($remainingBalance, 2),
-        ];
-    }
-
-    return $schedule;
+    return $category;
 }
 ```
 
----
+**Kasus Uji 1 — Kategori Belum Ada (INSERT)**
 
-## ⚖️ 12. Kelebihan & Kekurangan
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Pemanggilan pertama, kategori belum ada di DB | Kategori baru dibuat (INSERT) dan dikembalikan | 1 record Category baru tersimpan | Passed |
 
-### ✅ Kelebihan
+**Kasus Uji 2 — Kategori Sudah Ada (Idempoten)**
 
-- Mendeteksi **infinite loop** dan **off-by-one error**
-- Strategi Beizer **sistematis** dan kuantitatif
-- Wajib untuk **financial calculation** (cicilan, bunga, kompon)
-- Mendeteksi **performance issue** pada iterasi besar
-- Loop invariant memberikan **assertion** yang kuat
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| Pemanggilan ke-2, ke-3, ke-n — kategori sudah ada | Tidak ada INSERT baru, kembalikan kategori yang ada | Category::where()->first() mengembalikan existing record | Passed |
 
-### ❌ Kekurangan
+**Kasus Uji 3 — Loop Saldo: `destroy()` dengan current_amount = 0**
+Input: Hapus tabungan yang belum pernah diisi (current_amount = 0)
 
-- **Nested loop** bisa eksplodes test case-nya (n × m × k)
-- Sulit untuk **non-deterministic loop** (while dengan kondisi external)
-- Boundary value testing kadang **arbitrary** (kenapa n=360 dan bukan 480?)
-- Tidak menangkap bug **data race** di parallel loop
-- Performance test sensitif terhadap **environment** (CI vs local)
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| current_amount = 0 → loop pencairan tidak dieksekusi | Langsung delete saving, saldo tidak berubah → 200 | Saving dihapus, tidak ada trx income → 200 | Passed |
 
----
+**Kasus Uji 4 — Loop Saldo: `destroy()` dengan current_amount > 0**
+Input: Cairkan tabungan "Dana Darurat" dengan current_amount = Rp 500.000
 
-## 🛠️ 13. Tools Pendukung
+| Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|
+| current_amount > 0 → blok pencairan dieksekusi 1x | Saldo BCA += 500k, trx income dicatat, saving dihapus → 200 | Saldo bertambah, trx income tersimpan, saving terhapus → 200 | Passed |
 
-| Tool | Kegunaan |
-| :---- | :---- |
-| **PHPUnit** | Eksekusi loop test case |
-| **PHPBench** | Benchmark performance loop |
-| **Xdebug Profiler** | Detect slow loop & memory leak |
-| **PHPStan** | Detect potential infinite loop (statically) |
-| **BCMath** | Precision arithmetic dalam loop finansial |
+**Kasus Uji Tambahan — Siklus store() → update() Top Up → update() Tarik**
 
-```bash
-# Benchmark
-./vendor/bin/phpbench run tests/Benchmark --report=default
-
-# Memory profiling
-php -d xdebug.mode=profile artisan test --filter=Loop
-```
+| Urutan | Kondisi | Hasil Yang Diharapkan | Hasil | Status |
+|---|---|---|---|---|
+| 1. store() | Buat tabungan dengan current_amount = 100.000 | Saldo BCA berkurang 100k | Saldo berkurang 100k → 201 | Passed |
+| 2. update() top up | Naikkan ke 200.000 (selisih +100k) | Saldo BCA berkurang 100k lagi | Saldo berkurang 100k lagi → 200 | Passed |
+| 3. update() tarik | Turunkan ke 150.000 (selisih −50k) | Saldo BCA bertambah 50k | Saldo bertambah 50k → 200 | Passed |
 
 ---
 
-## 📚 Referensi
-
-1. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 10*. Universitas Kristen Indonesia.
-2. Beizer, B. (1990). *Software Testing Techniques* (2nd ed.). Van Nostrand Reinhold.
-3. Myers, G. J., Sandler, C., & Badgett, T. (2011). *The Art of Software Testing* (3rd ed.). Wiley.
-4. Pressman, R. S., & Maxim, B. R. (2020). *Software Engineering: A Practitioner's Approach* (9th ed.). McGraw-Hill.
-5. Hoare, C. A. R. (1969). *An axiomatic basis for computer programming*. Communications of the ACM. *(Loop invariant theory)*
+> ### 📋 Analisis SQA — Modul Tabungan
+>
+> **Kondisi Sistem Saat Ini**
+> `getSavingCategory()` bersifat **idempoten** — ini adalah desain yang baik dan mencegah duplikasi data kategori meskipun dipanggil berkali-kali. `destroy()` menggunakan kondisi `current_amount > 0` sebagai gate yang efektif: 0 iterasi jika tidak ada dana, 1 iterasi jika ada dana. Tidak ada potensi infinite loop di seluruh modul.
+>
+> **Dampak**
+> Sifat idempoten `getSavingCategory()` melindungi integritas data kategori. Namun Kasus Uji Tambahan (siklus store→update→update) mengungkap bahwa tidak ada validasi batas: top up melebihi saldo rekening tetap berhasil, dan setelah serangkaian operasi, saldo akun bisa menjadi negatif. Ini konsisten dengan temuan di Control Flow Testing dan Basic Path Testing.
+>
+> **Cara Baca Kasus Uji**
+> Kasus Uji 1 dan 2 di `getSavingCategory()` menguji **idempotency** — sifat yang memastikan operasi yang sama menghasilkan hasil yang sama tidak peduli berapa kali dijalankan. Ini penting untuk sistem finansial di mana operasi retransmisi (retry) bisa terjadi. Kasus Uji Tambahan adalah **sequential loop test** — menguji akumulasi state setelah rangkaian operasi berurutan.
 
 ---
 
-[⬅ Data Flow Testing](./Data_Flow_Testing.md) · [Kembali ke README](./README.md)
+## Ringkasan Loop Testing Seluruh Sistem
 
-**Tim REMACode** — Midnight Finance SQA Documentation
+| Modul | Loop yang Diuji | Kasus Uji 1 (0) | Kasus Uji 2 (1) | Kasus Uji 3 (n) | Kasus Uji 4 (batas) |
+|---|---|---|---|---|---|
+| Auth | `foreach accounts/categories` di setup() | Passed ⚠️ (array kosong diizinkan) | Passed | Passed | Passed (cooldown) |
+| Transfer | `foreach $siblings` di update/destroy | N/A (dicegah guard) | N/A | Passed (2 siblings) | Passed (3 siblings) |
+| Transaksi | Filter chaining di index() | Passed | Passed | Passed | **Failed** (sort_by) |
+| Tabungan | `getSavingCategory()` + destroy() | Passed | Passed | Passed | Passed |
 
-🎉 *Dokumentasi White Box Testing — Selesai*
+**Temuan utama:**
+- ⚠️ Auth `setup()`: 0 iterasi diizinkan → user bisa punya status `active` tanpa akun keuangan
+- 🔴 Transaksi `index()`: Kasus Uji 4 (sort_by tidak valid) → SQL injection
+- ✅ Tabungan `getSavingCategory()`: sifat idempoten terbukti benar
+- ✅ Semua loop berbasis `foreach` tidak berpotensi infinite loop
