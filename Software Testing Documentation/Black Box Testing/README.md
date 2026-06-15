@@ -26,25 +26,6 @@
 
 ---
 
-## Struktur Dokumentasi
-
-```
-midnight-sqa/
-├── README.md                        ← file ini
-│
-├── BB-01-boundary-value-analysis.md
-├── BB-02-equivalence-partitioning.md
-├── BB-03-decision-table-testing.md
-├── BB-04-comparison-testing.md
-├── BB-05-sample-testing.md
-├── BB-06-behaviour-testing.md
-├── BB-07-performance-testing.md
-├── BB-08-endurance-testing.md
-├── BB-09-cause-effect-testing.md
-│
-└── screenshots/                     ← 32 screenshot bukti pengujian
-```
-
 ---
 
 ## Daftar Pengujian Black Box (BB)
