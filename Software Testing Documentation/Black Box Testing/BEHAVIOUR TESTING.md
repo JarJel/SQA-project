@@ -173,19 +173,6 @@ stateDiagram-v2
 | TC2 | Login dengan password salah | User terdaftar dengan email `sultan@test.com` | User memasukkan password `salahpassword` dan klik MASUK | Sistem menolak login dan menampilkan pesan error password | "Kata sandi yang Anda masukkan salah." | ✅ Passed |
 | TC3 | Login dengan email tidak terdaftar | Email `tidakada@test.com` tidak ada di database | User memasukkan email tersebut dengan password apapun dan klik MASUK | Sistem menolak login dan menampilkan pesan error email | "Alamat email tidak ditemukan. Silakan buat akun terlebih dahulu." | ✅ Passed |
 
-### Screenshot Bukti Pengujian
-
-**TC1 — Login Berhasil → Dashboard Tampil**
-
-![BB06 Auth TC1 — Dashboard berhasil tampil](screenshots/sample-auth-tc1.png)
-
-**TC2 — Password Salah → Pesan Error**
-
-![BB06 Auth TC2 — Password salah ditolak](screenshots/sample-auth-tc2.png)
-
-**TC3 — Email Tidak Terdaftar → Pesan Error**
-
-![BB06 Auth TC3 — Email tidak ditemukan](screenshots/sample-auth-tc3.png)
 
 ---
 
@@ -204,19 +191,7 @@ stateDiagram-v2
 | TC2 | Transfer dengan nominal kosong / 0 | Form PINDAH DANA terbuka | User mengosongkan field nominal (nilai 0) dan klik EKSEKUSI TRANSFER | Browser mencegah pengiriman form dan menampilkan validasi | "Harap isi bidang ini." — form tidak terkirim | ✅ Passed |
 | TC3 | Transfer melebihi saldo — saldo tidak cukup | Brankas BCA memiliki saldo Rp -994.649.999 (negatif) | User melakukan transfer Rp 999.999.999 dari BCA ke Mandiri | Sistem mendeteksi saldo tidak mencukupi dan menolak transfer | "GAGAL Saldo dompet asal tidak mencukupi untuk nominal transfer beserta biaya admin!" | ✅ Passed |
 
-### Screenshot Bukti Pengujian
 
-**TC1 — Transfer Berhasil → Saldo Diperbarui**
-
-![BB06 Transfer TC1 — Transfer berhasil](screenshots/sample-transfer-tc1.png)
-
-**TC2 — Nominal 0 → Validasi Browser**
-
-![BB06 Transfer TC2 — Nominal 0 ditolak](screenshots/sample-transfer-tc2.png)
-
-**TC3 — Saldo Tidak Mencukupi → GAGAL**
-
-![BB06 Transfer TC3 — GAGAL saldo tidak cukup](screenshots/sample-transfer-tc3.png)
 
 ---
 
@@ -235,19 +210,6 @@ stateDiagram-v2
 | TC2 | Catat transaksi dengan nominal kosong | Form CATAT ALIRAN DANA terbuka, tab MASUK aktif | User mengosongkan field nominal dan klik SIMPAN | Browser mencegah pengiriman dan menampilkan validasi | "Harap isi bidang ini." — form tidak terkirim | ✅ Passed |
 | TC3 | Catat expense ekstrem — saldo tidak divalidasi | Brankas BCA memiliki saldo negatif | User mencatat expense Rp 999.999.999 dari BCA (type=expense) | Sistem seharusnya menolak karena saldo tidak mencukupi | ⚠️ HTTP 201 — saldo BCA menjadi **Rp -994.649.999 (NEGATIF)** — **BUG KRITIS** | 🔴 Failed |
 
-### Screenshot Bukti Pengujian
-
-**TC1 — Income Berhasil Dicatat → Saldo BSI Bertambah**
-
-![BB06 Transaksi TC1 — Income BSI berhasil](screenshots/sample-transaksi-tc1.png)
-
-**TC2 — Nominal Kosong → Validasi Browser**
-
-![BB06 Transaksi TC2 — Nominal kosong ditolak](screenshots/sample-transaksi-tc2.png)
-
-**TC3 — Expense Ekstrem → Saldo Negatif (BUG KRITIS)**
-
-![BB06 Transaksi TC3 — Saldo BCA negatif](screenshots/sample-transaksi-tc3.png)
 
 ---
 
@@ -266,19 +228,7 @@ stateDiagram-v2
 | TC2 | Buat target dengan nama kosong | Form TARGET IMPIAN BARU terbuka, sumber BSI dipilih | User mengosongkan field nama dan klik BUAT TARGET IMPIAN | Browser mencegah pengiriman dan menampilkan validasi pada field nama | "Harap isi bidang ini." — form tidak terkirim | ✅ Passed |
 | TC3 | Buat target dengan nama 300 karakter | Form TARGET IMPIAN BARU terbuka, sumber BSI dipilih | User mengisi field nama dengan 300 karakter (`AAA...×300`) dan klik BUAT TARGET IMPIAN | Sistem menolak karena nama melebihi batas 255 karakter | "GAGAL — The name field must not be greater than 255 characters." | ✅ Passed |
 
-### Screenshot Bukti Pengujian
 
-**TC1 — Target Impian Berhasil Dibuat**
-
-![BB06 Tabungan TC1 — TabunganSample berhasil dibuat](screenshots/sample-tabungan-tc1.png)
-
-**TC2 — Nama Kosong → Validasi Browser**
-
-![BB06 Tabungan TC2 — Nama kosong ditolak](screenshots/sample-tabungan-tc2.png)
-
-**TC3 — Nama > 255 Karakter → GAGAL**
-
-![BB06 Tabungan TC3 — Nama terlalu panjang ditolak](screenshots/sample-tabungan-tc3.png)
 
 ---
 
