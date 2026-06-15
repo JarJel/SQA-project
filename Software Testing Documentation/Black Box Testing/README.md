@@ -1,4 +1,4 @@
-# Dokumentasi SQA — SaPoPoe FINANCE (Midnight Finance)
+# Dokumentasi Black Box Testing — SaPoPoe FINANCE (Midnight Finance)
 ### Ujian Akhir Semester — Software Quality Assurance
 **Program Studi Teknik Informatika — Universitas Kebangsaan RI (UKRI)**
 
@@ -42,14 +42,6 @@ midnight-sqa/
 ├── BB-08-endurance-testing.md
 ├── BB-09-cause-effect-testing.md
 │
-├── WB-01-desk-checking.md
-├── WB-02-code-walkthrough.md
-├── WB-03-formal-inspections.md
-├── WB-04-control-flow.md
-├── WB-05-basic-path.md
-├── WB-06-data-flow.md
-├── WB-07-loop-testing.md
-│
 └── screenshots/                     ← 32 screenshot bukti pengujian
 ```
 
@@ -68,20 +60,6 @@ midnight-sqa/
 | [BB-07](BB-07-performance-testing.md) | Performance Testing | Dashboard (`/dashboard`) | 3 | 2 | 0⚠️ | Flowchart |
 | [BB-08](BB-08-endurance-testing.md) | Endurance Testing | Auth · Transfer · Transaksi · Tabungan | 20 iter | 15 | 5 | Flowchart |
 | [BB-09](BB-09-cause-effect-testing.md) | Cause-Effect Relationship | Auth · Transfer · Transaksi · Tabungan | 20 | 13 | 2 | Fishbone (4 diagram) |
-
----
-
-## Daftar Pengujian White Box (WB)
-
-| Kode | Teknik | Fokus Analisis | Diagram |
-|---|---|---|---|
-| [WB-01](WB-01-desk-checking.md) | Desk Checking | Review kode manual tanpa eksekusi | — |
-| [WB-02](WB-02-code-walkthrough.md) | Code Walkthrough | Penjelasan alur kode per fungsi | — |
-| [WB-03](WB-03-formal-inspections.md) | Formal Inspections | Inspeksi formal dengan checklist | — |
-| [WB-04](WB-04-control-flow.md) | Control Flow Testing | Alur percabangan & kondisi | Flowchart |
-| [WB-05](WB-05-basic-path.md) | Basic Path Testing | Jalur independen (cyclomatic complexity) | Graph |
-| [WB-06](WB-06-data-flow.md) | Data Flow Testing | Definisi & penggunaan variabel | — |
-| [WB-07](WB-07-loop-testing.md) | Loop Testing | Pengujian struktur perulangan | — |
 
 ---
 
@@ -117,16 +95,11 @@ if ($request->type === 'expense' && $wallet->balance < $request->amount) {
 ```
 Black Box Testing
 ─────────────────────────────────────────────────────
+Teknik digunakan       : 9 teknik (BB-01 s/d BB-09)
 Total Test Case        : 116
 Passed                 : 100
 Failed / Bug           :   2 defect kritis
 Warning / Kelemahan    :   5 area perlu peningkatan
-
-White Box Testing
-─────────────────────────────────────────────────────
-Teknik digunakan       : 7 teknik
-Modul dianalisis       : 4 modul (Auth, Transfer, Transaksi, Tabungan)
-Temuan                 : Konsisten dengan temuan Black Box
 
 Bukti Pengujian
 ─────────────────────────────────────────────────────
@@ -148,4 +121,4 @@ Tersimpan di           : screenshots/
 
 ---
 
-> Dokumentasi ini dibuat sebagai bagian dari **Ujian Akhir Semester (UAS) mata kuliah Software Quality**, Program Studi Teknik Informatika, Universitas Kebangsaan RI (UKRI), 2025/2026.
+> Dokumentasi Black Box Testing ini dibuat sebagai bagian dari **Ujian Akhir Semester (UAS) mata kuliah Software Quality**, Program Studi Teknik Informatika, Universitas Kebangsaan RI (UKRI), 2025/2026.
