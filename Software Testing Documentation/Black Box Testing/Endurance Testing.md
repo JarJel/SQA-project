@@ -52,9 +52,6 @@ flowchart TB
 
 ## Modul 1 — Autentikasi: `POST /api/login`
 
-### Screenshot Hasil Pengujian
-
-![Endurance Testing — Modul Autentikasi 5 iterasi](screenshots/endurance-auth.png)
 
 ### Tabel Hasil per Iterasi
 
@@ -79,9 +76,6 @@ flowchart TB
 
 ## Modul 2 — Transfer: `GET /api/transfers`
 
-### Screenshot Hasil Pengujian
-
-![Endurance Testing — Modul Transfer 5 iterasi](screenshots/endurance-transfer.png)
 
 ### Tabel Hasil per Iterasi
 
@@ -106,9 +100,6 @@ flowchart TB
 
 ## Modul 3 — Transaksi: `GET /api/transactions`
 
-### Screenshot Hasil Pengujian
-
-![Endurance Testing — Modul Transaksi 5 iterasi](screenshots/endurance-transaksi.png)
 
 ### Tabel Hasil per Iterasi
 
@@ -134,9 +125,6 @@ flowchart TB
 
 ## Modul 4 — Tabungan: `GET /api/savings`
 
-### Screenshot Hasil Pengujian
-
-![Endurance Testing — Modul Tabungan 5 iterasi](screenshots/endurance-tabungan.png)
 
 ### Tabel Hasil per Iterasi
 
