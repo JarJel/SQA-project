@@ -119,15 +119,18 @@ classDiagram
 
 **TC1 — Login Berhasil (Titik Singular Valid)**
 
-![Sample Auth TC1 — Dashboard login berhasil](screenshots/bva-auth-tc4.png)
+<img width="1920" height="1080" alt="sample-auth-tc1" src="https://github.com/user-attachments/assets/bb8e700a-283b-4a75-ac0a-aa2f00f64533" />
+
 
 **TC2 — Password Salah (Titik Singular Invalid)**
 
-![Sample Auth TC2 — Password salah ditolak](screenshots/bva-auth-tc3.png)
+<img width="1920" height="1080" alt="sample-auth-tc2" src="https://github.com/user-attachments/assets/fc41cddf-914b-47a8-9ddb-cc92b23855b1" />
+
 
 **TC3 — Email Tidak Terdaftar (Titik Singular Invalid)**
 
-![Sample Auth TC3 — Email tidak ditemukan](screenshots/ep-auth-tc3.png)
+<img width="1920" height="1080" alt="sample-auth-tc3" src="https://github.com/user-attachments/assets/e16d7de1-6d09-477f-86c8-e04def70d4a1" />
+
 
 ---
 
@@ -158,15 +161,18 @@ classDiagram
 
 **TC1 — Transfer Berhasil (Titik Singular Valid)**
 
-![Sample Transfer TC1 — Transfer berhasil](screenshots/bva-transfer-tc4.png)
+<img width="1920" height="1080" alt="sample-transfer-tc1" src="https://github.com/user-attachments/assets/8c7872f3-e9eb-4feb-a54d-c0eb2e3f8182" />
+
 
 **TC2 — Amount = 0 (Titik Singular Batas Bawah)**
 
-![Sample Transfer TC2 — Amount 0 ditolak](screenshots/bva-transfer-tc1.png)
+<img width="1920" height="1080" alt="sample-transfer-tc2" src="https://github.com/user-attachments/assets/fdef77ce-f6d3-41b3-9f27-52843e234d54" />
+
 
 **TC3 — Saldo Tidak Mencukupi (Titik Singular Batas Atas)**
 
-![Sample Transfer TC3 — GAGAL saldo tidak mencukupi](screenshots/bva-transfer-tc6.png)
+<img width="1920" height="1080" alt="sample-transfer-tc3" src="https://github.com/user-attachments/assets/b2ae3977-d176-45aa-9743-2b3915434b85" />
+
 
 ---
 
@@ -189,7 +195,7 @@ classDiagram
 
 | No | Test Case | Nilai Sampel (Input) | Expected Output | Actual Output | Status |
 |---|---|---|---|---|---|
-| TC1 | Income valid, portofolio dipilih | amount=`50.000`, type=`income`, porto=Mandiri | Transaksi dicatat, saldo +50.000 | Saldo Mandiri bertambah Rp 50.000 (3.000.000 → 3.050.000) | ✅ Passed |
+| TC1 | Income valid, portofolio dipilih | amount=`75.000`, type=`income`, porto=BSI | Transaksi dicatat, saldo +75.000 | Saldo BSI bertambah Rp 75.000 (2.050.000 → 2.125.000) | ✅ Passed |
 | TC2 | Amount = 0 (titik singular batas bawah) | amount=`0`, type=`income` | Ditolak — amount tidak boleh 0 | "Harap isi bidang ini." — form tidak dikirim | ✅ Passed |
 | TC3 | Expense ekstrem = 999.999.999 (titik singular batas atas) | amount=`999.999.999`, type=`expense`, porto=BCA | Ditolak — saldo tidak mencukupi | ⚠️ return 201 — **saldo BCA menjadi Rp -994.649.999 (NEGATIF)** | 🔴 **Failed** |
 
@@ -197,15 +203,17 @@ classDiagram
 
 **TC1 — Income Berhasil Dicatat (Titik Singular Valid)**
 
-![Sample Transaksi TC1 — Income Mandiri berhasil](screenshots/ep-transaksi-tc1.png)
+<img width="1920" height="1080" alt="sample-transaksi-tc1" src="https://github.com/user-attachments/assets/8452ece3-ea6c-4738-b15f-7d9479cf4ce7" />
+
 
 **TC2 — Amount = 0 (Titik Singular Batas Bawah)**
 
-![Sample Transaksi TC2 — Amount kosong ditolak](screenshots/bva-transaksi-tc1.png)
+<img width="1920" height="1080" alt="sample-transaksi-tc2" src="https://github.com/user-attachments/assets/1b0cbe6f-88c5-4241-aaec-2cbc34a8ec6b" />
+
 
 **TC3 — Expense Ekstrem → Saldo Negatif (BUG KRITIS)**
 
-![Sample Transaksi TC3 — Saldo BCA menjadi negatif](screenshots/bva-transaksi-tc6.png)
+
 
 ---
 
@@ -236,15 +244,18 @@ classDiagram
 
 **TC1 — Tabungan Berhasil Dibuat (Titik Singular Valid)**
 
-![Sample Tabungan TC1 — Tabungan berhasil dibuat](screenshots/ep-tabungan-tc1.png)
+<img width="1920" height="1080" alt="sample-tabungan-tc1" src="https://github.com/user-attachments/assets/23df9060-76f7-4c62-9f3f-9701972ad40d" />
+
 
 **TC2 — Nama Kosong (Titik Singular Batas Bawah)**
 
-![Sample Tabungan TC2 — Nama kosong ditolak](screenshots/bva-tabungan-tc1.png)
+<img width="1920" height="1080" alt="sample-tabungan-tc2" src="https://github.com/user-attachments/assets/ac287a75-ac6b-4751-b068-49d56769e489" />
+
 
 **TC3 — Nama > 255 Karakter (Titik Singular Batas Atas)**
 
-![Sample Tabungan TC3 — Nama terlalu panjang ditolak](screenshots/ep-tabungan-tc3.png)
+<img width="1920" height="1080" alt="sample-tabungan-tc3" src="https://github.com/user-attachments/assets/f711a21b-6a29-469a-9113-f33145b30e7d" />
+
 
 ---
 
