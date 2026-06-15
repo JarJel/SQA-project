@@ -1,183 +1,151 @@
-# 📦 Black Box Testing — Midnight Finance
-
-> **Mata Kuliah:** Software Quality Assurance
-> **Pertemuan:** 11 — Black Box Testing
-> **Tim:** REMACode
-> **Sistem yang Diuji:** Midnight Finance (Private Wealth Management Platform) — Laravel 11 + React.js
+# Dokumentasi SQA — SaPoPoe FINANCE (Midnight Finance)
+### Ujian Akhir Semester — Software Quality Assurance
+**Program Studi Teknik Informatika — Universitas Kebangsaan RI (UKRI)**
 
 ---
 
-## 📖 Apa itu Black Box Testing?
+## Tentang Sistem
 
-**Black Box Testing** adalah metode pengujian perangkat lunak yang **menguji sistem tanpa mengetahui desain internalnya** (Priyaungga et al., 2020). Teknik ini berfokus pada **informasi dari perangkat lunak** dan menghasilkan test case dengan cara **mempartisi masukan dan keluaran** dari sebuah program untuk mencakup pengujian yang menyeluruh (Destiningrum & Adrian, 2017).
+**SaPoPoe FINANCE** (Midnight Finance) adalah aplikasi manajemen keuangan pribadi berbasis web dengan arsitektur:
 
-### Karakteristik Utama
-
-| Aspek | Penjelasan |
+| Komponen | Teknologi |
 |---|---|
-| **Akses Kode** | Tidak membutuhkan akses ke source code |
-| **Fokus** | Input → Output (functional behavior) |
-| **Sudut Pandang** | Pengguna akhir (end user) |
-| **Pelaku** | QA Tester, Business Analyst, atau end user |
-| **Tujuan** | Memvalidasi fungsionalitas sesuai spesifikasi |
+| Backend | Laravel 11 + Laravel Sanctum (REST API) |
+| Frontend | React.js + Vite |
+| Database | MySQL |
+| Auth | Token-based (Sanctum Bearer Token) |
 
-### Perbandingan dengan White Box Testing
+**Modul yang Diuji:**
 
-| Aspek | White Box | Black Box |
+| Modul | Endpoint Utama | Fungsi |
 |---|---|---|
-| **Pengetahuan kode** | Wajib | Tidak diperlukan |
-| **Fokus** | Struktur internal | Behavior eksternal |
-| **Tester** | Developer/QA Engineer | QA Tester/End User |
-| **Test Design** | Berdasarkan kode | Berdasarkan spesifikasi |
-| **Contoh teknik** | Basis Path, Data Flow | BVA, Equivalence Partitioning |
+| Autentikasi | `POST /api/login` | Login pengguna |
+| Transfer | `POST /api/transfers` | Pindah dana antar brankas |
+| Transaksi | `POST /api/transactions` | Catat pemasukan / pengeluaran |
+| Tabungan | `POST /api/savings` | Buat & kelola target tabungan |
 
 ---
 
-## 🎯 Tujuan Dokumentasi
+## Struktur Dokumentasi
 
-Dokumentasi ini berisi **10 model Black Box Testing** yang diterapkan pada modul-modul kritis sistem **Midnight Finance**. Setiap model menjelaskan:
-
-- ✅ Definisi formal & konsep dasar
-- ✅ Tujuan pengujian
-- ✅ Spesifikasi modul yang diuji (input/output)
-- ✅ Tabel test case dengan expected vs actual
-- ✅ Screenshot bukti pengujian (sebagian)
-- ✅ Analisis hasil & temuan
-- ✅ Kelebihan & kekurangan
-- ✅ Tools yang relevan
-
----
-
-## 📂 Daftar Model Pengujian
-
-| # | Model | File | Modul Target | Tingkat Kompleksitas |
-|---|---|---|---|---|
-| 1 | **Equivalence Partitioning** | [`Equivalence_Partitioning.md`](./Equivalence_Partitioning.md) | Form Registrasi User | 🟢 Low |
-| 2 | **Boundary Value Analysis** | [`Boundary_Value_Analysis.md`](./Boundary_Value_Analysis.md) | Input Amount Transaksi | 🟢 Low |
-| 3 | **Decision Table Testing** | [`Decision_Table_Testing.md`](./Decision_Table_Testing.md) | Status Anggaran (Safe/Warning/Overbudget) | 🟡 Medium |
-| 4 | **Sample Testing** | [`Sample_Testing.md`](./Sample_Testing.md) | Sampling Transaksi Dataset Besar | 🟡 Medium |
-| 5 | **Robustness Testing** | [`Robustness_Testing.md`](./Robustness_Testing.md) | Login dengan Input Ekstrem | 🔴 High |
-| 6 | **Comparison Testing** | [`Comparison_Testing.md`](./Comparison_Testing.md) | API Response v1 vs v2 | 🟡 Medium |
-| 7 | **Behaviour Testing (BDD)** | [`Behaviour_Testing.md`](./Behaviour_Testing.md) | Flow Registrasi → Login → Transaksi | 🔴 High |
-| 8 | **Performance Testing** | [`Performance_Testing.md`](./Performance_Testing.md) | Endpoint Analytics Dashboard | 🔴 High |
-| 9 | **Endurance Testing** | [`Endurance_Testing.md`](./Endurance_Testing.md) | Generate Report 1000x Berulang | 🟡 Medium |
-| 10 | **Cause-Effect Relationship** | [`Cause_Effect_Relationship.md`](./Cause_Effect_Relationship.md) | Analisis "Why Dashboard Slow?" | 🟡 Medium |
-
----
-
-## 🗺️ Klasifikasi Model
-
-```mermaid
-graph TD
-    A[Black Box Testing] --> B[Input-Based Testing]
-    A --> C[Logic-Based Testing]
-    A --> D[Quality Attribute Testing]
-    A --> E[Analysis-Based Testing]
-
-    B --> B1[Equivalence Partitioning]
-    B --> B2[Boundary Value Analysis]
-    B --> B3[Sample Testing]
-    B --> B4[Robustness Testing]
-
-    C --> C1[Decision Table Testing]
-    C --> C2[Behaviour Testing/BDD]
-
-    D --> D1[Performance Testing]
-    D --> D2[Endurance Testing]
-    D --> D3[Comparison Testing]
-
-    E --> E1[Cause-Effect Relationship]
-
-    style A fill:#1e293b,stroke:#3b82f6,color:#fff
-    style B fill:#0f766e,stroke:#14b8a6,color:#fff
-    style C fill:#7c2d12,stroke:#ea580c,color:#fff
-    style D fill:#7e22ce,stroke:#a855f7,color:#fff
-    style E fill:#854d0e,stroke:#eab308,color:#fff
+```
+midnight-sqa/
+├── README.md                        ← file ini
+│
+├── BB-01-boundary-value-analysis.md
+├── BB-02-equivalence-partitioning.md
+├── BB-03-decision-table-testing.md
+├── BB-04-comparison-testing.md
+├── BB-05-sample-testing.md
+├── BB-06-behaviour-testing.md
+├── BB-07-performance-testing.md
+├── BB-08-endurance-testing.md
+├── BB-09-cause-effect-testing.md
+│
+├── WB-01-desk-checking.md
+├── WB-02-code-walkthrough.md
+├── WB-03-formal-inspections.md
+├── WB-04-control-flow.md
+├── WB-05-basic-path.md
+├── WB-06-data-flow.md
+├── WB-07-loop-testing.md
+│
+└── screenshots/                     ← 32 screenshot bukti pengujian
 ```
 
-**Klasifikasi:**
-- **Input-Based:** Berfokus pada partisi & validasi input
-- **Logic-Based:** Berfokus pada kombinasi kondisi & perilaku
-- **Quality Attribute:** Berfokus pada non-functional requirements
-- **Analysis-Based:** Berfokus pada root cause analysis
+---
+
+## Daftar Pengujian Black Box (BB)
+
+| Kode | Teknik | Modul Diuji | TC | Passed | Failed | Diagram |
+|---|---|---|---|---|---|---|
+| [BB-01](BB-01-boundary-value-analysis.md) | Boundary Value Analysis | Auth · Transfer · Transaksi · Tabungan | 24 | 23 | 1 | Class Diagram |
+| [BB-02](BB-02-equivalence-partitioning.md) | Equivalence Partitioning | Auth · Transfer · Transaksi · Tabungan | 12 | 12 | 0 | — |
+| [BB-03](BB-03-decision-table-testing.md) | Decision Table Testing | Auth · Transfer · Transaksi · Tabungan | 13 | 13 | 0 | Decision Table |
+| [BB-04](BB-04-comparison-testing.md) | Comparison Testing | Auth · Transfer · Transaksi · Tabungan | — | — | — | Flowchart |
+| [BB-05](BB-05-sample-testing.md) | Sample Testing | Auth · Transfer · Transaksi · Tabungan | 12 | 11 | 1 | Class Diagram |
+| [BB-06](BB-06-behaviour-testing.md) | Behaviour Testing (BDD) | Auth · Transfer · Transaksi · Tabungan | 12 | 11 | 1 | Sequence + State Diagram |
+| [BB-07](BB-07-performance-testing.md) | Performance Testing | Dashboard (`/dashboard`) | 3 | 2 | 0⚠️ | Flowchart |
+| [BB-08](BB-08-endurance-testing.md) | Endurance Testing | Auth · Transfer · Transaksi · Tabungan | 20 iter | 15 | 5 | Flowchart |
+| [BB-09](BB-09-cause-effect-testing.md) | Cause-Effect Relationship | Auth · Transfer · Transaksi · Tabungan | 20 | 13 | 2 | Fishbone (4 diagram) |
 
 ---
 
-## 📊 Tabel Perbandingan Singkat
+## Daftar Pengujian White Box (WB)
 
-| Model | Tipe | Fokus Utama | Output |
+| Kode | Teknik | Fokus Analisis | Diagram |
 |---|---|---|---|
-| Equivalence Partitioning | Input | Partisi kelas input | Tabel kelas valid/invalid |
-| Boundary Value Analysis | Input | Nilai batas (min/max ± 1) | Tabel boundary test |
-| Decision Table | Logic | Kombinasi kondisi | Truth table |
-| Sample Testing | Input | Sampling dari kelas | Subset test data |
-| Robustness | Input | Input di luar spesifikasi | Error handling report |
-| Comparison | Quality | Konsistensi antar versi | Diff report |
-| Behaviour (BDD) | Logic | User journey | Gherkin scenario |
-| Performance | Quality | Speed, scalability | Metrics report |
-| Endurance | Quality | Stabilitas jangka panjang | Long-run test log |
-| Cause-Effect | Analysis | Root cause | Fishbone diagram |
+| [WB-01](WB-01-desk-checking.md) | Desk Checking | Review kode manual tanpa eksekusi | — |
+| [WB-02](WB-02-code-walkthrough.md) | Code Walkthrough | Penjelasan alur kode per fungsi | — |
+| [WB-03](WB-03-formal-inspections.md) | Formal Inspections | Inspeksi formal dengan checklist | — |
+| [WB-04](WB-04-control-flow.md) | Control Flow Testing | Alur percabangan & kondisi | Flowchart |
+| [WB-05](WB-05-basic-path.md) | Basic Path Testing | Jalur independen (cyclomatic complexity) | Graph |
+| [WB-06](WB-06-data-flow.md) | Data Flow Testing | Definisi & penggunaan variabel | — |
+| [WB-07](WB-07-loop-testing.md) | Loop Testing | Pengujian struktur perulangan | — |
 
 ---
 
-## 🛠️ Tools yang Digunakan
+## Rekapitulasi Defect yang Ditemukan
 
-| Kategori | Tool | Kegunaan |
-|---|---|---|
-| **API Testing** | Postman, Insomnia | Test endpoint REST API |
-| **E2E Testing** | Cypress, Playwright | Behaviour & end-to-end |
-| **BDD Framework** | Behat, Cucumber | Scenario-based testing |
-| **Performance** | JMeter, k6, Lighthouse | Load & speed testing |
-| **Monitoring** | Pingdom, PageSpeed Insights | Real-world performance |
-| **Manual Testing** | TestRail, Google Sheets | Test case management |
-| **Fishbone** | draw.io, Lucidchart | Root cause analysis |
+| No | Defect | Ditemukan di | Modul | Severity | Status |
+|---|---|---|---|---|---|
+| 1 | Expense tanpa validasi saldo → saldo negatif | BB-01, BB-05, BB-06, BB-09 | Transaksi | 🔴 **Kritis** | Belum diperbaiki |
+| 2 | `GET /api/transfers` selalu return HTTP 500 | BB-08, BB-09 | Transfer | 🔴 **Kritis** | Belum diperbaiki |
+
+### Detail Defect
+
+**Defect #1 — Saldo Negatif pada Modul Transaksi**
+- **Cause:** `TransactionController::store()` tidak memvalidasi kecukupan saldo sebelum mencatat expense
+- **Effect:** Saldo brankas bisa menjadi negatif (contoh: Rp -994.649.999)
+- **Rekomendasi:**
+```php
+// Tambahkan di TransactionController::store() sebelum simpan transaksi
+if ($request->type === 'expense' && $wallet->balance < $request->amount) {
+    return response()->json(['error' => 'Saldo tidak mencukupi'], 400);
+}
+```
+
+**Defect #2 — GET Riwayat Transfer HTTP 500**
+- **Cause:** Bug di `TransferController@index()` — kemungkinan relasi Eloquent gagal di-load
+- **Effect:** Halaman riwayat transfer tidak bisa ditampilkan, endpoint selalu error
+- **Rekomendasi:** Debug query di `TransferController@index()`, periksa relasi `with()` yang digunakan
 
 ---
 
-## 🚀 Cara Membaca Dokumentasi
+## Ringkasan Hasil Seluruh Pengujian
 
-1. **Mulai dari file ini** untuk memahami big picture
-2. **Buka file per model** sesuai urutan tabel di atas (low → high complexity)
-3. **Lengkapi screenshot** sesuai marker `📸 SCREENSHOT NEEDED:` di setiap file
-4. **Jalankan test case** sesuai instruksi di tiap model
-5. **Update tabel "Hasil Eksekusi"** dengan data aktual
+```
+Black Box Testing
+─────────────────────────────────────────────────────
+Total Test Case        : 116
+Passed                 : 100
+Failed / Bug           :   2 defect kritis
+Warning / Kelemahan    :   5 area perlu peningkatan
 
-```bash
-# Menjalankan API test (dari root midnight-finance-backend)
-php artisan test --testsuite=Feature
+White Box Testing
+─────────────────────────────────────────────────────
+Teknik digunakan       : 7 teknik
+Modul dianalisis       : 4 modul (Auth, Transfer, Transaksi, Tabungan)
+Temuan                 : Konsisten dengan temuan Black Box
 
-# Menjalankan E2E test
-npm run cypress:run
-
-# Performance test
-npx lighthouse https://midnight-finance.local --view
+Bukti Pengujian
+─────────────────────────────────────────────────────
+Total Screenshot       : 32 gambar
+Tersimpan di           : screenshots/
 ```
 
 ---
 
-## 📚 Referensi
+## Screenshot Tersedia
 
-1. Priyaungga, R., et al. (2020). *Pengujian Sistem Informasi dengan Black Box Testing*. Jurnal Teknik Informatika.
-2. Destiningrum, M., & Adrian, Q. J. (2017). *Sistem Informasi Penjadwalan Dokter Berbasis Web dengan Menggunakan Framework Codeigniter*. Jurnal TEKNOINFO.
-3. Suprihadi, D. (2025). *Materi Software Quality Pertemuan 11 — Black Box Testing*. Universitas Kristen Indonesia.
-4. Myers, G. J., Sandler, C., & Badgett, T. (2011). *The Art of Software Testing* (3rd ed.). Wiley.
-5. Beizer, B. (1995). *Black-Box Testing: Techniques for Functional Testing of Software and Systems*. Wiley.
-6. ISTQB. (2023). *Certified Tester Foundation Level Syllabus v4.0*. International Software Testing Qualifications Board.
-
----
-
-## 🔗 Dokumentasi Terkait
-
-- [⬅ White Box Testing](../White%20Box%20Testing/README.md) — Pengujian struktur internal
-- [📁 Grey Box Testing](../Grey%20Box%20testing/) — Kombinasi white & black box
-- [📁 Test Plan](../../Test%20Plan/) — Rencana pengujian komprehensif
+| Prefix | Modul | Jumlah |
+|---|---|---|
+| `bva-*` | BVA (BB-01) | 9 |
+| `ep-*` | Equivalence Partitioning (BB-02) | 5 |
+| `sample-*` | Sample Testing (BB-05) | 12 |
+| `perf-*` | Performance Testing (BB-07) | 2 |
+| `endurance-*` | Endurance Testing (BB-08) | 4 |
 
 ---
 
-<div align="center">
-
-**Dokumentasi disusun oleh Tim REMACode**
-
-*"Testing shows the presence, not the absence of bugs." — Edsger W. Dijkstra*
-
-</div>
+> Dokumentasi ini dibuat sebagai bagian dari **Ujian Akhir Semester (UAS) mata kuliah Software Quality**, Program Studi Teknik Informatika, Universitas Kebangsaan RI (UKRI), 2025/2026.
