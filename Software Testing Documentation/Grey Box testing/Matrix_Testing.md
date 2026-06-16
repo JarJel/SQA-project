@@ -60,6 +60,11 @@ Untuk setiap kombinasi parameter dan kondisi dalam tabel matriks, jalankan test 
 | 7 | Tidak Terdaftar (`tidakada@test.com`) | Salah (`salahpassword`) | Lengkap | Ditolak — email tidak ditemukan | "Alamat email tidak ditemukan." | ✅ Passed |
 | 8 | Tidak Terdaftar (`tidakada@test.com`) | Salah (`salahpassword`) | Tidak Lengkap | Ditolak — email tidak ditemukan | "Alamat email tidak ditemukan." | ✅ Passed |
 
+### Screenshot Bukti — TC1 (Login Berhasil)
+
+<img width="1920" height="1080" alt="matrix-auth-tc1" src="https://github.com/user-attachments/assets/34e6ddd5-837e-4ad7-a938-a2a76c635e76" />
+
+
 ### 4. Analisis Hasil Test
 
 - **Tidak ada kombinasi parameter yang menyebabkan test case gagal.**
@@ -108,6 +113,11 @@ Untuk setiap kombinasi parameter dan kondisi dalam tabel matriks, jalankan test 
 | 6 | Invalid — `0` | Mencukupi (Mandiri) | Tidak Dipilih | Ditolak — amount tidak valid | "Harap isi bidang ini." | ✅ Passed |
 | 7 | Invalid — `0` | Tidak Mencukupi (BCA) | Dipilih (BSI) | Ditolak — amount tidak valid | "Harap isi bidang ini." | ✅ Passed |
 | 8 | Invalid — `0` | Tidak Mencukupi (BCA) | Tidak Dipilih | Ditolak — amount tidak valid | "Harap isi bidang ini." | ✅ Passed |
+
+### Screenshot Bukti — TC1 (Transfer Berhasil)
+
+<img width="1920" height="1080" alt="matrix-transfer-tc1" src="https://github.com/user-attachments/assets/18fbed88-bc07-42ff-b468-9fe25de136f5" />
+
 
 ### 4. Analisis Hasil Test
 
@@ -158,6 +168,11 @@ Untuk setiap kombinasi parameter dan kondisi dalam tabel matriks, jalankan test 
 | 6 | Invalid — `0` | Income | Tidak Dipilih | Ditolak — amount tidak valid | "Harap isi bidang ini." | ✅ Passed |
 | 7 | Invalid — `0` | Expense | Dipilih (BSI) | Ditolak — amount tidak valid | "Harap isi bidang ini." | ✅ Passed |
 | 8 | Invalid — `0` | Expense | Tidak Dipilih | Ditolak — amount tidak valid | "Harap isi bidang ini." | ✅ Passed |
+
+### Screenshot Bukti — TC1 (Transaksi Income Berhasil)
+
+<img width="1920" height="1080" alt="matrix-transaksi-tc1" src="https://github.com/user-attachments/assets/430df2b8-18ac-4977-98e2-bb021aca2511" />
+
 
 ### 4. Analisis Hasil Test
 
@@ -212,6 +227,11 @@ Untuk setiap kombinasi parameter dan kondisi dalam tabel matriks, jalankan test 
 | 6 | Invalid — `""` kosong | Valid — `500.000` | Tidak Dipilih | Ditolak — nama & brankas kosong | "Harap isi bidang ini." | ✅ Passed |
 | 7 | Invalid — 300 karakter | Invalid — `0` | Dipilih (BSI) | Ditolak — nama terlalu panjang | "GAGAL — The name field must not be greater than 255 characters." | ✅ Passed |
 | 8 | Invalid — 300 karakter | Invalid — `0` | Tidak Dipilih | Ditolak — nama terlalu panjang | "GAGAL — The name field must not be greater than 255 characters." | ✅ Passed |
+
+### Screenshot Bukti — TC1 (Tabungan Berhasil Dibuat)
+
+<img width="1920" height="1080" alt="matrix-tabungan-tc1" src="https://github.com/user-attachments/assets/67de3643-13f1-4fa4-bfda-f12c35646548" />
+
 
 ### 4. Analisis Hasil Test
 
