@@ -89,7 +89,8 @@ i. Pastikan halaman login tidak dapat diakses setelah berhasil login (redirect k
 
 **Skenario 1a–b — Halaman login tampil benar, login berhasil redirect ke dashboard**
 
-![Auth — Login berhasil, dashboard tampil](screenshots/sample-auth-tc1.png)
+<img width="1920" height="1080" alt="sample-auth-tc1" src="https://github.com/user-attachments/assets/0b5d142d-cfbc-42a7-aa63-27f3cc5397c1" />
+
 
 ---
 
@@ -121,7 +122,8 @@ h. Coba mengirim request `POST /api/login` dengan body kosong sepenuhnya.
 
 **Skenario 2d — Password salah menyebabkan login ditolak**
 
-![Auth TC2 — Password salah, login ditolak](screenshots/sample-auth-tc2.png)
+<img width="1920" height="1080" alt="sample-auth-tc2" src="https://github.com/user-attachments/assets/bd7d58cf-8038-46e1-a127-15e8e9230c69" />
+
 
 ---
 
@@ -144,8 +146,6 @@ d. Buka aplikasi di beberapa browser berbeda (Chrome, Edge, Firefox) untuk melih
 ### Screenshot Bukti
 
 **Skenario 3a — Login 5 iterasi stabil (data dari BB-08 Endurance Testing)**
-
-![Endurance Auth — 5 iterasi login stabil](screenshots/endurance-auth.png)
 
 ---
 
@@ -203,7 +203,8 @@ i. Pastikan sistem mencegah transfer ke brankas yang sama atau memberikan pesan 
 
 **Skenario 1b–c — Transfer berhasil, notifikasi "BERHASIL" tampil**
 
-![Transfer TC1 — Transfer berhasil](screenshots/sample-transfer-tc1.png)
+<img width="1920" height="1080" alt="sample-transfer-tc1" src="https://github.com/user-attachments/assets/b61aab72-804f-4264-b9f2-7042e552ecc0" />
+
 
 ---
 
@@ -235,7 +236,8 @@ h. Coba transfer dengan amount berupa angka negatif melalui direct API call.
 
 **Skenario 2c — Transfer dengan saldo tidak mencukupi ditolak**
 
-![Transfer TC3 — Saldo tidak mencukupi](screenshots/sample-transfer-tc3.png)
+<img width="1920" height="1080" alt="sample-transfer-tc3" src="https://github.com/user-attachments/assets/917cf08b-48a6-4f71-b4c4-2f7188bb709a" />
+
 
 ---
 
@@ -311,7 +313,8 @@ i. Pastikan saldo portofolio diperbarui setelah transaksi dihapus.
 
 **Skenario 1b–c — Income Rp 50.000 berhasil dicatat, saldo bertambah**
 
-![Transaksi TC1 — Income berhasil dicatat](screenshots/sample-transaksi-tc1.png)
+<img width="1920" height="1080" alt="sample-transaksi-tc1" src="https://github.com/user-attachments/assets/25bb75f3-96ad-419b-b6da-68beccd97d2b" />
+
 
 ---
 
@@ -343,7 +346,6 @@ h. Coba catat transaksi dengan amount duplikat berturut-turut (spam submit).
 
 **Skenario 2a — Bug Kritis: expense ekstrem menyebabkan saldo negatif**
 
-![Transaksi TC3 — Saldo BCA menjadi negatif](screenshots/sample-transaksi-tc3.png)
 
 ---
 
@@ -367,7 +369,8 @@ d. Buka halaman transaksi di beberapa browser berbeda untuk melihat kompatibilit
 
 **Skenario 3b — GET transaksi 5 iterasi stabil (data dari BB-08 Endurance Testing)**
 
-![Endurance Transaksi — 5 iterasi 62 record stabil](screenshots/endurance-transaksi.png)
+<img width="1920" height="1080" alt="endurance-transaksi" src="https://github.com/user-attachments/assets/4631ff4d-d997-4f39-9d26-29b9959e8f18" />
+
 
 ---
 
@@ -425,7 +428,8 @@ i. Pastikan tabungan yang dihapus tidak lagi tampil di daftar.
 
 **Skenario 1b–c — Tabungan "TabunganMT" berhasil dibuat dan muncul di daftar**
 
-![Tabungan TC1 — Tabungan berhasil dibuat](screenshots/sample-tabungan-tc1.png)
+<img width="1920" height="1080" alt="sample-tabungan-tc1" src="https://github.com/user-attachments/assets/3b1dccd6-ec6a-4835-b553-c712167c83fd" />
+
 
 ---
 
@@ -457,7 +461,8 @@ h. Coba membuat tabungan dengan nama yang sama dengan tabungan yang sudah ada.
 
 **Skenario 2a — Nama tabungan > 255 karakter ditolak backend**
 
-![Tabungan TC3 — Nama terlalu panjang ditolak](screenshots/sample-tabungan-tc3.png)
+<img width="1920" height="1080" alt="sample-tabungan-tc3" src="https://github.com/user-attachments/assets/e3cc15a1-004f-4c10-aa85-c166ab28db38" />
+
 
 ---
 
@@ -481,7 +486,8 @@ d. Buka halaman Target Impian di beberapa perangkat dan browser berbeda.
 
 **Skenario 3b — GET savings 5 iterasi stabil (data dari BB-08 Endurance Testing)**
 
-![Endurance Tabungan — 5 iterasi 3 record stabil](screenshots/endurance-tabungan.png)
+<img width="1920" height="1080" alt="endurance-tabungan" src="https://github.com/user-attachments/assets/5d26abb7-b2e2-4f2b-b86b-8e07bd66699a" />
+
 
 ---
 
