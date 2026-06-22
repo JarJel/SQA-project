@@ -144,7 +144,7 @@ flowchart TB
 **Modul lain tidak terganggu — Transfer POST masih berhasil saat bug GET aktif**
 
 <img width="1920" height="1080" alt="sample-transfer-tc1" src="https://github.com/user-attachments/assets/b2c1a957-54d9-491c-a7a3-2dd99d7190d3" />
-
+ 
 
 ### Analisis Skenario 2
 
